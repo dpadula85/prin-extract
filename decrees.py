@@ -172,3 +172,17 @@ def update_readme(path, manifest: dict, rows: List[dict]):
     head, rest = text.split(SECTOR_BEGIN, 1)
     tail = rest.split(SECTOR_END, 1)[1]
     p.write_text(f"{head}{SECTOR_BEGIN}\n{sector_table(manifest, rows)}\n{SECTOR_END}{tail}")
+
+
+def describe_changes(old: Optional[dict], new: dict) -> str:
+    """Markdown list of the sectors that are new or whose decree changed between two manifests."""
+    old_dec = (old or {}).get("decrees", {})
+    lines = []
+    for sec in sorted(new["decrees"], key=lambda x: (x[:2], int(x[2:]))):
+        rec = new["decrees"][sec]
+        if sec not in old_dec:
+            lines.append(f"- {sec}: new, decree n. {rec['decree_number']} of {rec['date']} ({rec['page']})")
+        elif old_dec[sec]["decree_number"] != rec["decree_number"]:
+            lines.append(f"- {sec}: decree n. {old_dec[sec]['decree_number']} replaced by n. "
+                         f"{rec['decree_number']} of {rec['date']} ({rec['page']})")
+    return "\n".join(lines) if lines else "No sector is new; files of known sectors changed."

@@ -1,0 +1,9 @@
+requests
+beautifulsoup4
+pypdf
+openpyxl
+pandas
+numpy
+scipy
+matplotlib
+pytest

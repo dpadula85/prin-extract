@@ -25,6 +25,10 @@ Optional: a LaTeX installation (figures use LaTeX text; `analysis.py --no-latex`
 
 `--uni` takes a case-insensitive substring of the institution name or an 11-digit tax code (codice fiscale), matched exactly. Prefer the tax code: `MILANO` also matches Politecnico and Bicocca, whereas `80012650158` is only Statale. `analysis.py` and `report.py` take `--highlight CITY` (default Siena) to colour one city on the maps and to write an institution fact sheet in the report; `report.py --no-compile` writes the LaTeX source only.
 
+## Automatic updates
+
+[.github/workflows/check-new-sectors.yml](.github/workflows/check-new-sectors.yml) runs every day (and on demand from the Actions tab). It runs `prin_extract.py`; if a sector is new or a decree changed, it installs LaTeX, runs the tests, the analysis and the report, and opens a pull request with the new PDFs, tables, figures, report and README, listing the new sectors and whether the tests and the analysis passed. Nothing is committed to the default branch. `analysis.py` also appends the shares of institutions and regions to `prin_out/history.csv` whenever the set of parsed sectors changes, so the numbers can be followed as sectors are published.
+
 ## Sectors
 
 Each sector has its own decree, which gives the funds available to the sector, split into the ring-fenced under-40 pool and the ordinary pool. A decree can be annulled and replaced (PE7: n. 32, replaced by n. 45); only the current one is listed. Sectors that are not parsed are not in any table. The table is rewritten by `prin_extract.py`.

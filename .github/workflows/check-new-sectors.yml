@@ -1,0 +1,88 @@
+name: Check for new PRIN sectors
+
+# Daily: download what the MUR has published, and if a sector is new (or its decree
+# changed) re-run the analysis and the report and open a pull request with the result.
+# Nothing is committed to the default branch.
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install the Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download and parse the published PDFs
+        run: python3 prin_extract.py --csv
+
+      - name: Detect new publications
+        id: changes
+        run: |
+          n=$(git status --porcelain -- prin_out/decrees.json prin_pdfs | wc -l)
+          echo "changed=$([ "$n" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          git show HEAD:prin_out/decrees.json > /tmp/decrees_old.json 2>/dev/null || echo '{}' > /tmp/decrees_old.json
+
+      - name: Install LaTeX
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended cm-super dvipng
+
+      - name: Tests
+        id: tests
+        if: steps.changes.outputs.changed == 'true'
+        continue-on-error: true
+        run: python3 -m pytest tests -q
+
+      - name: Analysis and report
+        id: analysis
+        if: steps.changes.outputs.changed == 'true'
+        continue-on-error: true
+        run: |
+          python3 analysis.py
+          python3 report.py
+
+      - name: Write the pull request text
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          python3 - <<'PY' > pr_body.md
+          import json
+          import decrees
+          old = json.load(open("/tmp/decrees_old.json")) or None
+          new = json.load(open("prin_out/decrees.json"))
+          print("Sectors published since the last update:\n")
+          print(decrees.describe_changes(old, new))
+          print("\nTests: ${{ steps.tests.outcome }}. Analysis and report: ${{ steps.analysis.outcome }}.")
+          print("If a step failed, open its log: a new institution must be added to data/institutions.csv, "
+                "and a parsed count that differs from the PDF means the layout changed.")
+          PY
+
+      - name: Open the pull request
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: data/update
+          title: "New PRIN 2026 sectors"
+          commit-message: "Update the data with the newly published PRIN 2026 sectors"
+          body-path: pr_body.md
+          add-paths: |
+            prin_pdfs
+            prin_out
+            report/report.tex
+            report/report.pdf
+            README.md

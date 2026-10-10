@@ -21,6 +21,7 @@ used only in aggregate.
 Tables go to prin_out/analysis/*.csv, figures to prin_out/figures/*.{pdf,png}.
 """
 import argparse as arg
+import datetime
 import json
 import logging
 from collections import Counter
@@ -649,6 +650,29 @@ def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
     _save(fig, ax, fig_dir, "gender")
 
 
+def update_history(out_dir: Path, d: Data, inst: pd.DataFrame, regions: pd.DataFrame) -> bool:
+    """Append the shares of institutions and regions to prin_out/history.csv when the set of
+    parsed sectors differs from the last entry; return whether rows were added. The file lets
+    the numbers be followed as sectors are published."""
+    path = out_dir / "history.csv"
+    sectors = " ".join(d.sectors)
+    old = pd.read_csv(path) if path.exists() else pd.DataFrame(
+        columns=["date", "n_sectors", "sectors", "kind", "key", "share_of_budget_pct"])
+    if len(old) and old["sectors"].iloc[-1] == sectors:
+        return False
+    stamp = datetime.date.today().isoformat()
+    new = pd.concat([
+        pd.DataFrame({"kind": "institution", "key": inst["short_name"].to_numpy(),
+                      "share_of_budget_pct": inst["share_of_budget_pct"].to_numpy()}),
+        pd.DataFrame({"kind": "region", "key": regions.index.to_numpy(),
+                      "share_of_budget_pct": regions["share_of_budget_pct"].to_numpy()})])
+    new.insert(0, "sectors", sectors)
+    new.insert(0, "n_sectors", len(d.sectors))
+    new.insert(0, "date", stamp)
+    pd.concat([old, new]).to_csv(path, index=False, encoding="utf-8-sig")
+    return True
+
+
 # ------------------------------------------------------------------ main
 
 def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) -> Dict[str, float]:
@@ -698,6 +722,7 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
                                   mur_total=float(r["mur_total"]))
             for _, r in inst[inst["city"] == highlight].iterrows()}
     (tab_dir / "summary.json").write_text(json.dumps(summary, indent=1))
+    update_history(out_dir, d, inst, regions)
     return summary
 
 
