@@ -393,15 +393,26 @@ def fig_map_cities(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: Option
     _save(fig, ax, fig_dir, "map_cities_funding")
 
 
-def fig_sectors(d: Data, sec: pd.DataFrame, fig_dir: Path):
+def fig_sectors(d: Data, sec: pd.DataFrame, u40: pd.DataFrame, fig_dir: Path):
+    """Per sector, two bars: the budget available against the money funded, and the
+    ring-fenced under-40 pool against the money that went to projects of under-40 PIs
+    (those projects can also be funded from the ordinary pool)."""
     fig, ax = _axes(small=True)
     x = np.arange(len(sec))
-    ax.bar(x, sec["budget"] / 1e6, facecolor="none", edgecolor=GREY, lw=2.5, label="available")
-    ax.bar(x, sec["funded"] / 1e6, color=PI_COLOR, width=0.7, label="funded")
+    w = 0.38
+    for off, avail, got, color, names in (
+            (-w / 2, sec["budget"], sec["funded"], PI_COLOR, ("available", "funded")),
+            (w / 2, u40.loc[sec.index, "pool"], u40.loc[sec.index, "money_under40_projects"], U40_COLOR,
+             ("under-40 pool", tex("under-40 PIs' projects")))):
+        ax.bar(x + off, got / 1e6, width=0.8 * w, color=color, label=names[1], zorder=2)
+        ax.bar(x + off, avail / 1e6, width=w, facecolor="none", edgecolor="#555555", lw=2.0,
+               label=names[0], zorder=3)
     ax.set_xticks(x, sec.index, rotation=90)
     ax.xaxis.set_minor_locator(plt.NullLocator())
     ax.set_ylabel(r"MUR funding / M EUR")
-    ax.legend(loc="upper right")
+    handles, labels = ax.get_legend_handles_labels()  # fill, outline, fill, outline
+    ax.legend([handles[1], handles[0], handles[2]],
+              [r"available (budget or pool)", labels[0], labels[2]], loc="upper right", fontsize=20)
     _save(fig, ax, fig_dir, "sector_budgets")
 
 
@@ -487,19 +498,6 @@ def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: in
     _save(fig, ax, fig_dir, "collaboration_map")
 
 
-def fig_under40_pool(d: Data, u40: pd.DataFrame, fig_dir: Path):
-    fig, ax = _axes(small=True)
-    x = np.arange(len(u40))
-    ax.bar(x, u40["pool"] / 1e6, facecolor="none", edgecolor=GREY, lw=2.5, label="under-40 pool")
-    ax.bar(x, u40["money_under40_projects"] / 1e6, color=U40_COLOR, width=0.7,
-           label=tex("projects of under-40 PIs"))
-    ax.set_xticks(x, u40.index, rotation=90)
-    ax.xaxis.set_minor_locator(plt.NullLocator())
-    ax.set_ylabel(r"MUR funding / M EUR")
-    ax.legend(loc="upper center")
-    _save(fig, ax, fig_dir, "under40_pool")
-
-
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
     styles = {"PI, funded": (PI_COLOR, "o"), "Partner-unit leaders, funded": (RU_COLOR, "^")}
     macros = ["PE", "LS", "SH", "All"]
@@ -541,13 +539,12 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     fig_budget_drop(d, inst, fig_dir)
     fig_map_regions(d, regions, fig_dir)
     fig_map_cities(d, inst, fig_dir, highlight)
-    fig_sectors(d, sec, fig_dir)
+    fig_sectors(d, sec, u40, fig_dir)
     fig_ranking(d, sec, fig_dir)
     fig_money(d, fig_dir)
     fig_kinds(d, fig_dir)
     fig_collaboration(d, inst, fig_dir, highlight=highlight)
     fig_gender(d, gt, fig_dir)
-    fig_under40_pool(d, u40, fig_dir)
     summary = dict(n_sectors=len(d.sectors), sectors=d.sectors, budget=d.budget,
                    funded=float(d.units["mur_contribution"].sum()),
                    n_projects=int(d.units["project_code"].nunique()),
