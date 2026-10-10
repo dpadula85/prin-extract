@@ -493,6 +493,17 @@ def fig_kinds(d: Data, fig_dir: Path):
     _save(fig, ax, fig_dir, "institution_types")
 
 
+def shared_projects(d: Data) -> Counter:
+    """Number of funded projects shared by each pair of nodes, a node being a city or the
+    national research bodies taken together (a pair is counted once per project)."""
+    place = d.units.assign(node=np.where(d.units["region"] == NATIONAL, NATIONAL, d.units["city"]))
+    shared: Counter = Counter()
+    for _, g in place.groupby("project_code"):
+        for a, b in combinations(sorted(set(g["node"])), 2):
+            shared[(a, b)] += 1
+    return shared
+
+
 def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: int = 8,
                       highlight: Optional[str] = None):
     """Collaboration graph on the map: nodes are cities (area ~ funding), a link joins two
@@ -503,10 +514,7 @@ def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: in
     pos = {c: (r["lon"], r["lat"]) for c, r in city.iterrows()}
     pos[NATIONAL] = (11.2, 38.9)
     place = d.units.assign(node=np.where(d.units["region"] == NATIONAL, NATIONAL, d.units["city"]))
-    shared: Counter = Counter()
-    for _, g in place.groupby("project_code"):
-        for a, b in combinations(sorted(set(g["node"])), 2):
-            shared[(a, b)] += 1
+    shared = shared_projects(d)
     nat_mur = float(place.loc[place["node"] == NATIONAL, "mur_contribution"].sum())
     fig, ax = _axes(small=True)
     _draw_regions(ax, None, None, None, label_values=False)
@@ -578,6 +586,49 @@ def fig_breadth(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: Optional[
     _save(fig, ax, fig_dir, "institution_breadth")
 
 
+def fig_neighbours(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str, window: int = 5):
+    """The highlighted institution and the ones ranked just above and below it by funding."""
+    pos = int(np.flatnonzero((inst["city"] == highlight).to_numpy())[0])
+    sel = inst.iloc[max(pos - window, 0):pos + window + 1][::-1]
+    fig, ax = _axes(small=True)
+    y = np.arange(len(sel))
+    colors_ = [RU_COLOR if c == highlight else PI_COLOR for c in sel["city"]]
+    ax.barh(y, sel["share_of_budget_pct"], color=colors_)
+    ax.set_yticks(y, [tex(f"{r} {n}") for r, n in zip(sel["rank"], sel["short_name"])])
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.set_xlabel(r"Share of total budget / \%")
+    _save(fig, ax, fig_dir, "highlight_neighbours")
+
+
+def fig_ego_map(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str):
+    """Map of the cities sharing projects with the highlighted one (width ~ number of projects)."""
+    city = _city_table(d, inst)
+    pos = {c: (r["lon"], r["lat"]) for c, r in city.iterrows()}
+    pos[NATIONAL] = (11.2, 38.9)
+    place = d.units.assign(node=np.where(d.units["region"] == NATIONAL, NATIONAL, d.units["city"]))
+    mine = set(place.loc[place["city"] == highlight, "project_code"])
+    shared: Counter = Counter()
+    for _, g in place[place["project_code"].isin(mine)].groupby("project_code"):
+        for n in set(g["node"]) - {highlight}:
+            shared[n] += 1
+    fig, ax = _axes(small=True)
+    _draw_regions(ax, None, None, None, label_values=False)
+    for n, w in shared.items():
+        ax.plot([pos[highlight][0], pos[n][0]], [pos[highlight][1], pos[n][1]], color=RU_COLOR,
+                lw=0.8 + 0.9 * w, alpha=0.7, solid_capstyle="round", zorder=2)
+    names = [highlight] + list(shared)
+    xy = np.array([pos[n] for n in names])
+    for k, n in enumerate(names):
+        ax.scatter(*xy[k], s=500 if k == 0 else 300, marker="D" if n == NATIONAL else "o", zorder=3,
+                   color=RU_COLOR if k == 0 else (GREY if n == NATIONAL else PI_COLOR), alpha=0.9,
+                   edgecolor="white", lw=1.0)
+    _place_labels(fig, ax, xy, np.full(len(names), np.sqrt(300 / np.pi)), list(range(len(names))),
+                  [tex("National bodies" if n == NATIONAL else n) for n in names], fontsize=16,
+                  colors=[RU_COLOR if k == 0 else None for k in range(len(names))], backing=True)
+    ax.set_title(tex(f"{highlight}: cities sharing projects, {_stamp(d)}"), fontsize=22)
+    _save(fig, ax, fig_dir, "highlight_map")
+
+
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
     styles = {"PI, funded": (PI_COLOR, "o"), "Partner-unit leaders, funded": (RU_COLOR, "^")}
     macros = ["PE", "LS", "SH", "All"]
@@ -629,6 +680,9 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     fig_gender(d, gt, fig_dir)
     fig_region_roles(d, regions, areas, fig_dir)
     fig_breadth(d, inst, fig_dir, highlight)
+    if highlight:
+        fig_neighbours(d, inst, fig_dir, highlight)
+        fig_ego_map(d, inst, fig_dir, highlight)
     summary = dict(n_sectors=len(d.sectors), sectors=d.sectors, budget=d.budget,
                    funded=float(d.units["mur_contribution"].sum()),
                    n_projects=int(d.units["project_code"].nunique()),

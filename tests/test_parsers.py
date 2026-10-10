@@ -134,3 +134,21 @@ def test_macro_areas_cover_every_region_except_national_bodies():
         regions.drop(analysis.NATIONAL)["mur_total"].sum())
     listed = {r for rs in analysis.MACRO_AREA.values() for r in rs}
     assert listed == set(regions.index) - {analysis.NATIONAL}
+
+
+def test_report_text_has_every_section_and_no_missing_numbers():
+    import report
+    tex = report.build(OUT, "Siena")
+    for title in ("Scope", "Budget and funded money per sector", "Geography", "Gender of the unit leaders",
+                  "Institution fact sheet: Siena", "All institutions"):
+        assert title in tex
+    assert "nan" not in tex.replace("Finance", "").lower().split("\\begin{document}")[1].replace("financ", "")
+    assert tex.count(r"\begin{figure}") == tex.count(r"\end{figure}")
+
+
+def test_readme_results_block_numbers_come_from_the_tables():
+    import report
+    block = report.readme_results(OUT)
+    d = analysis.load(OUT)
+    assert f"{d.budget / 1e6:.2f} M EUR" in block
+    assert f"{d.units['project_code'].nunique()}, {len(d.units)}" in block

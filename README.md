@@ -1,26 +1,33 @@
 # prin-extract
 
-Extract the funded projects of the Italian **PRIN 2026** call (MUR, *Tabella B – Progetti finanziati*) from the official PDFs into a searchable table, and filter them by university.
+Turns the official results of the Italian **PRIN 2026** call into searchable tables, and analyses who received the money: by sector, region, institution type, project role, PI age group and gender of the unit leaders.
 
-The MUR publishes the results as one PDF per ERC-style sector (PE = Physical Sciences & Engineering, LS = Life Sciences, SH = Social Sciences & Humanities). They are hard to search: one project spans several rows (the coordinating unit and its partners) and the title sits apart from the rows. This tool turns them into a flat table with one row per research unit.
+The MUR (Ministry of University and Research) publishes the results as one decree per ERC sector (PE = Physical Sciences and Engineering, LS = Life Sciences, SH = Social Sciences and Humanities), each with three PDFs: the decree with the funds of the sector, the ranking of the projects judged fundable (Tabella A), and the funded projects (Tabella B). A funded project spans several rows (the coordinating unit and its partner units) and its title sits apart from them, so the PDFs cannot be searched or summed directly. This tool reads them into flat tables, one row per research unit.
 
-Source: <https://prin.mur.gov.it/Pages/Index/301>
+Source: <https://prin.mur.gov.it/Pages/Index/301>. Sectors are published one after the other, so every result below is provisional.
 
-## Contents
+## Install
 
-| Path | What it is |
-|---|---|
-| `prin_extract.py` | The script: finds/downloads the PDFs, parses them, writes the tables |
-| `prin_pdfs/` | The Tabella B PDFs as downloaded from MUR; `decrees/` and `tabella_a/` hold each sector's decree and ranking |
-| `prin_out/decrees.json` | Current decree of each sector (links, number, date) and the funds per sector |
-| `common.py`, `decrees.py` | Shared helpers; decree scraping, funds table, README sector table |
-| `prin_out/prin2026_funded_projects.xlsx` | Excel output: `Summary`, one sheet per `--uni`, `All units` |
-| `prin_out/all_rows.csv` | Every parsed unit (726 rows) |
-| `prin_out/SIENA.csv` | Units of Università degli Studi di Siena (8 projects, 5 as coordinator) |
+```
+pip install requests beautifulsoup4 pypdf openpyxl pandas numpy scipy matplotlib
+```
+
+Optional: a LaTeX installation (figures use LaTeX text; `analysis.py --no-latex` falls back on matplotlib's own) and `pdflatex` for the report.
+
+## Which command do I need?
+
+| I want | Run | Needs | Writes |
+|---|---|---|---|
+| The tables of all funded units and of the ranking | `python3 prin_extract.py --csv` | network, or the PDFs already in `prin_pdfs/` with `--no-download` | `prin_out/all_rows.csv`, `ranking.csv`, `decrees.json`, the Excel file, the sector table below |
+| The projects of one or more institutions | `python3 prin_extract.py --uni 80002070524 --csv` | same | one CSV and one Excel sheet per `--uni` |
+| Tables and figures of the analysis | `python3 analysis.py` | the output of `prin_extract.py --csv` | `prin_out/analysis/*.csv`, `prin_out/figures/*.{pdf,png}` |
+| The PDF report | `python3 report.py` | the output of `analysis.py`, `pdflatex` | `report/report.pdf`, the results block below |
+
+`--uni` takes a case-insensitive substring of the institution name or an 11-digit tax code (codice fiscale), matched exactly. Prefer the tax code: `MILANO` also matches Politecnico and Bicocca, whereas `80012650158` is only Statale. `analysis.py` and `report.py` take `--highlight CITY` (default Siena) to colour one city on the maps and to write an institution fact sheet in the report; `report.py --no-compile` writes the LaTeX source only.
 
 ## Sectors
 
-Each ERC sector is approved by its own decree (*Decreto Direttoriale*), which carries the final ranking (Tabella A), the funded projects (Tabella B) and the funds available to the sector, split into the ring-fenced under-40 pool and the ordinary pool. A decree can be annulled and replaced (PE7: n. 32, replaced by n. 45); only the current one is listed. Sectors that are not parsed are **not** in the tables. The table is rewritten by the script.
+Each sector has its own decree, which gives the funds available to the sector, split into the ring-fenced under-40 pool and the ordinary pool. A decree can be annulled and replaced (PE7: n. 32, replaced by n. 45); only the current one is listed. Sectors that are not parsed are not in any table. The table is rewritten by `prin_extract.py`.
 
 <!-- sectors:begin -->
 18 of 28 sectors parsed.
@@ -57,43 +64,118 @@ Each ERC sector is approved by its own decree (*Decreto Direttoriale*), which ca
 | SH8 | not yet published | | 8.96 | | |
 <!-- sectors:end -->
 
-`prin_pdfs/` also holds `PE7_..._Progetti finanziati.pdf` and `PE7_..._Progetti_finanziati.pdf`, byte-identical copies of the same table; the script de-duplicates them.
+## Results
 
-## Install
+<!-- results:begin -->
+Provisional: 18 of 28 sectors. Regenerate with `python3 analysis.py` and `python3 report.py`; the full report is [report/report.pdf](report/report.pdf).
 
-```
-pip install requests beautifulsoup4 pypdf openpyxl pandas
-```
+| Quantity | Value |
+|---|---|
+| Budget of the parsed sectors | 164.01 M EUR |
+| Funded | 155.40 M EUR (94.8% of the budget) |
+| Projects, units | 144, 726 (144 PI, 582 RU) |
+| Institutions with a funded unit | 84 |
+| Share by institution type | Public univ. 76.9%, Private univ. 3.9%, Telematic univ. 1.3%, Advanced schools 2.7%, Research bodies 0.5%, National bodies 9.4%, AFAM 0.1% |
+| Share by macro-area | North 41.8% (of which 30% as PI), Centre 23.4% (of which 21% as PI), South and Islands 20.2% (of which 24% as PI); national research bodies 9.4% |
+| Median MUR contribution per unit | 258 k EUR (PI), 193 k EUR (RU) |
+| Projects of under-40 PIs | 37 projects, 40.11 M EUR (25.8% of the funded money); under-40 pools 24.32 M EUR |
+| Women among unit leaders | 33% of PIs, 37% of partner-unit leaders |
 
-## Usage
+![Share of the total budget by region (national research bodies not shown).](prin_out/figures/map_regions_share.png)
+*Share of the total budget by region (national research bodies not shown).*
 
-```
-# download the PDFs and filter for one or more universities
-python3 prin_extract.py --uni SIENA --uni PISA --uni 80002070524 --csv
+![Per macro-area and region, share of the funding received as coordinating (PI) and partner (RU) units.](prin_out/figures/regions_roles.png)
+*Per macro-area and region, share of the funding received as coordinating (PI) and partner (RU) units.*
 
-# offline, using the PDFs already in prin_pdfs/
-python3 prin_extract.py --uni SIENA --no-download --csv
-```
+![Per sector, in percent of the total budget: budget available and money funded, with the projects of under-40 PIs in green.](prin_out/figures/sector_budgets.png)
+*Per sector, in percent of the total budget: budget available and money funded, with the projects of under-40 PIs in green.*
 
-Options: `--uni` (repeatable, required), `--pdf-dir` (default `prin_pdfs`), `--out` (default `prin_out`), `--no-download`, `--csv`.
+![Share of the total budget by institution type.](prin_out/figures/institution_types.png)
+*Share of the total budget by institution type.*
 
-`--uni` takes either a case-insensitive substring of the institution name or an 11-digit tax code (codice fiscale), matched exactly. Prefer the tax code: `MILANO` also matches Politecnico and Bicocca, whereas `80012650158` is only Statale.
+![Share of women among unit leaders, with 95% intervals.](prin_out/figures/gender.png)
+*Share of women among unit leaders, with 95% intervals.*
+<!-- results:end -->
+
+## What the analysis computes
+
+| Output | Question it answers |
+|---|---|
+| Share of the budget by sector, with the under-40 PIs' projects | How the funded money compares with the budget of each sector |
+| Share by institution type, region, macro-area | Where the money went |
+| PI and RU split by region | Which part of a region's money came from coordinating and which from partner units |
+| Money per unit | The distribution of the contribution to a single unit |
+| Gender of unit leaders | The share of women among PIs and partner-unit leaders, with Wilson 95% intervals |
+| Per-institution tables, collaboration graph, breadth | In `prin_out/analysis/` and the report: ranks, shared projects between cities, sectors per institution |
+
+Definitions: the *budget* is the sum, over the parsed sectors, of the funds the decrees make available (under-40 pool plus ordinary pool); a *share* is the MUR contribution divided by that budget; a project's money is the sum of its units' contributions. National research bodies (CNR, INAF, INFN, INGV) are multi-site and have no region, so they are a separate bucket in the regional tables and are left off the maps.
+
+## Hand-made tables in `data/`
+
+| File | Content | When to edit |
+|---|---|---|
+| `institutions.csv` | tax code, short name, city, region, coordinates, type of each institution | when a new sector brings an institution not listed: `analysis.py` stops with its name |
+| `given_names.csv` | first given name, gender (F or M), and whether it was assigned by hand or by the Italian ending rule | `analysis.py` logs a warning with the names it does not find; a missing name falls back on the ending rule |
+| `italy_regions.geojson` | simplified region boundaries (ISTAT administrative boundaries, via the openpolis/geojson-italy repository) | never |
+
+Gender is inferred from the first given name only, is binary, and is meant for aggregate use.
 
 ## Output columns
 
-`sector`, `project_code`, `title`, `role` (PI = coordinating unit, RU = partner unit), `name` (unit leader), `institution`, `cf` (institution tax code), `mur_contribution` (EUR), `total_cost` (EUR), `coordinator` (name and institution of the project's PI).
+`all_rows.csv`, one row per funded unit: `sector`, `project_code`, `title`, `role` (PI = coordinating unit, RU = partner unit), `name` (unit leader), `institution`, `cf` (tax code), `mur_contribution` and `total_cost` (EUR, Tabella B columns "Contributo MUR" and "Costo totale"), `coordinator`.
+
+`ranking.csv`, one row per ranked project: `sector`, `rank`, `project_code`, `title`, `pi_given`, `pi_surname`, `score` (total score), `under40` (the PI is printed in green in the MUR tables), `funded`. Only projects tied on the total score carry the tie-break columns `excellence`, `impact`, `equity` (criteria scores), `men`, `women` (team composition) and `birth_year` (day and month are masked in the PDF).
 
 ## How it works
 
-1. `find_pdf_urls` scrapes the PRIN page and the MUR "atti e normativa" pages it links to, keeping PDFs whose name contains `tabella` and `finanziati`. `fetch_pdf` accepts only files that really start with `%PDF-` (the server sometimes answers with an HTML page); failed downloads are listed so they can be saved manually and parsed with `--no-download`.
-2. `pypdf` extracts the text, whitespace is flattened, and two regular expressions are applied: `ROW` matches a unit (`n  PI|RU  name  CODE_unit  institution  tax code  four amounts`) and `TITLE` matches `n. CODE - title`. Project code links the two.
-3. The sector is taken from the PDF file name; duplicate (project, unit) pairs across files are dropped, keeping the newest file and warning if copies differ.
-4. Rows are filtered by `--uni` and written to xlsx (values only, no macros) and optionally CSV.
+1. `decrees.py` scrapes the PRIN page and the MUR pages it links to, keeps the current decree of each sector, and downloads the decree and Tabella A (`prin_pdfs/decrees/`, `prin_pdfs/tabella_a/`). The funds table is read from the decrees; every decree must give the same numbers.
+2. `prin_extract.py` downloads Tabella B, accepting only files that really start with `%PDF-` (the server sometimes answers with an HTML page), flattens the text and applies two regular expressions: one for a unit (`n  PI|RU  name  CODE_unit  institution  tax code  four amounts`) and one for a title. The project code links them. Duplicate (project, unit) pairs across files are dropped, keeping the newest file.
+3. `tabella_a.py` reads the ranking in content-stream order (rank, code, title lines, name lines, score, tie-break cells) and the text colour of each cell to flag under-40 PIs.
+4. `analysis.py` joins the units with `data/`, and writes tables and figures. `report.py` writes `report/report.tex` from the same tables and compiles it.
 
-## Checks and limits
+Checks: for each Tabella B PDF, the number of parsed units equals the number of `CODE_unit` identifiers in its text and the number of titles equals the number of projects; every funded project is in the ranking and the PI names of the two tables agree; the funded money of a sector never exceeds its budget; the regional shares add up to the funded money. Tabella B titles that carry page-footer text or are cut at a page break are replaced by those of Tabella A.
 
-- For each PDF the number of parsed units equals the number of `CODE_unit` identifiers in its text, and the number of titles equals the number of projects, so the regexes miss no rows in the PDFs present.
-- The parsing is automatic and depends on the PDF layout: verify any figure you rely on against the official tables.
-- Amounts are those of the Tabella B columns "Costo totale" and "Contributo MUR"; the other two money columns (co-financing, contribution) are matched but not exported.
+## Limits
 
-The PDFs are public documents of the Ministero dell'Università e della Ricerca; the script is released under the MIT licence.
+- Tabella A contains the projects the evaluation committees judged fundable, not all the projects submitted, so **no success rate (by institution, region, age or gender) can be computed**.
+- The parsing depends on the PDF layout: verify any figure you rely on against the official tables.
+- Under-40 projects can also be funded through the ordinary ranking, so the money going to them is not the use of the under-40 pool.
+
+## When something goes wrong
+
+| Symptom | Cause and fix |
+|---|---|
+| `could not download` a PDF | the server returned HTML: save the file in the folder shown and re-run with `--no-download` |
+| `institutions missing from data/institutions.csv` | a new institution: add its row |
+| warning `given names not in data/given_names.csv` | add the names, or accept the ending rule |
+| a parsed count differs from the PDF | the layout changed: the check in `prin_extract.py` output shows which file |
+| a sector is not in the table | its decree is not published yet, or the page has no Tabella B |
+
+## Tests
+
+```
+python3 -m pytest tests
+```
+
+They run on the PDFs and tables in the repository, without network, in a few seconds.
+
+## Layout
+
+| Path | What it is |
+|---|---|
+| `prin_extract.py` | download and parse Tabella B, write the unit tables |
+| `decrees.py` | decrees, funds per sector, the sector table above |
+| `tabella_a.py` | the ranking and the under-40 flag |
+| `analysis.py`, `style.py` | tables and figures; matplotlib style |
+| `gender.py` | gender from the first given name |
+| `report.py` | the LaTeX report and the results block above |
+| `common.py` | helpers shared by the modules |
+| `data/` | hand-made tables |
+| `prin_pdfs/` | the PDFs as downloaded (`decrees/`, `tabella_a/`, and Tabella B) |
+| `prin_out/` | all outputs |
+| `report/` | the report |
+| `tests/` | tests |
+
+`prin_pdfs/` holds two byte-identical copies of the PE7 Tabella B; the script de-duplicates them.
+
+The PDFs are public documents of the Ministero dell'Università e della Ricerca; the code is released under the MIT licence.
