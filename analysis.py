@@ -242,22 +242,32 @@ def fig_institutions(d: Data, inst: pd.DataFrame, fig_dir: Path, n: int = 20):
     _save(fig, ax, fig_dir, "institutions_share")
 
 
-def fig_concentration(d: Data, inst: pd.DataFrame, fig_dir: Path):
-    """Cumulative share of the funding held by the k best-funded institutions."""
-    x = np.sort(inst["mur_total"].to_numpy())[::-1]
-    k = np.arange(1, len(x) + 1)
-    cum = 100 * np.cumsum(x) / x.sum()
-    fig, ax = _axes()
-    ax.plot(np.concatenate([[0], k]), np.concatenate([[0], cum]), color=PI_COLOR, lw=3)
-    ax.plot([0, len(x)], [0, 100], color=GREY, lw=1.5, ls="--")
-    for n_top, y_key in ((10, 93), (20, 83)):
-        ax.plot(n_top, cum[n_top - 1], "o", color=RU_COLOR, ms=12, zorder=3)
-        ax.plot(3, y_key, "o", color=RU_COLOR, ms=12, zorder=3)
-        ax.text(6, y_key, rf"top {n_top}: {cum[n_top - 1]:.0f}\%", fontsize=30, va="center")
-    ax.set_xlabel(r"Institutions, best funded first / 1")
-    ax.set_ylabel(r"Cumulative funding / \%")
-    ax.set_xlim(0, len(x)), ax.set_ylim(0, 100)
-    _save(fig, ax, fig_dir, "concentration")
+def fig_budget_drop(d: Data, inst: pd.DataFrame, fig_dir: Path, n_named: int = 10):
+    """Budget not yet assigned once the k best-funded institutions are accounted for: it
+    starts at the budget of the parsed sectors and ends at what no unit received."""
+    ranked = inst.sort_values("mur_total", ascending=False)
+    left = (d.budget - np.concatenate([[0.0], np.cumsum(ranked["mur_total"].to_numpy())])) / 1e6
+    top = d.budget / 1e6
+    k = np.arange(len(left))
+    fig, ax = _axes(small=True)
+    ax.step(k, left, where="post", color=PI_COLOR, lw=3)
+    ax.axhline(left[-1], color=GREY, lw=1.5, ls="--")
+    ax.annotate(rf"not assigned: {left[-1]:.1f} M EUR", (0.82 * len(ranked), left[-1]),
+                xytext=(0.82 * len(ranked), 0.2 * top), fontsize=22, ha="center", va="bottom",
+                arrowprops=dict(arrowstyle="-", color="0.5", lw=1.0, shrinkA=2, shrinkB=0))
+    for j, y_text in zip(range(1, n_named + 1), np.linspace(0.97 * top, 0.43 * top, n_named)):
+        share = 100 * (left[j - 1] - left[j]) / top
+        ax.annotate(tex(rf"{ranked['short_name'].iloc[j - 1]} ({share:.1f}%)"),
+                    (j, (left[j - 1] + left[j]) / 2), xytext=(0.27 * len(ranked), y_text),
+                    textcoords="data", fontsize=22, va="center",
+                    arrowprops=dict(arrowstyle="-", color="0.5", lw=1.0, shrinkA=3, shrinkB=2, relpos=(0, 0.5)))
+    ax.set_xlabel(r"Institutions accounted for, best funded first / 1")
+    ax.set_ylabel(r"Budget left / M EUR")
+    ax.set_xlim(0, len(ranked)), ax.set_ylim(0, 1.02 * top)
+    sec = ax.secondary_yaxis("right", functions=(lambda y: 100 * y / top, lambda p: p * top / 100))
+    sec.set_ylabel(r"of budget / \%", fontsize=SMALL["font.size"])
+    sec.tick_params(labelsize=SMALL["xtick.labelsize"])
+    _save(fig, ax, fig_dir, "budget_by_institution")
 
 
 DIRECTIONS = ((1, 0, "left", "center"), (-1, 0, "right", "center"), (0, 1, "center", "bottom"),
@@ -464,7 +474,7 @@ def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: in
     for (a, b), w in sorted(shown.items(), key=lambda kv: (highlight in kv[0], kv[1])):
         hot = highlight in (a, b)
         ax.plot([pos[a][0], pos[b][0]], [pos[a][1], pos[b][1]], color=RU_COLOR if hot else "#4d6d8c",
-                lw=(1.2 + 0.8 * w) if hot else 0.4 * w ** 0.9, alpha=0.8 if hot else 0.45,
+                lw=(0.8 + 0.35 * w) if hot else 0.15 * w ** 0.9, alpha=0.85 if hot else 0.5,
                 solid_capstyle="round", zorder=2.5 if hot else 2)
     names = list(city.index) + [NATIONAL]
     mur = np.concatenate([city["mur"].to_numpy(), [nat_mur]])
@@ -539,7 +549,7 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     global USE_LATEX
     USE_LATEX = use_latex
     fig_institutions(d, inst, fig_dir)
-    fig_concentration(d, inst, fig_dir)
+    fig_budget_drop(d, inst, fig_dir)
     fig_map_regions(d, regions, fig_dir)
     fig_map_cities(d, inst, fig_dir, highlight)
     fig_sectors(d, sec, fig_dir)
