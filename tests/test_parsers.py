@@ -97,3 +97,20 @@ def test_institution_table_keys_every_funded_cf():
     regions = {f["properties"]["region"] for f in
                json.loads((ROOT / "data" / "italy_regions.geojson").read_text())["features"]}
     assert set(inst["region"].dropna()) <= regions
+
+
+def test_under40_flag_agrees_with_the_printed_birth_years():
+    r = pd.read_csv(OUT / "ranking.csv")
+    known = r[r["birth_year"].notna()]
+    assert len(known) > 0
+    assert not known.loc[known["birth_year"] <= 1985, "under40"].any()
+    assert known.loc[known["birth_year"] >= 1987, "under40"].all()
+
+
+def test_under40_table_is_consistent():
+    d = analysis.load(OUT)
+    u = analysis.under40_table(d)
+    assert (u["funded_under40"] <= u["ranked_under40"]).all()
+    assert (u["funded_over40"] <= u["ranked_over40"]).all()
+    assert (u["ranked_under40"] + u["ranked_over40"]).sum() == len(d.ranking)
+    assert (u["funded_under40"] + u["funded_over40"]).sum() == d.units["project_code"].nunique()

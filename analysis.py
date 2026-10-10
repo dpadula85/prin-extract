@@ -23,7 +23,9 @@ Tables go to prin_out/analysis/*.csv, figures to prin_out/figures/*.{pdf,png}.
 import argparse as arg
 import json
 import logging
+from collections import Counter
 from dataclasses import dataclass
+from itertools import combinations
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -32,6 +34,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import cm, colors
 from matplotlib.patches import Polygon
+from matplotlib.ticker import MaxNLocator
 from scipy import stats
 
 import gender
@@ -46,6 +49,7 @@ KIND_LABELS = {"public_university": "Public univ.", "private_university": "Priva
                "research_body": "Research bodies", "national_research_body": "National bodies",
                "afam": "AFAM"}
 PI_COLOR, RU_COLOR, GREY = "#1f4e78", "#c8782a", "#9a9a9a"
+U40_COLOR = "#3f8d15"  # the green the MUR tables print under-40 PIs in
 SMALL = {"xtick.labelsize": 22, "ytick.labelsize": 22, "font.size": 28}
 
 
@@ -188,6 +192,41 @@ def gender_table(d: Data) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def under40_table(d: Data) -> pd.DataFrame:
+    """Per sector: ranked and funded projects by PI age group, the sector's ring-fenced
+    under-40 pool, the MUR money that went to projects of under-40 PIs, and how many of
+    those projects were funded below the best unfunded project of an over-40 PI (so
+    only the under-40 pool can have funded them)."""
+    budgets = d.budgets.set_index("sector")
+    rows = []
+    for sec in d.sectors:
+        r = d.ranking[d.ranking["sector"] == sec]
+        young = r[r["under40"]]
+        best_out = r.loc[~r["funded"] & ~r["under40"], "rank"].min()
+        funded_young = young[young["funded"]]["project_code"]
+        rows.append(dict(
+            sector=sec, ranked_under40=len(young), funded_under40=int(young["funded"].sum()),
+            ranked_over40=len(r) - len(young), funded_over40=int(r[~r["under40"]]["funded"].sum()),
+            pool=budgets.loc[sec, "under40"], ordinary=budgets.loc[sec, "ordinary"],
+            money_under40_projects=d.units.loc[d.units["project_code"].isin(funded_young),
+                                               "mur_contribution"].sum(),
+            funded_below_ordinary_cut=int((young["funded"] & (young["rank"] > best_out)).sum())
+            if not np.isnan(best_out) else 0))
+    return pd.DataFrame(rows).set_index("sector")
+
+
+def under40_rate_table(d: Data) -> pd.DataFrame:
+    """Fraction of ranked projects that were funded, by PI age group, Wilson 95% interval."""
+    rk = d.ranking.assign(macro=d.ranking["sector"].str[:2])
+    rows = []
+    for label, sel in (("PI under 40", rk[rk["under40"]]), ("PI over 40", rk[~rk["under40"]])):
+        for macro in ["PE", "LS", "SH", "All"]:
+            g = sel if macro == "All" else sel[sel["macro"] == macro]
+            f, lo, hi = wilson(int(g["funded"].sum()), len(g))
+            rows.append(dict(group=label, macro=macro, n_ranked=len(g), funded_fraction=f, low=lo, high=hi))
+    return pd.DataFrame(rows)
+
+
 # --------------------------------------------------------------- figures
 
 def _save(fig, ax, fig_dir: Path, name: str):
@@ -216,19 +255,73 @@ def fig_institutions(d: Data, inst: pd.DataFrame, fig_dir: Path, n: int = 20):
 
 
 def fig_concentration(d: Data, inst: pd.DataFrame, fig_dir: Path):
-    c = concentration(inst)
-    x = np.sort(inst["mur_total"].to_numpy())
-    cum = np.concatenate([[0.0], np.cumsum(x)]) / x.sum()
-    p = np.linspace(0.0, 1.0, len(cum))
+    """Cumulative share of the funding held by the k best-funded institutions."""
+    x = np.sort(inst["mur_total"].to_numpy())[::-1]
+    k = np.arange(1, len(x) + 1)
+    cum = 100 * np.cumsum(x) / x.sum()
     fig, ax = _axes()
-    ax.plot(p, cum, color=PI_COLOR, lw=3)
-    ax.plot([0, 1], [0, 1], color=GREY, lw=1.5, ls="--")
-    ax.set_xlabel(r"Fraction of institutions / 1")
-    ax.set_ylabel(r"Fraction of funding / 1")
-    ax.text(0.04, 0.88, rf"Gini = {c['gini']:.2f}", fontsize=34, transform=ax.transAxes)
-    ax.text(0.04, 0.78, rf"top 10: {100 * c['top10_share']:.0f}\%", fontsize=34, transform=ax.transAxes)
-    ax.set_xlim(0, 1), ax.set_ylim(0, 1)
+    ax.plot(np.concatenate([[0], k]), np.concatenate([[0], cum]), color=PI_COLOR, lw=3)
+    ax.plot([0, len(x)], [0, 100], color=GREY, lw=1.5, ls="--")
+    for n_top, y_key in ((10, 93), (20, 83)):
+        ax.plot(n_top, cum[n_top - 1], "o", color=RU_COLOR, ms=12, zorder=3)
+        ax.plot(3, y_key, "o", color=RU_COLOR, ms=12, zorder=3)
+        ax.text(6, y_key, rf"top {n_top}: {cum[n_top - 1]:.0f}\%", fontsize=30, va="center")
+    ax.set_xlabel(r"Institutions, best funded first / 1")
+    ax.set_ylabel(r"Cumulative funding / \%")
+    ax.set_xlim(0, len(x)), ax.set_ylim(0, 100)
     _save(fig, ax, fig_dir, "concentration")
+
+
+DIRECTIONS = ((1, 0, "left", "center"), (-1, 0, "right", "center"), (0, 1, "center", "bottom"),
+              (0, -1, "center", "top"), (0.7, 0.7, "left", "bottom"), (-0.7, 0.7, "right", "bottom"),
+              (0.7, -0.7, "left", "top"), (-0.7, -0.7, "right", "top"))
+
+
+def _overlap(a, b) -> float:
+    w = min(a[2], b[2]) - max(a[0], b[0])
+    h = min(a[3], b[3]) - max(a[1], b[1])
+    return max(w, 0.0) * max(h, 0.0)
+
+
+def _place_labels(fig, ax, xy, radius_pts, which, labels, fontsize=18, colors=None, backing=False):
+    """Write `labels` next to the nodes `which` (indices into `xy`, the data coordinates of
+    all nodes; `radius_pts` their marker radii in points) at the first of eight positions
+    that overlaps no earlier label, no node and not the axes frame; the largest nodes are
+    labelled first. Falls back on the least-overlapping position."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    scale = fig.dpi / 72.0
+    centres = ax.transData.transform(np.asarray(xy))
+    radii = np.asarray(radius_pts, dtype=float) * scale
+    frame = ax.get_window_extent(renderer)
+    nodes = [(c[0] - r, c[1] - r, c[0] + r, c[1] + r) for c, r in zip(centres, radii)]
+    placed = []
+    for k in sorted(range(len(which)), key=lambda k: -radii[which[k]]):
+        i = which[k]
+        probe = ax.text(0, 0, labels[k], fontsize=fontsize)
+        box = probe.get_window_extent(renderer)
+        probe.remove()
+        best = None
+        for dx, dy, ha, va in DIRECTIONS:
+            gap = radii[i] + 3 * scale
+            ax_, ay_ = centres[i][0] + dx * gap, centres[i][1] + dy * gap
+            x0 = ax_ - {"left": 0, "center": box.width / 2, "right": box.width}[ha]
+            y0 = ay_ - {"bottom": 0, "center": box.height / 2, "top": box.height}[va]
+            cand = (x0, y0, x0 + box.width, y0 + box.height)
+            penalty = sum(_overlap(cand, o) for o in placed)
+            penalty += sum(_overlap(cand, n) for j, n in enumerate(nodes) if j != i)
+            penalty += 10 * (box.width * box.height - _overlap(cand, (frame.x0, frame.y0, frame.x1, frame.y1)))
+            if best is None or penalty < best[0]:
+                best = (penalty, dx, dy, ha, va, cand)
+                if penalty == 0:
+                    break
+        _, dx, dy, ha, va, cand = best
+        placed.append(cand)
+        gap_pts = radius_pts[i] + 3
+        ax.annotate(labels[k], tuple(xy[i]), xytext=(dx * gap_pts, dy * gap_pts),
+                    textcoords="offset points", ha=ha, va=va, fontsize=fontsize, zorder=6,
+                    color=None if colors is None else colors[k],
+                    bbox=dict(boxstyle="round,pad=0.12", fc="white", ec="none", alpha=0.8) if backing else None)
 
 
 def _draw_regions(ax, values: Optional[pd.Series], cmap, norm, label_values: bool):
@@ -272,23 +365,36 @@ def fig_map_regions(d: Data, regions: pd.DataFrame, fig_dir: Path):
     _save(fig, ax, fig_dir, "map_regions_share")
 
 
-def fig_map_cities(d: Data, inst: pd.DataFrame, fig_dir: Path):
-    sited = inst[inst["region"] != NATIONAL].copy()
-    sited["lat"] = d.units.drop_duplicates("cf").set_index("cf").loc[sited.index, "lat"]
-    sited["lon"] = d.units.drop_duplicates("cf").set_index("cf").loc[sited.index, "lon"]
-    city = sited.groupby("city").agg(lat=("lat", "first"), lon=("lon", "first"),
+def _city_table(d: Data, inst: pd.DataFrame) -> pd.DataFrame:
+    sited = inst[inst["region"] != NATIONAL].join(
+        d.units.drop_duplicates("cf").set_index("cf")[["lat", "lon"]])
+    return sited.groupby("city").agg(lat=("lat", "first"), lon=("lon", "first"),
                                      mur=("mur_total", "sum")).sort_values("mur", ascending=False)
+
+
+def _bubble_size(mur, scale_to) -> np.ndarray:
+    return 2.2e3 * np.asarray(mur, dtype=float) / scale_to
+
+
+def fig_map_cities(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: Optional[str] = None,
+                   n_labels: int = 10):
+    city = _city_table(d, inst)
     fig, ax = _axes(small=True)
     _draw_regions(ax, None, None, None, label_values=False)
-    ax.scatter(city["lon"], city["lat"], s=2.2e3 * city["mur"] / city["mur"].max(),
-               color=PI_COLOR, alpha=0.65, edgecolor="white", lw=1.0, zorder=3)
+    sizes = _bubble_size(city["mur"], city["mur"].max())
+    colors_ = [RU_COLOR if c == highlight else PI_COLOR for c in city.index]
+    ax.scatter(city["lon"], city["lat"], s=sizes, color=colors_, alpha=0.65, edgecolor="white",
+               lw=1.0, zorder=3)
     for ref in (2.0, 10.0):
-        ax.scatter([], [], s=2.2e3 * ref * 1e6 / city["mur"].max(), color=PI_COLOR, alpha=0.65,
+        ax.scatter([], [], s=_bubble_size(ref * 1e6, city["mur"].max()), color=PI_COLOR, alpha=0.65,
                    edgecolor="white", label=rf"{ref:.0f} M EUR")
     ax.legend(loc="lower left", labelspacing=2.2, borderpad=1.2, fontsize=20)
-    for name, r in city.head(8).iterrows():
-        ax.annotate(tex(name), (r["lon"], r["lat"]), xytext=(9, 6), textcoords="offset points",
-                    fontsize=18, zorder=4)
+    which = list(range(min(n_labels, len(city))))
+    if highlight in city.index and city.index.get_loc(highlight) not in which:
+        which.append(city.index.get_loc(highlight))
+    _place_labels(fig, ax, city[["lon", "lat"]].to_numpy(), np.sqrt(sizes / np.pi), which,
+                  [tex(city.index[i]) for i in which],
+                  colors=[RU_COLOR if city.index[i] == highlight else None for i in which])
     ax.set_title(tex(f"Area $\\propto$ MUR funding, {_stamp(d)}"), fontsize=22)
     _save(fig, ax, fig_dir, "map_cities_funding")
 
@@ -319,16 +425,20 @@ def fig_ranking(d: Data, sec: pd.DataFrame, fig_dir: Path):
 
 
 def fig_money(d: Data, fig_dir: Path):
-    fig, ax = _axes()
-    bins = np.linspace(0, d.units["mur_contribution"].max() / 1e3, 26)
-    for role, color, label in (("PI", PI_COLOR, "coordinating units"), ("RU", RU_COLOR, "partner units")):
-        v = d.units.loc[d.units["role"] == role, "mur_contribution"] / 1e3
-        ax.hist(v, bins=bins, histtype="step", lw=3, color=color, density=True,
-                label=rf"{label}, median {np.median(v):.0f}")
-    ax.set_xlabel(r"MUR contribution per unit / k EUR")
-    ax.set_ylabel(r"Probability density / (k EUR)$^{-1}$")
-    ax.legend(loc="upper right")
-    _save(fig, ax, fig_dir, "money_per_unit")
+    """Histogram of the MUR contribution per unit, in the style of plot_dist.py: unfilled
+    hatched bars, Sturges bins, counts; the dashed line marks the median."""
+    xmax = 50 * np.ceil(d.units["mur_contribution"].max() / 1e3 / 50)
+    for role, color, name in (("PI", PI_COLOR, "coordinating"), ("RU", RU_COLOR, "partner")):
+        v = d.units.loc[d.units["role"] == role, "mur_contribution"].to_numpy() / 1e3
+        fig, ax = _axes()
+        ax.hist(v, bins=np.linspace(0, xmax, int(np.log2(len(v)) + 1) + 1), histtype="bar",
+                rwidth=0.75, hatch="//", fill=False, color=color, edgecolor=color)
+        ax.axvline(np.median(v), color="k", lw=1.5, ls="--")
+        ax.yaxis.set_major_locator(MaxNLocator(5))
+        ax.set_xlabel(r"MUR contribution per unit / k EUR")
+        ax.set_ylabel(r"Count")
+        ax.set_xlim(0, xmax)
+        _save(fig, ax, fig_dir, f"money_per_unit_{name}")
 
 
 def fig_kinds(d: Data, fig_dir: Path):
@@ -345,30 +455,80 @@ def fig_kinds(d: Data, fig_dir: Path):
     _save(fig, ax, fig_dir, "institution_types")
 
 
-def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, n: int = 20):
-    top = list(inst.head(n).index)
-    names = [tex(s) for s in inst.head(n)["short_name"]]
-    pos = {cf: i for i, cf in enumerate(top)}
-    m = np.zeros((n, n))
-    for _, g in d.units.groupby("project_code"):
-        members = [pos[c] for c in set(g["cf"]) if c in pos]
-        for i in members:
-            for j in members:
-                m[i, j] += 1
-    fig, ax = _axes(tick=18)
-    fig.set_size_inches(14, 14)
-    im = ax.imshow(np.where(m > 0, m, np.nan), cmap="Blues", vmin=0)
-    ax.set_xticks(range(n), names, rotation=90)
-    ax.set_yticks(range(n), names)
-    ax.xaxis.set_minor_locator(plt.NullLocator()), ax.yaxis.set_minor_locator(plt.NullLocator())
-    ax.tick_params(which="both", top=False, right=False)
-    for i in range(n):
-        for j in range(n):
-            if m[i, j] > 0:
-                ax.text(j, i, f"{int(m[i, j])}", ha="center", va="center", fontsize=12,
-                        color="white" if m[i, j] > 0.6 * m.max() else "black")
-    fig.colorbar(im, ax=ax, shrink=0.8, label=r"Shared projects / 1")
-    _save(fig, ax, fig_dir, "collaboration")
+def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: int = 8,
+                      highlight: Optional[str] = None):
+    """Collaboration graph on the map: nodes are cities (area ~ funding), a link joins two
+    cities with at least `min_shared` projects in common (width ~ number of projects); the
+    links of the highlighted city are drawn whatever their weight. National bodies have no
+    place: they are one node in the sea."""
+    city = _city_table(d, inst)
+    pos = {c: (r["lon"], r["lat"]) for c, r in city.iterrows()}
+    pos[NATIONAL] = (11.2, 38.9)
+    place = d.units.assign(node=np.where(d.units["region"] == NATIONAL, NATIONAL, d.units["city"]))
+    shared: Counter = Counter()
+    for _, g in place.groupby("project_code"):
+        for a, b in combinations(sorted(set(g["node"])), 2):
+            shared[(a, b)] += 1
+    nat_mur = float(place.loc[place["node"] == NATIONAL, "mur_contribution"].sum())
+    fig, ax = _axes(small=True)
+    _draw_regions(ax, None, None, None, label_values=False)
+    shown = {e: w for e, w in shared.items() if w >= min_shared or highlight in e}
+    for (a, b), w in sorted(shown.items(), key=lambda kv: (highlight in kv[0], kv[1])):
+        hot = highlight in (a, b)
+        ax.plot([pos[a][0], pos[b][0]], [pos[a][1], pos[b][1]], color=RU_COLOR if hot else "#4d6d8c",
+                lw=(1.2 + 0.8 * w) if hot else 0.4 * w ** 0.9, alpha=0.8 if hot else 0.45,
+                solid_capstyle="round", zorder=2.5 if hot else 2)
+    names = list(city.index) + [NATIONAL]
+    mur = np.concatenate([city["mur"].to_numpy(), [nat_mur]])
+    sizes = _bubble_size(mur, city["mur"].max())
+    xy = np.array([pos[n] for n in names])
+    for k, n in enumerate(names):
+        ax.scatter(*xy[k], s=sizes[k], marker="D" if n == NATIONAL else "o", zorder=3,
+                   color=RU_COLOR if n == highlight else (GREY if n == NATIONAL else PI_COLOR),
+                   alpha=0.8, edgecolor="white", lw=1.0)
+    degree = Counter()
+    for (a, b), w in shown.items():
+        degree[a] += w
+        degree[b] += w
+    which = sorted({names.index(n) for n, _ in degree.most_common(10)}
+                   | ({names.index(highlight)} if highlight in names else set()))
+    _place_labels(fig, ax, xy, np.sqrt(sizes / np.pi), which,
+                  [tex("National bodies" if names[i] == NATIONAL else names[i]) for i in which],
+                  colors=[RU_COLOR if names[i] == highlight else None for i in which], backing=True)
+    ax.set_title(tex(f"Links: {min_shared}+ shared projects (width $\\propto$ number), "
+                     f"{_stamp(d)}"), fontsize=22)
+    _save(fig, ax, fig_dir, "collaboration_map")
+
+
+def fig_under40_rate(d: Data, rt: pd.DataFrame, fig_dir: Path):
+    macros = ["PE", "LS", "SH", "All"]
+    fig, ax = _axes(small=True)
+    for k, (label, color, marker) in enumerate((("PI under 40", U40_COLOR, "o"), ("PI over 40", PI_COLOR, "s"))):
+        sub = rt[rt["group"] == label].set_index("macro").loc[macros]
+        x = np.arange(len(macros)) + (k - 0.5) * 0.25
+        ax.errorbar(x, 100 * sub["funded_fraction"],
+                    yerr=100 * np.vstack([sub["funded_fraction"] - sub["low"],
+                                          sub["high"] - sub["funded_fraction"]]),
+                    fmt=marker, color=color, ms=12, capsize=6, lw=2.5, label=tex(label))
+    ax.set_xticks(range(len(macros)), macros)
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.set_ylabel(r"Funded among ranked / \%")
+    ax.set_ylim(0, 105)
+    ax.legend(loc="lower left")
+    _save(fig, ax, fig_dir, "under40_funded_fraction")
+
+
+def fig_under40_pool(d: Data, u40: pd.DataFrame, fig_dir: Path):
+    fig, ax = _axes(small=True)
+    x = np.arange(len(u40))
+    ax.bar(x, u40["pool"] / 1e6, facecolor="none", edgecolor=GREY, lw=2.5, label="under-40 pool")
+    ax.bar(x, u40["money_under40_projects"] / 1e6, color=U40_COLOR, width=0.7,
+           label=tex("projects of under-40 PIs"))
+    ax.set_xticks(x, u40.index, rotation=90)
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.set_ylabel(r"MUR funding / M EUR")
+    ax.legend(loc="upper center")
+    _save(fig, ax, fig_dir, "under40_pool")
 
 
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
@@ -394,29 +554,34 @@ def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
 
 # ------------------------------------------------------------------ main
 
-def run(out_dir: Path, use_latex: bool = True) -> Dict[str, float]:
+def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) -> Dict[str, float]:
     d = load(out_dir)
     tab_dir, fig_dir = out_dir / "analysis", out_dir / "figures"
     tab_dir.mkdir(exist_ok=True), fig_dir.mkdir(exist_ok=True)
     inst, regions, sec = institution_table(d), region_table(d), sector_table(d)
     kinds, gt = _money(d.units, "kind", d.budget), gender_table(d)
+    u40, rt = under40_table(d), under40_rate_table(d)
     inst.to_csv(tab_dir / "institutions.csv", encoding="utf-8-sig")
     regions.to_csv(tab_dir / "regions.csv", encoding="utf-8-sig")
     sec.to_csv(tab_dir / "sectors.csv", encoding="utf-8-sig")
     kinds.to_csv(tab_dir / "institution_types.csv", encoding="utf-8-sig")
     gt.to_csv(tab_dir / "gender.csv", index=False, encoding="utf-8-sig")
+    u40.to_csv(tab_dir / "under40.csv", encoding="utf-8-sig")
+    rt.to_csv(tab_dir / "under40_rate.csv", index=False, encoding="utf-8-sig")
     global USE_LATEX
     USE_LATEX = use_latex
     fig_institutions(d, inst, fig_dir)
     fig_concentration(d, inst, fig_dir)
     fig_map_regions(d, regions, fig_dir)
-    fig_map_cities(d, inst, fig_dir)
+    fig_map_cities(d, inst, fig_dir, highlight)
     fig_sectors(d, sec, fig_dir)
     fig_ranking(d, sec, fig_dir)
     fig_money(d, fig_dir)
     fig_kinds(d, fig_dir)
-    fig_collaboration(d, inst, fig_dir)
+    fig_collaboration(d, inst, fig_dir, highlight=highlight)
     fig_gender(d, gt, fig_dir)
+    fig_under40_rate(d, rt, fig_dir)
+    fig_under40_pool(d, u40, fig_dir)
     summary = dict(n_sectors=len(d.sectors), sectors=d.sectors, budget=d.budget,
                    funded=float(d.units["mur_contribution"].sum()),
                    n_projects=int(d.units["project_code"].nunique()),
@@ -429,10 +594,11 @@ def run(out_dir: Path, use_latex: bool = True) -> Dict[str, float]:
 def main(argv=None) -> int:
     ap = arg.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--out", default="prin_out", help="directory written by prin_extract.py")
+    ap.add_argument("--highlight", default="Siena", help="city to colour on the maps (default Siena)")
     ap.add_argument("--no-latex", action="store_true", help="render text with mathtext, not LaTeX")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    s = run(Path(a.out), use_latex=not a.no_latex)
+    s = run(Path(a.out), use_latex=not a.no_latex, highlight=a.highlight)
     print(f"{s['n_projects']} projects, {s['funded'] / 1e6:.1f} of {s['budget'] / 1e6:.1f} M EUR "
           f"in {s['n_sectors']} sectors; Gini {s['gini']:.2f}")
     return 0

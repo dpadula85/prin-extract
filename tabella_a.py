@@ -65,29 +65,44 @@ def _title_and_name(body: List[str]) -> Tuple[str, str]:
     return " ".join(body[:k]), " ".join(body[k:])
 
 
-def read_cells(path: Path) -> List[str]:
-    """Text cells of the PDF in content-stream order."""
-    from pypdf import PdfReader
-    cells: List[str] = []
+def _is_green(rgb) -> bool:
+    r, g, b = rgb
+    return g > r + 0.15 and g > b + 0.15
 
-    def visit(text, cm, tm, font_dict, font_size):
-        if text.strip():
-            cells.append(re.sub(r"\s+", " ", text.strip()))
+
+def read_cells(path: Path) -> List[Tuple[str, bool]]:
+    """Text cells of the PDF in content-stream order, each with whether it is printed in
+    green (the PDF marks the code and name of under-40 PIs that way)."""
+    from pypdf import PdfReader
+    cells: List[Tuple[str, bool]] = []
+    fill = (0.0, 0.0, 0.0)
+
+    def operand(operator, args, cm, tm):
+        nonlocal fill
+        if operator == b"rg":
+            fill = tuple(float(a) for a in args)
+        elif operator == b"g":
+            fill = (float(args[0]),) * 3
+
+    def text(t, cm, tm, font_dict, font_size):
+        if t.strip():
+            cells.append((re.sub(r"\s+", " ", t.strip()), _is_green(fill)))
     for page in PdfReader(path).pages:
-        page.extract_text(visitor_text=visit)
+        fill = (0.0, 0.0, 0.0)
+        page.extract_text(visitor_operand_before=operand, visitor_text=text)
     return cells
 
 
-def parse_cells(cells: List[str], sector: str) -> List[dict]:
+def parse_cells(cells: List[Tuple[str, bool]], sector: str) -> List[dict]:
     rows: List[dict] = []
     cur = None
-    for c in cells:
+    for c, green in cells:
         if c.startswith(FOOTNOTE):
             cur = None
         elif CODE.fullmatch(c):
             if cur is not None and cur["numbers"] and cur["numbers"][-1] == str(len(rows) + 1):
                 cur["numbers"].pop()  # the next row's rank, printed before its code
-            cur = dict(rank=len(rows) + 1, project_code=c, body=[], numbers=[])
+            cur = dict(rank=len(rows) + 1, project_code=c, under40=green, body=[], numbers=[])
             rows.append(cur)
         elif cur is None or NOISE.match(c):
             continue
@@ -113,7 +128,7 @@ def parse_cells(cells: List[str], sector: str) -> List[dict]:
             sector=sector, rank=r["rank"], project_code=r["project_code"],
             title=re.sub(r"(?<=\w-) ", "", title), pi_given=given, pi_surname=surname,
             score=score, excellence=tie[0], impact=tie[1], equity=tie[2], men=men, women=women,
-            birth_year=int(date.group(1)) if date else None))
+            birth_year=int(date.group(1)) if date else None, under40=r["under40"]))
     return out
 
 

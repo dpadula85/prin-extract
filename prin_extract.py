@@ -268,7 +268,7 @@ def main():
     if a.csv:
         write(out / "all_rows.csv", rows)
         rcols = ["sector", "rank", "project_code", "title", "pi_given", "pi_surname", "score",
-                 "excellence", "impact", "equity", "men", "women", "birth_year", "funded"]
+                 "excellence", "impact", "equity", "men", "women", "birth_year", "under40", "funded"]
         with open(out / "ranking.csv", "w", newline="", encoding="utf-8-sig") as fh:
             w = csv.DictWriter(fh, fieldnames=rcols)
             w.writeheader(); w.writerows(ranked)
