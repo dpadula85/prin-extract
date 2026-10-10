@@ -20,6 +20,7 @@ from pathlib import Path
 from urllib.parse import urljoin, unquote
 
 import decrees
+import tabella_a
 from common import START, fetch_pdf, num, sector_of
 
 ROW = re.compile(
@@ -235,6 +236,23 @@ def main():
 
     rows = dedupe(rows)
     print("Sectors parsed:", ", ".join(sorted({r["sector"] for r in rows})))
+    ranked = []
+    for f in sorted((pdf_dir / "tabella_a").glob("*.pdf")):
+        ranked += tabella_a.parse_pdf(f, sector_of(f.name))
+    funded = {r["project_code"] for r in rows}
+    for r in ranked:
+        r["funded"] = r["project_code"] in funded
+        # Tabella B titles can carry page-footer text or be cut at a page break, while
+        # Tabella A drops lone punctuation cells: keep B's title unless the two differ
+        # in more than punctuation and spacing
+        b = titles.get(r["project_code"], "")
+        if re.sub(r"\W+", "", b).lower() != re.sub(r"\W+", "", r["title"]).lower():
+            titles[r["project_code"]] = r["title"]
+    missing = funded - {r["project_code"] for r in ranked}
+    if missing:
+        print(f"! {len(missing)} funded projects are not in the parsed Tabella A: "
+              f"{sorted(missing)}", file=sys.stderr)
+    print(f"Tabella A: {len(ranked)} ranked projects, {sum(r['funded'] for r in ranked)} funded")
     coord = {r["project_code"]: f'{r["name"]} ({r["institution"]})' for r in rows if r["role"] == "PI"}
     for r in rows:
         r["title"] = titles.get(r["project_code"], "")
@@ -249,6 +267,11 @@ def main():
 
     if a.csv:
         write(out / "all_rows.csv", rows)
+        rcols = ["sector", "rank", "project_code", "title", "pi_given", "pi_surname", "score",
+                 "excellence", "impact", "equity", "men", "women", "birth_year", "funded"]
+        with open(out / "ranking.csv", "w", newline="", encoding="utf-8-sig") as fh:
+            w = csv.DictWriter(fh, fieldnames=rcols)
+            w.writeheader(); w.writerows(ranked)
     results = []
     for u in a.uni:
         key = u.lower()

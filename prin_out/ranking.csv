@@ -1,0 +1,236 @@
+﻿sector,rank,project_code,title,pi_given,pi_surname,score,excellence,impact,equity,men,women,birth_year,funded
+LS2,1,2026PJCJL7,Decoding and Targeting Cancer Plasticity,Giovanni,TONON,95.25,,,,,,,True
+LS2,2,2026PPSM7R,Deciphering how conformational landscape converts repeat-rich protein architecture into trafficking decisions,Alexander Miguel,MONZON,95.0,,,,,,,True
+LS2,3,2026P32FB5,Harnessing Regulatory Toolkits Underlying Meristem Developmental Plasticity and Stress Resilience in Arabidopsis thaliana and Oryza sativa (MeriPlaSt),Veronica,GREGIS,92.5,,,,,,,True
+LS2,4,2026P3LEPC,Leveraging multidisciplinary expertise to identify new stratification biomarkers and clinically actionable dependencies in high-risk T-cell acute lymphoblastic leukemia/lymphoma (T-ALL/LBL): breaking barriers toward molecularly guided treatment (BREAK-TALL),Stefania,BORTOLUZZI,87.5,,,,,,,True
+LS2,5,2026PHKJ4C,Omics Signatures and Phenotypic Expression in Beckwith-Wiedemann and Silver-Russell Syndromes,Andrea,RICCIO,86.0,,,,,,,True
+LS2,6,2026PLY933,Signaling-network states as functional vulnerabilities in AML with unmet clinical need,Francesca,SACCO,85.75,,,,,,,False
+LS2,7,2026PXZ7C2,DARKOLIG — Dark genome and OLIGogenic architecture in unsolved Neurodevelopmental disorders,Federico,ZARA,85.25,,,,,,,False
+LS2,8,2026P8X5XF,Decoding iron-erythropoiesis crosstalk in hereditary anemias to identify new therapeutic targets,Lucia,DE FRANCESCHI,85.0,,,,,,,False
+LS3,1,2026PCAZ2P,Multiscale dissection of Collagen VI landscapes in degenerative musculoskeletal diseases,Paolo,BONALDO,93.0,,,,,,,True
+LS3,2,2026PXAXAX,The conventional and unconventional roles of the translational machinery in angiogenesis and in the response to hypoxia,Stefano,BIFFO,88.25,,,,,,,True
+LS3,3,2026P3J8LS,LIpid droplet COmmunication Networks In Cancer (LICONIC),Tito,CALI',87.25,35.5,,,,,,True
+LS3,4,2026PNZE48,Dynamic interplay between cell-intrinsic and cell-extrinsic mechanics in shaping immunosurveillance in therapy-resistant tumors. (MECH-IMMUNE),Giannino,DEL SAL,87.25,35.0,,,,,,True
+LS3,5,2026PL82Y3,Exploring the role of collagen glycosylation–mechanotransduction axis in osteosarcoma invasiveness,Roberta,BESIO,87.0,,,,,,,False
+LS3,6,2026P2EPRX,RESWITCH: Regeneration Competence and Developmental Switching Triggering Somatic Embryogenesis in Woody Plants,Giorgio,GAMBINO,85.0,34.0,17.0,1.0,3,3,,False
+LS3,7,2026PHW72Y,Modeling Physiopathological Interplay in the Muscle Microenvironment: A 3D Platform for Mechanistic Insight and Therapeutic Discovery,Antonio,MUSARO',85.0,34.0,17.0,0.86,6,8,,False
+LS4,1,2026PJ528E,TaRgetIng undruGGable drivErs in Rare cancers through eXon skipping-based strategies (TRIGGERx),Michele,MILELLA,100.0,40.0,20.0,0.86,8,6,,True
+LS4,2,2026P8WEEP,Targeting Adaptive tumor Plasticity to overcome Resistance in ColoRectal Cancer through multi-omics approaches - TAP-ResCRC,Luca,FALZONE,100.0,40.0,20.0,0.67,4,8,,True
+LS4,3,2026PZH329,PRISM-T2D BCAA-Klotho-FGF23 Axis as a Multidirectional Hepato-Renal-Bone Network in Type 2 Diabetes,Gianluca,PERSEGHIN,98.5,,,,,,,True
+LS4,4,2026PKHE87,"SHAPE_AGING_Sex Hormone Adaptation, Psychosexual health and Environmental vulnerability in aging",Linda,VIGNOZZI,98.25,39.5,,,,,,True
+LS4,5,2026PW5A7S,Multidimensional Analysis of Tumor Resistance and mIcroenvironment compleXity in Triple-Negative Breast Cancer (MATRIX-TNBC),Gerolama,CONDORELLI,98.25,39.0,,,,,,True
+LS4,6,2026PP8FMT,Diabetes-specific disruptors of cardiovascular resilience and drivers of heart failure (DISRUPT-DM),Gian Paolo,FADINI,96.75,,,,,,,True
+LS4,7,2026PS3E2E,BEYOND-PTH Integrated phenotyping of PTH actions across clinical models of muscle–adipose-bone remodeling,Giovanna,MANTOVANI,95.75,,,,,,,True
+LS4,8,2026PNCJBL,Addressing the immunometabolic landscape fueling autoreactive T cells in type 1 diabetes,Paolo,FIORINA,94.75,,,,,,,True
+LS4,9,2026PML3R8,Impact on infarct size of environmental pollution and AI-enhanced ECG intepretation in patients with acute coronary syndromes,Emanuele,BARBATO,93.5,,,,,,,True
+LS4,10,2026PCC9XM,Mechanisms and Outcomes of Metabolic Health in pituitary Adenomas: the MOMHA study,Annamaria,COLAO,91.25,,,,,,,True
+LS4,11,2026PZMLMW,Decoding the Multi-Organ Interfaces Driving Adaptive or Maladaptive Cardiac Remodeling and Heart Failure and the Impact of Physical Exercise and Aging.,Daniela,CARNEVALE,91.0,,,,,,,True
+LS4,12,2026P89RB8,KLEAR: Targeting KLHL14-dependent Evasion of Adaptive radiotherapy responses in fusion-positive Rhabdomyosarcoma,Francesco,MARAMPON,89.75,,,,,,,False
+LS4,13,2026PB9TB3,The Cholesin/GPR146 axis regulation of immunometabolism and wound healing: implications in MASH progression (CHARM),Stefania,BASILI,89.0,,,,,,,False
+LS4,14,2026PNCR7Y,Endocrine immune-related adverse events in cancer patients treated with immune-checkpoint inhibitors: predictive factors and patients’ risk stratification,Sabrina,CHILOIRO,87.5,,,,,,,True
+LS4,15,2026PYLWNB,Intercepting Doxorubicin-induced Cardiotoxicity Through Early Metaboloepigenetic Signatures and Mitochondrial Therapy,Alessandra,GHIGO,86.0,,,,,,,False
+LS4,16,2026P7L582,HemE and sex horMonEs interplay in liveR metabolic trAjectories (HemERa),Emanuela,TOLOSANO,85.25,,,,,,,False
+LS7,1,2026PWA7H5,Epi-COMBO —Epigenetic COnvergent Multi-tumor Blockade of Oncogenic non-coding networks: Modulating the 8q24 MYC–PVT1 axis through miR-423-5p and other epigenetic targeting.,Michele,CARAGLIA,100.0,40.0,20.0,0.95,9,10,,True
+LS7,2,2026PT4KJY,"Integrated multi-omics, pharmacokinetics and patient-derived organoids to predict response to JAK inhibitors in adult and pediatric ulcerative colitis",Gabriele,STOCCO,100.0,40.0,20.0,0.86,3,4,1976,True
+LS7,3,2026PJYZXJ,"Adolescent Stress and Psychopathological Trajectories: Vulnerability, Neurobiological Mechanisms, and Gene–Environment Interactions Toward Targeted Interventions",Marco Andrea,RIVA,100.0,40.0,20.0,0.86,8,6,1959,True
+LS7,4,2026P42P95,The evaluation of LAV-BPIFB4 therapy in improving inflammatory components of adiposity in obesity,Carmine,VECCHIONE,100.0,40.0,20.0,0.73,7,4,,True
+LS7,5,2026PWFFF4,Pharmacological modulation of myelination to rescue circuit dysfunction after adolescent alcohol exposure,Roberto,CICCOCIOPPO,100.0,40.0,20.0,0.62,4,9,,True
+LS7,6,2026PBSNLJ,"BRIDGE: Beyond Bias: Rethinking Inference and clinical study Design to build a new, measurable Gender medicine Ecosystem.",Mariaclelia Stefania,DI SERIO,99.0,,,,,,,True
+LS7,7,2026PECJS5,Chemical EPigenomics of drug tolerant persister cells in gastric cancer,Saverio,MINUCCI,98.75,,,,,,,True
+LS7,8,2026PRZ3LH,INNOV-HAI: INNOVative and Integrated Strategies for Controlling Healthcare-Associated Infections from Multidrug-Resistant Microorganisms in Italian Hospitals,Paolo,VILLARI,98.25,,,,,,,True
+LS7,9,2026PNA3F7,"Postbiotic-Mediated Reprogramming of Inflammatory, Angiogenic and Epigenetic Pathways in Cancer: A Strategy to Improve Therapy Response and Overcome Resistance",Massimo,LIBRA,97.75,,,,,,,True
+LS7,10,2026PJM4N4,Rewiring Neural Cell-State Plasticity Across Development and Glioblastoma: Pharmacological Targeting of Pathological Cellular Trajectories,Alessandro,FIORENZANO,96.25,38.0,19.5,0.93,7,8,,True
+LS7,11,2026P8R9FN,Integrative Tumor and cfDNA Methylation Analysis to Predict Recurrence and Clinical Outcomes in High-risk Melanoma Patients Treated with Adjuvant Immunotherapy,Michele,MAIO,96.25,38.0,19.5,0.67,4,2,,True
+LS7,12,2026P94K5N,RISK-IT: Risk Miscalibration as a Fundamental Mechanism of Health Behaviour in Complex Information Environments,Fabrizio,BERT,96.0,38.5,,,,,,True
+LS7,13,2026PCPCC3,BCLAF1 Functional dissection and clinical exploitation Against Neuroblastoma (BFAN),Carmela,DELL'AVERSANA,96.0,38.0,,,,,,True
+LS7,14,2026PCK3FY,"ADVANCES — AAV host factor Discovery, VAlidation, and Cross-tissue Enhancement Strategies",Anna Christina,KAJASTE-RUDNITSKI,93.0,38.0,,,,,,True
+LS7,15,2026PJ7KY5,Balancing NOP and MOP Receptor Activation to Separate Analgesia from Opioid Side Effects,Girolamo,CALO',93.0,37.5,,,,,,False
+LS7,16,2026P94KK9,Integrated faecal immunochemical testing (FIT)-based clinical and molecular risk stratification for colorectal cancer diagnosis in symptomatic patients,Lorenzo,FUCCIO,92.0,,,,,,,False
+LS7,17,2026P4BN2S,MIND-AGE: Molecular mechanisms of accelerated agINg in mood Disorders and AGing modulating strategiEs,Claudia,PISANU,91.0,,,,,,,True
+LS7,18,2026PSJ4MR,Omic-based and clinical profiling of post-inflammatory disorders of the gastrointestinal tract (ORIGIN-GI),Giovanni,BARBARA,90.75,,,,,,,False
+LS7,19,2026PP425R,"Amino acids infusion for renal protection in critically ill patients: a multicenter, double-blind, placebo-controlled, randomized trial - PROTECTION 2",Giovanni,LANDONI,90.5,,,,,,,False
+LS7,20,2026PX35JL,PASSION - Proton Arc radiotherapy Strategy and Selective Immune system activation for Optimized Novel breast cancer treatment Frank Reinhard,Heinrich,LOHR,89.0,,,,,,,False
+LS7,21,2026P7T3R7,ECHO: Exploring Clonal Hematopoiesis as a Systemic Modifier of the Bone Marrow Ecosystem in Plasma Cell Dyscrasias,Niccolo',BOLLI,88.5,,,,,,,False
+LS7,22,2026PPPCB2,ICOPE-BIO: Effectiveness of an ICOPE-Based Multidomain Intervention on Intrinsic Capacity Trajectories and Biological Ageing Profiles in Community-Dwelling Older Adults,Giuseppe,BELLELLI,88.0,,,,,,,False
+LS7,23,2026PWBYPB,"Long-term health effects of pollution peaks beyond average exposure: unravelling exposure dynamics, biological pathways, and susceptibility factors. The Peak of Air Pollution Exposures and long-Term Health Effects (PAPETHE) study",Giovanni,VERONESI,87.75,,,,,,,False
+LS7,24,2026PM45NT,"ENDOCARE: CB2 receptor targeting in endometriosis — integrating human organoids, neurobiology and drug discovery to treat pain, psychological burden and infertility",Vittoria,BORGONETTI,86.75,,,,,,,True
+LS7,25,2026PJJBA4,Multi-scale Determinants of Intra-Urban Temperature Variability and Climate Adaptation,Francesco,SERA,86.5,,,,,,,False
+LS7,26,2026PJHZR5,Engineering Mitochondrial Transfer for Neurorepair A Platform Technology for Organelle-Based Neurorepair in Ischemic and Neurodegenerative Brain Injury,Silvia,CARLONI,86.25,,,,,,,False
+LS7,27,2026P3TPWX,Decoding IMmunometabolic circuits in PediAtriC nervous system Tumors - IMPACT,Veronica,FERRUCCI,85.5,35.0,,,,,,True
+LS7,28,2026PTLP9H,Venetoclax-compatible next-generation multifunctional CAR T cells for acute myeloid leukemia targeting,Fabrizio,PANE,85.5,34.0,,,,,,False
+PE10,1,2026PLXLAZ,PETRICORE - Quantifying soil moisture effects on rainfall across scales and regimes,Claudia,PASQUERO,94.0,38.0,,,,,,True
+PE10,2,2026P8B3F3,A Multidisciplinary AppROach to unravel the seismic cycle in geothermal systems (AMARO),Giulio,DI TORO,94.0,37.0,,,,,,True
+PE10,3,2026PB3CXT,Eocene Thermal optimum with EC-Earth4: proxy Reconstruction and Numerical AnaLysis (ETERNAL),Jost-Diedrich,GRAF VON HARDENBERG,91.0,,,,,,,True
+PE10,4,2026PPRH89,MATS: Modulation of the Air-sea boundary layer Turbulence by Sub-mesoscale dynamics,Claudia,FANELLI,90.75,36.5,18.0,,,,,True
+PE10,5,2026P35NEJ,Mélanges Across Scales: Revealing the Rheological Architecture of Subduction Interfaces from Outcrops to Maps,Andrea,FESTA,90.75,36.5,17.5,,,,,True
+PE10,6,2026PRT73L,SOFIA - Southern Ocean freshwater and biogeochemical Fluxes from Integrated multi-sensor satellite retrievals and polar observational Anchors,Giuseppe,AULICINO,90.0,,,,,,,True
+PE10,7,2026P59J42,"The dawn of the Humboldt Current System: Paleogene origins, early evolution and ecosystem resilience across major climatic transitions",Alberto,COLLARETA,88.5,,,,,,,True
+PE10,8,2026PYRZ2L,REACT - Rapid rEsponse to Alpine Climatological Threats for debris-flow early warning,Emanuele,MARCHETTI,87.5,,,,,,,True
+PE10,9,2026P43HCN,Atmospheric Microplastics: Bridging Emissions and Air Pollution Research (AMBER),Silvia,BUCCI,87.25,34.5,18.0,,,,,True
+PE10,10,2026PL7CR3,Agile Scanning of Convective Environments for Nowcasting and Doppler Radar Studies (ASCENDS),Alessandro,BATTAGLIA,85.25,34.5,16.5,,,,,False
+PE10,11,2026P7ZZX9,ATLAS - From distributed dAmage to crusTaL weakening and rupture: trAcking earthquake preparation in fault Systems,Matteo,PICOZZI,85.25,33.5,18.0,,,,,False
+PE10,12,2026PLJP77,HIRMOS - Integrated hydrological modelling and satellite observations for assessing water quantity and quality in large reservoirs,Salvatore,MANFREDA,85.25,33.5,17.0,,,,,False
+PE10,13,2026PSSHWE,CAve and Lake archives of the past 2 Ma climate and volcanism in central Mediterranean Area (CALMA),Giovanni,ZANCHETTA,85.0,34.0,,,,,,False
+PE10,14,2026PKW8CY,Decoding geological H2 systems: from deep time to future energy demand Acronym H2oly Waters,Marco,SCAMBELLURI,85.0,33.5,,,,,,False
+PE11,1,2026PM5L5M,Next Generation Materials for Nuclear Applications: Technological Innovation and Regulatory Challenges - NEXUS,Sara,BIAMINO,100.0,40.0,20.0,0.57,10,4,,True
+PE11,2,2026PSJ7S2,biocompAtible Microstructural deviceS for the conTrolled rElease of entRapped Drugs in the treatment of urothelial cArcinoMa - AMSTERDAM,Pietro,RUSSO,100.0,40.0,20.0,0.33,10,2,,True
+PE11,3,2026P9XJJS,"Harnessing Inactivated Microorganisms for Next-Generation Sustainable, Fire-Safe Polymer Composites",Giulio,MALUCELLI,99.75,,,,,,,True
+PE11,4,2026PBZJ8K,Multifunctional 4D ultrasound-activated piezoelectric wound foam for the treatment of biofilm-infected chronic wounds (VIBE),Elena Maria,VARONI,95.0,,,,,,,True
+PE11,5,2026PNJX94,Tailor-Made Surface-Confined Flame Retardants Derived from Renewable Resources and Upcycling Processes for Bioplastics (SURFLAME-BIO),Alberto,FRACHE,94.0,,,,,,,True
+PE11,6,2026PC7X2J,HEAT: Hierarchical Engineering of infrAred Thermo-optical (meta)materials beyond crystalline order,Valeria,GILIBERTI,93.0,,,,,,,True
+PE11,7,2026PT8JMP,SLAM - Spent Li-ion batteries into Advanced catalytic Materials,Emilia,PAONE,90.5,,,,,,,False
+PE11,8,2026PX3AHZ,ARCHitectured ceramics with Engineered microstructures and programmable crack propagation (ARCHÈ),Paola,PALMERO,88.5,,,,,,,False
+PE11,9,2026PJP3MS,Bioinspired Self-hEaling/Sensing mulTifunctional composites (BEST),Flavia,LIBONATI,88.25,,,,,,,False
+PE11,10,2026P5TLCT,Q-LEAP Quantum-engineered Ultrathin Metals and Scalable 2D Materials for Enhanced Photoconversion and Green Hydrogen Production,Francesco,BUATIER DE MONGEOT,86.5,,,,,,,False
+PE1,1,2026PYFEZ9,Emergent Structures in Kinetic Theory: from Gases to Plasmas,Alessia,NOTA,100.0,40.0,20.0,0.8,12,8,,True
+PE1,2,2026P3T2LW,"Variational Methods, Geometric Analysis and Free Boundary Problems",Andrea,MALCHIODI,100.0,40.0,20.0,0.7,30,16,,True
+PE1,3,2026PHMPHK,Order and randomness in Hamiltonian dynamics and dispersive PDEs,Massimiliano,BERTI,97.25,,,,,,,True
+PE1,4,2026P392RW,"Universality and Renormalization in Random Fields, Singular Dynamics and Quantum Field Theory",Francesco,CARAVENNA,97.0,,,,,,,True
+PE1,5,2026PC2343,Modern challenges across Analysis and Geometry,Fabio,CAVALLETTI,96.75,,,,,,,False
+PE1,6,2026P8PA7E,The interplay of geometry and topology in the study of manifolds and groups,Maria Beatrice,POZZETTI,95.0,,,,,,,True
+PE1,7,2026PE45P3,Smart Polytopal Methods for Multiphysics/Multiscale problems,Silvia,BERTOLUZZA,94.0,,,,,,,False
+PE1,8,2026PKP2M8,Analysis of Singular Structures: Minimizers and Energy-driven Evolution Problems - Acronym: AnSiStEM,Luigi,AMBROSIO,93.75,,,,,,,False
+PE2,1,2026PNT4XW,Energetics of QUantum Information Processing (EQUIP),Mauro,PATERNOSTRO,97.0,,,,,,,True
+PE2,2,2026PNCHKR,Collider Pathways to New Physics in the Precision Era,Ramona,GROEBER,96.0,,,,,,,True
+PE2,3,2026PWZR49,"BeamOn: a high ‑ precision, low ‑ material beam monitor for hadron therapy based on large ‑ area stitched monolithic active pixel sensors",Gianluca,USAI,95.25,,,,,,,True
+PE2,4,2026PFJ75P,Ultracold MOlecules in Arrays of optical Traps (U-MOAT),Paolo,DE NATALE,94.75,,,,,,,True
+PE2,5,2026P4JRKZ,Non-perturbative dynamics of fundamental interactions from ab-initio lattice simulations,Vittorio,LUBICZ,93.75,,,,,,,True
+PE2,6,2026PFWNAH,Criticality-Enhanced Mesoscopic Photodetection with Quantum Emitter Ensembles (DENSE),Simone,FELICETTI,93.5,,,,,,,True
+PE2,7,2026P8PP9R,"The Quantum Nature of Gravity: Symmetries, Black Holes and Entanglement",Alberto,ZAFFARONI,93.25,,,,,,,False
+PE2,8,2026PNJJ99,Multi-coherence in many-body driven quantum systems: from polarons to ferromagnetic superfluids (CoheSy),Alessio,RECATI,93.0,,,,,,,False
+PE2,9,2026P8YKN4,Non-equilibrium statistical physics of novel AI paradigms (NESPA),Marc Jean Marcel,MEZARD,92.75,,,,,,,False
+PE2,10,2026PMCMJP,"Integrated Multiscale Precision Approaches for Collider Theory: Future Avenues in Calculations, Tools, Observables and Reconstruction (IMPACT_FACTOR)",Simone,MARZANI,92.5,,,,,,,False
+PE2,11,2026PNEFC7,FArSIDER: Frozen Argon and Scintillation Identification Detector Enhancement for Rare events,Maura,PAVAN,91.25,,,,,,,False
+PE2,12,2026P2AAMA,Study of Thermonuclear Events with Laser Light for Astrophysical Reactions,Aurora,TUMINO,88.25,,,,,,,False
+PE3,1,2026P8SB85,Equilibrium and Non-Equilibrium Transport in complex GELS: from models to biological systems (E-NET-GELS),Emanuela,ZACCARELLI,98.5,,,,,,,True
+PE3,2,2026P4W29P,Quantum non-reciprocity (Q-NORE),Silvia,PICOZZI,97.75,,,,,,,True
+PE3,3,2026PLRFP7,"PROTEUS: Physics of Cancer Dynamics: Single Cells, Interacting Populations and Data-Driven Adaptive Control",Marco,COSENTINO LAGOMARSINO,96.5,,,,,,,True
+PE3,4,2026PRWBFN,DETERMINISTIC CONTROL OF QUANTUM MATERIALS WITH LIGHT - DELIGHT,Lara,BENFATTO,90.5,,,,,,,True
+PE3,5,2026PL4ZKA,Rare-earth intercalated Dirac monolayers for electrically tunable magnetism (RETUNE),Polina,SHEVERDYAEVA,88.75,,,,,,,True
+PE3,6,2026PCH84S,Data-Driven Design and On-Surface Synthesis of Tunable 1D-to-2D Covalent Molecular Quantum Networks - DYNAMO,Simona,ACHILLI,88.5,36.0,,,,,,False
+PE3,7,2026PYBZPP,Energy-efficient Conductive Bridge RAM for Flexible Electronics enabled by Amorphous Telluride Electrolytes (ECO-FLEX),Riccardo,MAZZARELLO,88.5,35.0,,,,,,False
+PE3,8,2026P9AEJJ,SILENTIO - SILicon Emitter based Next-generation Technology for Integrated Optics,Jacopo,FORNERIS,88.25,,,,,,,False
+PE5,1,2026P92F5R,Deciphering the Fusobacterial Glycocode: How Surface Glycans Drive Host Interaction and Immune Modulation FUSOGLYCOATLAS,Alba,SILIPO,98.5,,,,,,,True
+PE5,2,2026PH9NYR,SYnthetic molecular Machines and Pumps operaATIng in complex Environments (Sympatie),Alberto,CREDI,96.5,,,,,,,True
+PE5,3,2026P39CXW,NiXome — A structural-bioinorganic atlas of human metalloproteome vulnerability to environmental nickel,Stefano Luciano,CIURLI,95.75,,,,,,,True
+PE5,4,2026PZX45Y,TWIST — ToWard chiral light from Inverted Singlet-Triplet emitters,Cristiano,ZONTA,94.75,,,,,,,True
+PE5,5,2026PPBFKX,SPIRAL: Chirality-Driven SPIN Control of Photocatalytic Water Splitting,Ludovico,VALLI,94.25,,,,,,,True
+PE5,6,2026PC3LM3,Spatially Programmed 3D Adsorbents for Carbon dioxidE capture under competitive water conditions (3D-SPACE),Valentina,CROCELLA',93.0,,,,,,,True
+PE5,7,2026P2CL48,FLUOride TRAPping through bridged dimeric metal complexes: A platform for possible in kit 18F-labelling and Theranostic applications (FLUOTRAP),Lorenzo,TEI,91.75,,,,,,,True
+PE5,8,2026PS4NJT,SupraCapture: SUPRAmolecular nanohybrids for targeted protein CAPTURE,Fabrizio,MANCIN,87.75,,,,,,,False
+PE5,9,2026PKEPBB,Cross-coupling strategies for the sustainable synthesis of biologically active compounds - XSus,Manuel,ORLANDI,87.0,,,,,,,True
+PE5,10,2026PNWFHB,Mobility in the assemblY of Supramolecular Therapeutics to Inhibit Cancer Angiogenesis And Inflammation focusing on Melanoma (MYSTICA_AIM),Silvia,MARCHESAN,86.75,,,,,,,False
+PE5,11,2026P7P9EF,Targeting human protein disulfide isomerase A3 (PDIA3) for the development of innovative preclinical-ready broad-spectrum antivirals against respiratory viral infections: a contribution to a basic need. (Acronim: SHUFFLE),Marco Lucio,LOLLI,86.25,,,,,,,False
+PE5,12,2026P9M33X,Circular High Entropy Metal PHOsphates REcovery from Wastes for (Electrophoto)catalytic Reactions - CHEMPHOREWER,Laura Eleonora,DEPERO,85.25,,,,,,,False
+PE6,1,2026P7R5JT,Agentic Trustworthy & Human-supervised ENvironments for AI (ATHENA),Luigi,TROIANO,99.5,,,,,,,True
+PE6,2,2026P39CW7,PREMISE - PREdictive Multimodal Intelligence with Spatial and Episodic memory,Lorenzo,BARALDI,95.0,,,,,,,True
+PE6,3,2026P43NRH,Embodied eXPERtise Transfer through Mutual Interpretation (EXPERT-MI),Marco,CRISTANI,93.0,,,,,,,True
+PE6,4,2026PPTAHC,AEGIS: Ensuring AI Reliability and Longevity Through Hardware and Software Cross-Layer Hardening,Paolo,RECH,92.5,,,,,,,True
+PE6,5,2026PYPKPX,New Frontiers in Tele-Rehabilitation as a Service (NF-TRaaS),Antonio,CELESTI,92.0,,,,,,,True
+PE6,6,2026PT85XP,PRESERVE: Preserving Developer Intent in Trustworthy AI-Assisted Software Engineering,Fabio,PALOMBA,91.5,,,,,,,True
+PE6,7,2026P5PEE5,ResAccess-AI (Responsible Artificial Intelligence for Accessible Interactive Systems),Fabio,PATERNO',89.5,,,,,,,False
+PE6,8,2026PLXMR2,Model-Augmented AI in Computational Biology (MADAI-CB): Integrating Multi-Omics and Multimodal Data for Mechanistic Modeling and Personalized Therapies in Non-Communicable Diseases,Alfredo,PULVIRENTI,88.5,,,,,,,False
+PE6,9,2026P9J894,Decomposition of Logic-based Combinatorial Problems (DECO-LOG),Marco,MARATEA,88.0,,,,,,,False
+PE6,10,2026P79T3K,FORGE - Flexible Open Retrieval for GEnomics,Giulio Ermanno,PIBIRI,87.5,,,,,,,False
+PE6,11,2026PZJHZC,Generative Graph Learning for Spatio-Temporal Processes (GraSP),Davide,BACCIU,87.0,,,,,,,False
+PE7,1,2026PJMWPX,Multimodal Engineered Technologies and Artificial Intelligence for early prediction and prevention of metabolic complications in healthCARE pathways for non-communicable diseases (Acronym: META-AI CARE),Pasquale,FOGGIA,100.0,40.0,20.0,0.82,10,7,,True
+PE7,2,2026PEPNKS,MultifunctiOnal weaRable Platforms for AI-enabled HEalth monitoring and User-centered Sustainability (MORPHEUS),Antonio,MAFFUCCI,100.0,40.0,20.0,0.8,6,9,,True
+PE7,3,2026P7EAZX,WhoWh: WattHour on Wheels – Enabling Scalable Electric Mobility via Integrated Design and Control of Grid-Friendly Charging Systems,Sonia,LEVA,100.0,40.0,20.0,0.44,7,2,,True
+PE7,4,2026PTCCMW,Modular Surfaces with AI-driven Conversion for Integrated Photovoltaics - MOSAIC4IPV,Gabriele Maria,LOZITO,100.0,40.0,20.0,0.2,9,1,,True
+PE7,5,2026PHLMC4,e-DoIT-RISE - echo-Doppler Imaging Tonometer: Reference Infrastructure for Stiffness Evaluation,Andrea,SCORZA,100.0,40.0,20.0,0.0,5,0,,True
+PE7,6,2026PJSZXF,"System-level co-design, fabrication and testing of microscale Biosensing platforms integrating Nanoscale CMOS ICs, Micromachined Transducers and Functionalized Biointerfaces (SymBioNIC)",Paolo Stefano,CROVETTI,99.25,,,,,,,True
+PE7,7,2026PRM3Y8,"Lab-to-Cell approach for online monitoring, diagnostics, control, and life-cycle assessment of next-generation battery systems",Pier Andrea,TRAVERSO,98.75,,,,,,,True
+PE7,8,2026PW4NBT,SYNAPSE-EM - Adaptive Electromagnetic Neuroimaging: Multimodal Functional Data with Structural Bio-Priors,Paolo,ROCCA,98.5,,,,,,,True
+PE7,9,2026PH5MMN,Photonic Highways for Advanced Real-time Observation and Sensing (PHAROS),Antonio,MECOZZI,97.75,,,,,,,True
+PE7,10,2026PWJ2BB,DENDRA - Adaptive Dendritic Electronics for Self-Organizing Neuromorphic Intelligence,Marco,FANCIULLI,97.25,,,,,,,True
+PE7,11,2026PNS22N,Metrological framework for TRUSTworthy MEasuring systems with machine-learning components across their life cycle (TRUSTME),Gabriele,PATRIZI,96.5,,,,,,,True
+PE7,12,2026PTJ5FX,CRYO-DC4FUSION: DC Microgrid for Cryogenic Power Supplies Enabling Future Tokamak Fusion Power Plants,Pericle,ZANCHETTA,94.0,37.5,19.0,,,,,False
+PE7,13,2026P4W7PS,Molecularly Imprinted Digital Microneedles for Multianalyte Early Detection of Alzheimer’s Disease Biomarkers - MIND,Giuseppe,BARILLARO,94.0,37.5,18.5,,,,,False
+PE7,14,2026P5XAWZ,Sensing-enabled MMICs for Adaptive Reconfigurable Millimeter-wave Transmitters (SMART),Gian Piero,GIBIINO,93.5,37.5,18.5,0.33,10,2,,False
+PE7,15,2026P59TBP,Instrumented Wheels for Zero Accidents - IWheZA,Gianpiero,MASTINU,93.5,37.0,18.5,0.3,17,3,,False
+PE7,16,2026P4Z3FE,Multiplexed nanophotonic sensing platform for real-time monitoring of 3D blood-brain barrier spheroids (BIC-MULTISENSE),Silvia,ROMANO,93.25,,,,,,,False
+PE7,17,2026P4MW2A,Reliable and Interoperable Grid-Forming Converters for Power-Electronics-Dominated Grids (RIGFORM),Tommaso,CALDOGNETTO,90.5,,,,,,,False
+PE7,18,2026P8223T,DEXTER – Data-driven EXoskeleton for Integrated Arm-Wrist-Hand Neuro-Motor Recovery,Giuseppe,CARBONE,89.5,,,,,,,False
+PE8,1,2026PT4LAW,SENTINEL: Non-Intrusive Cybersecurity for Safety-Critical Devices,Domenico,CAPRIGLIONE,100.0,,,,,,,True
+PE8,2,2026PF7RZ7,CHROMA – Color and Human Response for Urban Overheating Mitigation and Adaptation in Multisensory Built Environments,Francesco,ASDRUBALI,99.0,,,,,,,True
+PE8,3,2026PP584L,EuTechnologies for Solar Monitoring of Active Resilient Thermal pavements (EUTECH-SMART),Francesco,CANESTRARI,97.75,,,,,,,True
+PE8,4,2026PRP438,"LACES – Low-impact Advanced Concrete Engineering Systems: Mechanical and Multiphysics Modelling, Experimental Validation and Design Guidelines",Francesco,DAL CORSO,97.5,,,,,,,True
+PE8,5,2026P5WRZ8,AI-PRAESIDIUM — agentic AI for Performance-based Robustness AssESsment of Degraded InfrastrUcture across Multiple scales,Andrea,PROTA,97.25,,,,,,,True
+PE8,6,2026PPLHWR,"NEXUS-FLOAT: Nuclear Energy X-sector Utilization and Storage on FLOATing platforms - Integration of SMRs and AMRs with process heat use, storage and offshore technologies for the Mediterranean decarbonization",Antonio,CAMMI,97.0,,,,,,,True
+PE8,7,2026PWELAN,CRATERA. A Comprehensive Research Platform based on AI-assisted Analysis for Archaeological Heritage Conservation in Multi-Risk Areas,Renata,PICONE,96.5,,,,,,,True
+PE8,8,2026PMAYZE,Ammonia High temperature ElectrochemicAl synthesis and Decomposition (AHEAD),Massimo,SANTARELLI,96.25,39.0,,,,,,True
+PE8,9,2026PWTWM5,Advanced Theoretical and Computational Methods for the Design and Modeling of Multiscale Innovative Materials and Structures – ATOMS-MIMS,Fernando,FRATERNALI,96.25,38.5,,,,,,True
+PE8,10,2026PKHJA4,ENCHANT – ENgineered Co-design of surfaces and geometries for Heat exchANgers in sustainable Thermal systems,Sara,RAINIERI,93.5,,,,,,,True
+PE8,11,2026PPCYZY,Adaptive Hydrogen Energy Architectures for Autonomous Logistics and Mobility (A-HEAL),Stefano,UBERTINI,91.5,,,,,,,True
+PE8,12,2026PSLPF4,AURA - Atmospheric hUmidity Recovery with Advanced sorbents,Valeria,PALOMBA,90.0,,,,,,,True
+PE8,13,2026PLWK3R,PANTHER - Photothermal cArbon Nanofluids by flame synTHesis for solar-assistEd CO ₂ Recovery from amines,Carmela,RUSSO,89.0,,,,,,,True
+PE8,14,2026PJA772,GEOCHARME 2: GEOphysical CHARacterization and Monitoring of Earthen dams and levees 2,Laura,SOCCO,88.5,,,,,,,False
+PE8,15,2026PWCEEC,"TRUST-IN-RC: Trained, Reliable and Uncertainty-aware Structural digital-Twin based approaches for INfrastructures subjected to Reinforcement Corrosion",Beatrice,BELLETTI,88.0,35.5,17.5,0.84,11,8,,False
+PE8,16,2026PP2SAM,Holistic resilience modelling and climate change adaptation of critical infrastructure exposed to NaTech risk,Iunio,IERVOLINO,88.0,35.5,17.5,0.55,8,3,,False
+PE8,17,2026P7C5HF,DREAM-AM - Defect-Resolved Multiscale Fatigue Design and Topology Optimisation of complex Metal Additively Manufactured Components,Andrea,TRIDELLO,87.25,,,,,,,True
+PE8,18,2026PEA2X7,Advanced Reactors and Thermochemical Energy Materials for Innovative Storage - ARTEMIS,Laura,FEDELE,87.0,,,,,,,False
+PE8,19,2026PJ2K77,AQUAtic environments for energy sheet pile WALLs (AQUA-WALL),Francesco,CECINATO,86.5,,,,,,,False
+PE8,20,2026P58XKW,MICA - from phenomenological to physics-based soil mechanics: a Microstructure-Informed Constitutive framework for engineering Applications,Angelo,AMOROSI,86.0,34.0,,,,,,False
+PE8,21,2026P38TNH,MATT — Multi-material Additive manufacturing Through voxel-level inTelligence,Bianca Maria,COLOSIMO,86.0,33.0,,,,,,False
+PE8,22,2026P894ZM,A unified FRamework for performance-based design of fOundation systems under DYnamic soil–structure inTEraction (AFRODYTE),Domenico,GAUDIO,85.0,,,,,,,False
+PE9,1,2026P7JKEP,CERCO-GEMME: Constraining the Evolutionary Roads to Compact Objects with Gravitational-wave Emission and Multi-Messenger Events,Mario,SPERA,93.25,,,,,,,True
+PE9,2,2026P59TTH,ET-STAR: Einstein Telescope – Science and Technical Advanced Requirements,Marica,BRANCHESI,93.0,,,,,,,True
+PE9,3,2026PZ8WMF,Augmented Physics for EXtremes (APEX),Gianluca,ISRAEL,92.75,,,,,,,True
+PE9,4,2026PWYR42,Unlocking the Full Cosmological Information of Next-Generation Surveys,Luigi,GUZZO,92.5,,,,,,,True
+PE9,5,2026PM39MZ,"A unified Vision of the InteractioN betwEen soLar wind structures, turbuLence and shOcks (VINELLO)",Sergio,SERVIDIO,92.25,,,,,,,False
+PE9,6,2026P4H9JK,BRIDGE - From nuclear matter to gamma-ray burst jets and kilonovae: modelling binary neutron star mergers across the relevant scales,Riccardo,CIOLFI,92.0,,,,,,,False
+PE9,7,2026PRM87C,Exploring the cosmic galaxy frontier [FRONTIER],Andrea,FERRARA,91.0,,,,,,,False
+PE9,8,2026PZ9MB3,BIOGEOMARS-Deciphering the BioGeo Puzzle of Martian Organic Carbon through Studies of Laboratory Analogs and Martian Meteorites,Teresa,FORNARO,86.0,,,,,,,False
+SH4,1,2026P93SNJ,Understanding Action: Toward a Causal Multilevel Theory of Neural Architecture and Dynamics (ACTION-NET),Nadia,BOLOGNINI,97.5,,,,,,,True
+SH4,2,2026PXNXPE,Human and Artificial Intelligence in a dynamic world: A multidisciplinary approach,Valerio,CAPRARO,97.25,,,,,,,True
+SH4,3,2026PE8RSJ,The Multimodal Turn: Uncovering the Neurocognitive Principles of Language and Communication Beyond Speech,Francesco,PAVANI,97.0,,,,,,,True
+SH4,4,2026PYP5C3,Sensory evidence and PRIors in Nocebo Genesis (sPRINg),Mirta,FIORIO,94.75,,,,,,,True
+SH4,5,2026PEW38H,VeLe - Venetian texts and Lexicography tradition,Federico,BARICCI,93.75,,,,,,,True
+SH4,6,2026PZ7AX7,"Decisions, Rules and Strategies: Distributed Executive Flexibility in the Motor System (STREaM)",Luigi,CATTANEO,90.25,,,,,,,True
+SH4,7,2026PBPH3Z,Costs and Benefits of Acting Together: The Cognitive and Neural Foundations of Cooperative Choice (JANUS – Joint Action Neurocognition of Utility and Social Value),Eraldo,PAULESU,89.75,,,,,,,True
+SH4,8,2026PXWX5Z,"Accent Representation, Ideologies, and Attitudes (ARIA)",Silvia,CALAMAI,89.0,,,,,,,True
+SH4,9,2026P2NLM5,ROOTS: Discovering the Subcortical ROOTS of Social Cognition: Cerebellar and Dopaminergic Mechanisms of Predictive Social Learning,Zaira,CATTANEO,88.5,,,,,,,False
+SH4,10,2026P327AF,B-MESH: Borrowing across Multilingual Ecologies and SpeakerHoods in Italy,Silvia,DAL NEGRO,88.0,,,,,,,False
+SH4,11,2026PTYBJT,TUNE. Tracking (UN)predictability and Expectations: How rhythmic regularities shape the developing brain in typical and atypical populations,Viola Marina,MACCHI CASSIA,87.5,,,,,,,False
+SH4,12,2026P28277,GATE - Gating Awareness: Entangling Intrinsic Brain Dynamics with Consciousness Levels and Contents,Marco,TAMIETTO,87.25,,,,,,,False
+SH4,13,2026PSJ9PR,Rattles and Bolts: Language Acquisition in Babies and Machines (R'n'B LAB),Cristiano,CHESI,85.75,,,,,,,False
+SH4,14,2026PX3JRA,"Tuning to the world: how adaptation to natural stimulus statistics molds visual processing across domains, species, developmental time and levels of abstraction",Judit,GERVAIN,85.5,,,,,,,False
+SH4,15,2026PAJRNY,"RESPECT Recognition, Epistemic Symmetry and Participation in Expert-by-experience Care Transformations",Elena,FACCIO,85.25,,,,,,,False
+SH4,16,2026P5FH9L,DIGI-HEALTH: Digital Work and Healthy Recovery: A Multilevel Framework for Psychophysiological Sustainability,Guido,ALESSANDRI,85.0,,,,,,,False
+SH5,1,2026PZXJPY,"DAPHNE – Digital Archive of Petrarchan Heritage and Networked Evidence: A National FAIR Census, Description, and Visual Repository of Petrarchan Manuscripts in Italy (XIV-XVI centuries).",Natascia,TONELLI,100.0,,,,,,,True
+SH5,2,2026PN4LPF,What’s the Matter? Matter as an Epistemic and Ontological Principle in Premodern Thought (4th–16th Centuries),Mario,LOCONSOLE,99.75,,,,,,,True
+SH5,3,2026P8783L,REcovering AnCient Texts and developing new interpretative paradigms through Greek papyrological collections (REAcT),Giovan Battista,D'ALESSIO,99.0,40.0,,,,,,True
+SH5,4,2026PTH2J2,Sharpening concepts: the architecture of mathematical definitions,Andrea,SERENI,99.0,39.5,,,,,,True
+SH5,5,2026PP99C8,ArchAut An Archaeology of Italian Autofiction (1922-1975) through Authors’ Archives,Lorenzo,MARCHESE,96.5,,,,,,,True
+SH5,6,2026PH9WNA,"Reconstructing the Hittite City: Text, Materiality, and Territory - ReHit",Rita,FRANCIA,95.0,,,,,,,True
+SH5,7,2026P8W4MY,"Natural Intelligence: Ancient Perspectives on its Forms, Powers, and Limits",Roberto,GRANIERI,93.5,38.0,,,,,,True
+SH5,8,2026PJX9M8,TRACE – Text and Reception of the Aristotelian Corpus: The Ethics,Ciro,GIACOMELLI,93.5,37.0,,,,,,True
+SH5,9,2026PAYZKY,"STAGE-IT - Staging German Theatre in Italy. Mapping Intercultural Practices of Circulation, Adaptation, Performance, and Publishing",Marco,CASTELLARI,92.5,,,,,,,False
+SH5,10,2026PXT489,INTEGRA-MED: Epistemic and Value Integration in Emerging Medical Technologies,Marta,BERTOLASO,92.25,,,,,,,False
+SH5,11,2026PTZL54,Caught in Boiardo’s Web: Literary Genres and Artistic Codes in Fifteenth-century Vernacular Literature,Arnaldo,SOLDANI,92.0,,,,,,,False
+SH5,12,2026PYF3B3,STEPS Stepwise Epistemology: a New Framework for Bounded Rationality,Luca Francesco,SAN MAURO,91.25,,,,,,,False
+SH5,13,2026P93X8R,LiLaC - The Living Language of Comedy,Virginia,MASTELLARI,88.75,,,,,,,True
+SH5,14,2026PFKX9H,ERror-aware Reasoning: Algebraic and proof Theoretic Approaches (ERRATA),Stefano,BONZIO,88.5,,,,,,,False
+SH5,15,2026PYHPHP,De Interpretatione: Origins and Receptions Aristotle’s Treatise from Ancient Roots to Medieval and Renaissance Traditions (DI.OR),Maddalena,BONELLI,87.25,,,,,,,False
+SH5,16,2026PBW7J7,Technologies and Materialities of Power’s Written Practices. Reframing the Documentary Revolution in Medieval Italy (12th-14th c.) - acronym: TEMPO,Marta Luigina,MANGINI,86.5,,,,,,,False
+SH6,1,2026PNB5SZ,"SPECTRA. Voices, Environments, Embodiment. Historical and Cultural Perspectives on Demonic Possession in Italy from the Early Modern Period to the Present",Federico,BARBIERATO,100.0,,,,,,,True
+SH6,2,2026PLC5LA,HERB-IT Herbaria as Knowledge Infrastructures: Shaping Botanical Cultures in Italy across the Longue Durée,Elena,CANADELLI,99.75,,,,,,,True
+SH6,3,2026PMHZJW,"Greek Inscriptions of Magna Graecia: Texts, Contexts, and Digital Corpus",Emilio,ROSAMILIA,99.5,,,,,,,True
+SH6,4,2026P8CJTH,Beyond Institutions: Non-Institutional Economic Agency in the Bronze Age – A Comparative and Diachronic Study of Economic Practices in Cuneiform Sources,Maurizio,VIANO,99.25,,,,,,,True
+SH6,5,2026PZNPN4,LEGALITES. Legal Elites and Social Transformation in the Kingdom of Italy (9th–12th Centuries),Paolo,TOMEI,96.25,,,,,,,True
+SH6,6,2026P3TTLE,"Credit Italies Banking, Industry, and the Geography of Credit Allocation, 1893–1973 (CREDIT-IT)",Marianna,ASTORE,96.0,,,,,,,True
+SH6,7,2026PM97LY,AFTER: Afterlives of fascism in everyday spaces,Emanuele,ERTOLA,95.5,,,,,,,True
+SH6,8,2026PS9SLE,"PatriarKeys. Patriarchy across the ages: Keys to decoding power relations, family practices, social languages, and gender inequalities",Isabella,LAZZARINI,95.25,38.5,,,,,,True
+SH6,9,2026PFPATZ,"Crisis and Transformation of the Italian Clergy after Vatican II (1965-1995). Questioning Ecclesial Structures, Clerical Cultures, Gender Models, and Reframing the Missionary Paradigm in the Age of Latin American Liberation Catholicism and the Emergence of Asian and African ‘Young Churches’",Silvia,SCATENA,95.25,37.5,,,,,,False
+SH6,10,2026PW7ZC9,"FIRST-SICILY: FIRST entrance, dispersal and adaptation of Homo sapiens in SICILY",Rita,SORRENTINO,95.0,,,,,,,True
+SH6,11,2026P8EFMT,MEMINI - Mapping Elite Members In (Roman) Northern Italy,Giulia,VETTORI,94.75,38.5,18.0,1.0,5,5,,False
+SH6,12,2026PAHEHJ,The Greek Lexicon of Roman Administration,Andrea,RAGGI,94.75,38.5,18.0,0.78,11,7,,False
+SH6,13,2026PKWW3J,NEGOTIA. Negotiation of Asset and Patrimony Transformations in Late Medieval Italy,Massimo Valerio,VALLERANI,91.5,,,,,,,False
+SH6,14,2026P5LRBC,"UNEVEN GROUND. Inequality, Resources and Wealth Distribution in Ancient Northern Italy",Lorenzo,ZAMBONI,87.0,,,,,,,False
+SH7,1,2026PC2PY8,"AURORA-Artificial Intelligence and Urban Reconfigurations: infrastructures, practices and narratives in contempORAry cities",Michela,LAZZERONI,96.5,,,,,,,True
+SH7,2,2026P53P8J,Critical and strategic Raw material dependence: European policies and Socio-economic Transformations (CREST),Simona,IAMMARINO,88.5,36.0,,,,,,True
+SH7,3,2026PXHN45,Effects of Climate Hazards On Economies and Societies across Scales (ECHOESS),Alessandro,CAIANI,88.5,35.0,,,,,,True
+SH7,4,2026PFPY3A,Families with a Migrant Background and Socio-Demographic Inequalities in Contemporary Italy (FAMBIT),Eleonora,TRAPPOLINI,88.0,,,,,,,True
+SH7,5,2026PKE93N,"Circular Economy Data, Models and Indicators for Transition Analytics (CIRCE-DATA)",Massimiliano,MAZZANTI,87.5,,,,,,,True
+SH7,6,2026PNA9YP,INFLOW: infertility in the low fertility era,Marco,COZZANI,87.0,,,,,,,True
+SH7,7,2026PWCNYF,"DATALOC — Data Centres, Cloud Services and Local Development: Environmental, Economic and Social Impacts in Europe and Italy",Maria,SAVONA,85.25,,,,,,,False
