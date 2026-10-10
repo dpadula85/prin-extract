@@ -1,0 +1,326 @@
+{
+ "budgets": {
+  "LS1": {
+   "ordinary": 6050032.93,
+   "total": 6876029.64,
+   "under40": 825996.71
+  },
+  "LS2": {
+   "ordinary": 5612975.92,
+   "total": 6526295.38,
+   "under40": 913319.46
+  },
+  "LS3": {
+   "ordinary": 4880443.93,
+   "total": 5659798.73,
+   "under40": 779354.8
+  },
+  "LS4": {
+   "ordinary": 11091757.56,
+   "total": 12940419.8,
+   "under40": 1848662.24
+  },
+  "LS5": {
+   "ordinary": 8300913.14,
+   "total": 9774991.6,
+   "under40": 1474078.46
+  },
+  "LS6": {
+   "ordinary": 6720804.67,
+   "total": 7805432.95,
+   "under40": 1084628.28
+  },
+  "LS7": {
+   "ordinary": 14817188.54,
+   "total": 17876518.51,
+   "under40": 3059329.97
+  },
+  "LS8": {
+   "ordinary": 7133169.68,
+   "total": 8388561.62,
+   "under40": 1255391.94
+  },
+  "LS9": {
+   "ordinary": 12709796.63,
+   "total": 15113225.76,
+   "under40": 2403429.13
+  },
+  "PE1": {
+   "ordinary": 4479149.2,
+   "total": 5516870.22,
+   "under40": 1037721.02
+  },
+  "PE10": {
+   "ordinary": 8208741.56,
+   "total": 9408406.92,
+   "under40": 1199665.36
+  },
+  "PE11": {
+   "ordinary": 5437753.84,
+   "total": 6491048.33,
+   "under40": 1053294.49
+  },
+  "PE2": {
+   "ordinary": 6116355.26,
+   "total": 7318345.39,
+   "under40": 1201990.13
+  },
+  "PE3": {
+   "ordinary": 5142740.48,
+   "total": 5979613.72,
+   "under40": 836873.24
+  },
+  "PE4": {
+   "ordinary": 5980909.34,
+   "total": 7153276.85,
+   "under40": 1172367.51
+  },
+  "PE5": {
+   "ordinary": 7191669.17,
+   "total": 8218330.35,
+   "under40": 1026661.18
+  },
+  "PE6": {
+   "ordinary": 6091144.79,
+   "total": 7424311.14,
+   "under40": 1333166.35
+  },
+  "PE7": {
+   "ordinary": 10251359.05,
+   "total": 11790953.69,
+   "under40": 1539594.64
+  },
+  "PE8": {
+   "ordinary": 14124589.0,
+   "total": 16689595.4,
+   "under40": 2565006.4
+  },
+  "PE9": {
+   "ordinary": 4292671.31,
+   "total": 4970521.99,
+   "under40": 677850.68
+  },
+  "SH1": {
+   "ordinary": 8707374.67,
+   "total": 10583160.22,
+   "under40": 1875785.55
+  },
+  "SH2": {
+   "ordinary": 10138231.54,
+   "total": 11868682.2,
+   "under40": 1730450.66
+  },
+  "SH3": {
+   "ordinary": 7802101.15,
+   "total": 9360947.54,
+   "under40": 1558846.39
+  },
+  "SH4": {
+   "ordinary": 8120980.78,
+   "total": 9622279.87,
+   "under40": 1501299.09
+  },
+  "SH5": {
+   "ordinary": 9026614.2,
+   "total": 10499510.29,
+   "under40": 1472896.09
+  },
+  "SH6": {
+   "ordinary": 8213638.01,
+   "total": 9374231.98,
+   "under40": 1160593.97
+  },
+  "SH7": {
+   "ordinary": 6588844.28,
+   "total": 7698286.16,
+   "under40": 1109441.88
+  },
+  "SH8": {
+   "ordinary": 7674000.36,
+   "total": 8959707.72,
+   "under40": 1285707.36
+  }
+ },
+ "decrees": {
+  "LS2": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000037.06-10-2026.pdf",
+   "decree_number": 37,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-37-macrosettore-ls-settore-ls2-approvazione",
+   "sector": "LS2",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS2_Tabella%20A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS2_Tabella%20B_Progetti%20finanziati.pdf"
+  },
+  "LS3": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000038.06-10-2026.pdf",
+   "decree_number": 38,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-38-macrosettore-ls-settore-ls3-approvazione",
+   "sector": "LS3",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS3_Tabella%20A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS3_Tabella%20B_Progetti%20finanziati.pdf"
+  },
+  "LS4": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000042.06-10-2026.pdf",
+   "decree_number": 42,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-42-macrosettore-ls-settore-ls4-approvazione",
+   "sector": "LS4",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS4_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS4_Tabella_B_Progetti%20finanziati.pdf"
+  },
+  "LS7": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000039.06-10-2026.pdf",
+   "decree_number": 39,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-39-macrosettore-ls-settore-ls7-approvazione",
+   "sector": "LS7",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS7_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS7_Tabella_B_Progetti%20finanziati.pdf"
+  },
+  "PE1": {
+   "annulled_by": null,
+   "date": "05/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000029.05-10-2026%5B1%5D.pdf",
+   "decree_number": 29,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n29-del-05-10-2026",
+   "sector": "PE1",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE1_Tabella_A_Graduatoria_finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE1_Tabella_B_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "PE10": {
+   "annulled_by": null,
+   "date": "05/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000035.05-10-2026%5B1%5D.pdf",
+   "decree_number": 35,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n35-del-05-10-2026",
+   "sector": "PE10",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE10_Tabella_A_Graduatoria_finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE10_Tabella_B_Progetti_finanziati_PE10%5B1%5D.pdf"
+  },
+  "PE11": {
+   "annulled_by": null,
+   "date": "05/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000036.05-10-2026%5B1%5D.pdf",
+   "decree_number": 36,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n36-del-05-10-2026",
+   "sector": "PE11",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE11_Tabella_A_-_Graduatoria_finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE11_Tabella_B_-_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "PE2": {
+   "annulled_by": null,
+   "date": "05/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000030.05-10-2026%5B1%5D.pdf",
+   "decree_number": 30,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-30-del-05-10-2026",
+   "sector": "PE2",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE2_-_Tabella_A_-_Graduatoria_finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE2_Tabella_B_-_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "PE3": {
+   "annulled_by": null,
+   "date": "05/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000031.05-10-2026%5B1%5D.pdf",
+   "decree_number": 31,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n31-del-05-10-2026",
+   "sector": "PE3",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE3_Tabella_A_Graduatoria_finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE3_Tabella_B_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "PE5": {
+   "annulled_by": null,
+   "date": "08/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000047.08-10-2026%5B1%5D.pdf",
+   "decree_number": 47,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n47-del-08-10-2026",
+   "sector": "PE5",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE5_Tabella_A_Graduatoria_finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE5_Tabella_B_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "PE6": {
+   "annulled_by": null,
+   "date": "08/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/Decreto%20Direttoriale%20n.48%20del%2008-10-2026.pdf",
+   "decree_number": 48,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-48-del-08-10-2026",
+   "sector": "PE6",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE6_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE6_Tabella_B_Progetti%20finanziati.pdf"
+  },
+  "PE7": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000045.06-10-2026.pdf",
+   "decree_number": 45,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-45-macrosettore-pe-settore-pe7-approvazione",
+   "sector": "PE7",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE7_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE7_Tabella_B_Progetti%20finanziati.pdf"
+  },
+  "PE8": {
+   "annulled_by": null,
+   "date": "05/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000033.05-10-2026%5B1%5D.pdf",
+   "decree_number": 33,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n33-del-05-10-2026",
+   "sector": "PE8",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE8_Tabella_A_%E2%80%93_Graduatoria_Finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE8_Tabella_B_-_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "PE9": {
+   "annulled_by": null,
+   "date": "05/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro_Decreti%28R%29.0000034.05-10-2026%5B1%5D.pdf",
+   "decree_number": 34,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n34-del-05-10-2026",
+   "sector": "PE9",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE9_Tabella_A_-_Graduatoria_finale%5B1%5D.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE9_Tabella_B_-_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "SH4": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000040.06-10-2026.pdf",
+   "decree_number": 40,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-40-macrosettore-sh-settore-sh4-approvazione",
+   "sector": "SH4",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/SH4_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/SH4_Tabella_B_Progetti%20finanziati.pdf"
+  },
+  "SH5": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000041.06-10-2026.pdf",
+   "decree_number": 41,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-41-macrosettore-sh-settore-sh5-approvazione",
+   "sector": "SH5",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/SH5_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/SH5_Tabella_B_Progetti%20finanziati.pdf"
+  },
+  "SH6": {
+   "annulled_by": null,
+   "date": "06/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/KH5RHFCV.AKXKJJB.Registro%20Decreti%28R%29.0000044.06-10-2026.pdf",
+   "decree_number": 44,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-44-macrosettore-sh-settore-sh6-approvazione",
+   "sector": "SH6",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/SH6_Tabella%20A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/SH6_Tabella%20B_Progetti%20finanziati.pdf"
+  },
+  "SH7": {
+   "annulled_by": null,
+   "date": "09/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/D.D.%2049%20del%2009-10-2026%20PRIN%202026%20SH7.pdf",
+   "decree_number": 49,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-49-del-09-10-2026",
+   "sector": "SH7",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/SH7_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/SH7_Tabella_B_Progetti%20finanziati.pdf"
+  }
+ }
+}

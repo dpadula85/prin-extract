@@ -15,11 +15,12 @@ Output (in --out, default ./prin_out):
                                   "Summary" sheet, one sheet per --uni, and "All units"
   add --csv to also write all_rows.csv and one CSV per --uni
 """
-import argparse, csv, re, sys, time
+import argparse, csv, re, sys
 from pathlib import Path
 from urllib.parse import urljoin, unquote
 
-START = "https://prin.mur.gov.it/Pages/Index/301"
+import decrees
+from common import START, fetch_pdf, num, sector_of
 
 ROW = re.compile(
     r"\b(?P<n>\d{1,2}) (?P<role>PI|RU) (?P<name>.+?) "
@@ -32,10 +33,6 @@ TITLE = re.compile(
     r"(?= Totale| \d{1,2}\. 20\d{2}[A-Z0-9]{6} - | n° Nome| Cofinanziament| "
     r"(?:PE|LS|SH)\d+ - Tabella|$)"
 )
-
-
-def num(s):
-    return float(s.replace(".", "").replace(",", "."))
 
 
 def parse_text(text, sector=""):
@@ -51,6 +48,13 @@ def parse_text(text, sector=""):
         ))
     titles = {m["code"]: m["title"].strip() for m in TITLE.finditer(flat)}
     return rows, titles
+
+
+def find_session():
+    import requests
+    s = requests.Session()
+    s.headers["User-Agent"] = "Mozilla/5.0 (prin-extract)"
+    return s
 
 
 def find_pdf_urls():
@@ -73,25 +77,6 @@ def find_pdf_urls():
             if name.endswith(".pdf") and "tabella" in name and "finanziati" in name:
                 pdfs.add(u)
     return sorted(pdfs), s
-
-
-def fetch_pdf(sess, url, dest, tries=3):
-    """Download url to dest; only accept real PDFs (server sometimes returns HTML)."""
-    if dest.exists() and dest.read_bytes()[:5] == b"%PDF-":
-        return True
-    for i in range(tries):
-        try:
-            r = sess.get(url, timeout=120,
-                         headers={"Referer": START, "Accept": "application/pdf,*/*"})
-            if r.ok and r.content[:5] == b"%PDF-":
-                dest.write_bytes(r.content)
-                return True
-            print(f"  try {i+1}: {dest.name} -> HTTP {r.status_code}, "
-                  f"{r.headers.get('content-type')}, not a PDF", file=sys.stderr)
-        except Exception as e:
-            print(f"  try {i+1}: {dest.name} -> {e}", file=sys.stderr)
-        time.sleep(2 * (i + 1))
-    return False
 
 
 HEAD = [("sector", "Sector", 8), ("project_code", "Project code", 14), ("title", "Title", 60),
@@ -192,14 +177,9 @@ def dedupe(rows):
     return df.drop(columns=["mtime"]).to_dict("records")
 
 
-def sector_of(name):
-    m = re.search(r"(?<![A-Z0-9])(PE\d+|LS\d+|SH\d+|CYB)(?!\d)", name.upper())
-    return m.group(1) if m else ""
-
-
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--uni", action="append", required=True)
+    ap.add_argument("--uni", action="append", default=[], help="university filter (repeatable)")
     ap.add_argument("--pdf-dir", default="prin_pdfs")
     ap.add_argument("--out", default="prin_out")
     ap.add_argument("--no-download", action="store_true", help="only parse PDFs already in --pdf-dir")
@@ -224,6 +204,17 @@ def main():
             for u in failed:
                 print("   ", u, file=sys.stderr)
             print(file=sys.stderr)
+
+    manifest_path = out / "decrees.json"
+    if not a.no_download:
+        sess_d = find_session()
+        current = decrees.find_decrees(sess_d)
+        failed = decrees.download_decrees(sess_d, current, pdf_dir)
+        for u in failed:
+            print("! could not download", u, file=sys.stderr)
+        budgets = decrees.parse_budgets(sorted((pdf_dir / "decrees").glob("*.pdf")))
+        decrees.save_manifest(manifest_path, current, budgets)
+    manifest = decrees.load_manifest(manifest_path)
 
     rows, titles = [], {}
     for f in sorted(pdf_dir.glob("*.pdf")):
@@ -271,6 +262,9 @@ def main():
               f"{sum(r['mur_contribution'] for r in sel):,.0f} EUR MUR")
         for r in sorted(sel, key=lambda x: (x["sector"], x["project_code"])):
             print(f'  {r["sector"]:4} {r["project_code"]} {r["role"]} {r["name"]}  | {r["title"][:70]}')
+
+    if manifest:
+        decrees.update_readme(Path(__file__).with_name("README.md"), manifest, rows)
 
     xlsx = out / "prin2026_funded_projects.xlsx"
     write_xlsx(xlsx, results, rows)
