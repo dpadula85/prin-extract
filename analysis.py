@@ -179,8 +179,7 @@ def gender_table(d: Data) -> pd.DataFrame:
     """Female share (of persons with an inferred gender) in each group, Wilson 95% interval."""
     rk, un = d.ranking.copy(), d.units.copy()
     rk["macro"], un["macro"] = rk["sector"].str[:2], un["sector"].str[:2]
-    groups = {"PI, funded": rk[rk["funded"]], "PI, ranked not funded": rk[~rk["funded"]],
-              "Partner-unit leaders, funded": un[un["role"] == "RU"]}
+    groups = {"PI, funded": rk[rk["funded"]], "Partner-unit leaders, funded": un[un["role"] == "RU"]}
     rows = []
     for label, df in groups.items():
         for macro in ["PE", "LS", "SH", "All"]:
@@ -193,10 +192,11 @@ def gender_table(d: Data) -> pd.DataFrame:
 
 
 def under40_table(d: Data) -> pd.DataFrame:
-    """Per sector: ranked and funded projects by PI age group, the sector's ring-fenced
-    under-40 pool, the MUR money that went to projects of under-40 PIs, and how many of
-    those projects were funded below the best unfunded project of an over-40 PI (so
-    only the under-40 pool can have funded them)."""
+    """Per sector: the ring-fenced under-40 pool, the MUR money that went to the funded
+    projects of under-40 PIs, and how many of those were funded below the best unfunded
+    over-40 project of the ranking (a lower bound on the projects only the pool can have
+    funded). The ranking lists only fundable projects, not everything submitted, so no
+    success rate by age group can be formed from it."""
     budgets = d.budgets.set_index("sector")
     rows = []
     for sec in d.sectors:
@@ -213,18 +213,6 @@ def under40_table(d: Data) -> pd.DataFrame:
             funded_below_ordinary_cut=int((young["funded"] & (young["rank"] > best_out)).sum())
             if not np.isnan(best_out) else 0))
     return pd.DataFrame(rows).set_index("sector")
-
-
-def under40_rate_table(d: Data) -> pd.DataFrame:
-    """Fraction of ranked projects that were funded, by PI age group, Wilson 95% interval."""
-    rk = d.ranking.assign(macro=d.ranking["sector"].str[:2])
-    rows = []
-    for label, sel in (("PI under 40", rk[rk["under40"]]), ("PI over 40", rk[~rk["under40"]])):
-        for macro in ["PE", "LS", "SH", "All"]:
-            g = sel if macro == "All" else sel[sel["macro"] == macro]
-            f, lo, hi = wilson(int(g["funded"].sum()), len(g))
-            rows.append(dict(group=label, macro=macro, n_ranked=len(g), funded_fraction=f, low=lo, high=hi))
-    return pd.DataFrame(rows)
 
 
 # --------------------------------------------------------------- figures
@@ -500,24 +488,6 @@ def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: in
     _save(fig, ax, fig_dir, "collaboration_map")
 
 
-def fig_under40_rate(d: Data, rt: pd.DataFrame, fig_dir: Path):
-    macros = ["PE", "LS", "SH", "All"]
-    fig, ax = _axes(small=True)
-    for k, (label, color, marker) in enumerate((("PI under 40", U40_COLOR, "o"), ("PI over 40", PI_COLOR, "s"))):
-        sub = rt[rt["group"] == label].set_index("macro").loc[macros]
-        x = np.arange(len(macros)) + (k - 0.5) * 0.25
-        ax.errorbar(x, 100 * sub["funded_fraction"],
-                    yerr=100 * np.vstack([sub["funded_fraction"] - sub["low"],
-                                          sub["high"] - sub["funded_fraction"]]),
-                    fmt=marker, color=color, ms=12, capsize=6, lw=2.5, label=tex(label))
-    ax.set_xticks(range(len(macros)), macros)
-    ax.xaxis.set_minor_locator(plt.NullLocator())
-    ax.set_ylabel(r"Funded among ranked / \%")
-    ax.set_ylim(0, 105)
-    ax.legend(loc="lower left")
-    _save(fig, ax, fig_dir, "under40_funded_fraction")
-
-
 def fig_under40_pool(d: Data, u40: pd.DataFrame, fig_dir: Path):
     fig, ax = _axes(small=True)
     x = np.arange(len(u40))
@@ -532,8 +502,7 @@ def fig_under40_pool(d: Data, u40: pd.DataFrame, fig_dir: Path):
 
 
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
-    styles = {"PI, funded": (PI_COLOR, "o"), "PI, ranked not funded": (GREY, "s"),
-              "Partner-unit leaders, funded": (RU_COLOR, "^")}
+    styles = {"PI, funded": (PI_COLOR, "o"), "Partner-unit leaders, funded": (RU_COLOR, "^")}
     macros = ["PE", "LS", "SH", "All"]
     fig, ax = _axes(small=True)
     for k, (label, (color, marker)) in enumerate(styles.items()):
@@ -560,14 +529,13 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     tab_dir.mkdir(exist_ok=True), fig_dir.mkdir(exist_ok=True)
     inst, regions, sec = institution_table(d), region_table(d), sector_table(d)
     kinds, gt = _money(d.units, "kind", d.budget), gender_table(d)
-    u40, rt = under40_table(d), under40_rate_table(d)
+    u40 = under40_table(d)
     inst.to_csv(tab_dir / "institutions.csv", encoding="utf-8-sig")
     regions.to_csv(tab_dir / "regions.csv", encoding="utf-8-sig")
     sec.to_csv(tab_dir / "sectors.csv", encoding="utf-8-sig")
     kinds.to_csv(tab_dir / "institution_types.csv", encoding="utf-8-sig")
     gt.to_csv(tab_dir / "gender.csv", index=False, encoding="utf-8-sig")
     u40.to_csv(tab_dir / "under40.csv", encoding="utf-8-sig")
-    rt.to_csv(tab_dir / "under40_rate.csv", index=False, encoding="utf-8-sig")
     global USE_LATEX
     USE_LATEX = use_latex
     fig_institutions(d, inst, fig_dir)
@@ -580,7 +548,6 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     fig_kinds(d, fig_dir)
     fig_collaboration(d, inst, fig_dir, highlight=highlight)
     fig_gender(d, gt, fig_dir)
-    fig_under40_rate(d, rt, fig_dir)
     fig_under40_pool(d, u40, fig_dir)
     summary = dict(n_sectors=len(d.sectors), sectors=d.sectors, budget=d.budget,
                    funded=float(d.units["mur_contribution"].sum()),
