@@ -48,6 +48,11 @@ KIND_LABELS = {"public_university": "Public univ.", "private_university": "Priva
                "telematic": "Telematic univ.", "school": "Advanced schools",
                "research_body": "Research bodies", "national_research_body": "National bodies",
                "afam": "AFAM"}
+MACRO_AREA = {"North": ["Piemonte", "Valle d'Aosta/Vallée d'Aoste", "Liguria", "Lombardia",
+                         "Trentino-Alto Adige/Südtirol", "Veneto", "Friuli-Venezia Giulia", "Emilia-Romagna"],
+              "Centre": ["Toscana", "Umbria", "Marche", "Lazio"],
+              "South and Islands": ["Abruzzo", "Molise", "Campania", "Puglia", "Basilicata", "Calabria",
+                                    "Sicilia", "Sardegna"]}
 PI_COLOR, RU_COLOR, GREY = "#1f4e78", "#c8782a", "#9a9a9a"
 U40_COLOR = "#3f8d15"  # the green the MUR tables print under-40 PIs in
 SMALL = {"xtick.labelsize": 22, "ytick.labelsize": 22, "font.size": 28}
@@ -131,16 +136,44 @@ def _money(df: pd.DataFrame, by, budget: float) -> pd.DataFrame:
 
 
 def institution_table(d: Data) -> pd.DataFrame:
+    """One row per institution: money, roles, the number of sectors with a funded unit,
+    and its rank by funding overall and among institutions of the same type."""
     t = _money(d.units, "cf", d.budget)
     info = d.units.drop_duplicates("cf").set_index("cf")[["short_name", "city", "region", "kind"]]
-    return info.join(t).sort_values("mur_total", ascending=False)
+    t = info.join(t).sort_values("mur_total", ascending=False)
+    t["n_sectors"] = d.units.groupby("cf")["sector"].nunique()
+    t["rank"] = np.arange(1, len(t) + 1)
+    t["rank_in_type"] = t.groupby("kind").cumcount() + 1
+    return t
+
+
+def institution_sector_table(d: Data) -> pd.DataFrame:
+    """Long table, one row per institution and sector in which it has funded units."""
+    g = d.units.groupby(["cf", "short_name", "sector"])
+    t = g.agg(projects=("project_code", "nunique"), mur=("mur_contribution", "sum"),
+              pi_units=("role", lambda r: int((r == "PI").sum())),
+              ru_units=("role", lambda r: int((r == "RU").sum()))).reset_index()
+    t["share_of_budget_pct"] = 100 * t["mur"] / d.budget
+    return t.sort_values(["short_name", "sector"])
 
 
 def region_table(d: Data) -> pd.DataFrame:
     regions = [f["properties"]["region"] for f in
                json.loads((DATA / "italy_regions.geojson").read_text())["features"]]
     t = _money(d.units, "region", d.budget)
-    return t.reindex(regions + [NATIONAL]).fillna(0.0)
+    t = t.reindex(regions + [NATIONAL]).fillna(0.0)
+    t["pi_share_of_region_pct"] = 100 * t["mur_pi"] / t["mur_total"].where(t["mur_total"] > 0)
+    return t
+
+
+def macro_area_table(d: Data) -> pd.DataFrame:
+    """The regional money grouped into North, Centre, South and Islands (national bodies
+    left out), with the share of it that came from coordinating units."""
+    units = d.units.copy()
+    units["area"] = units["region"].map({r: a for a, rs in MACRO_AREA.items() for r in rs})
+    t = _money(units[units["area"].notna()], "area", d.budget).reindex(list(MACRO_AREA))
+    t["pi_share_of_region_pct"] = 100 * t["mur_pi"] / t["mur_total"]
+    return t
 
 
 def sector_table(d: Data) -> pd.DataFrame:
@@ -498,6 +531,53 @@ def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: in
     _save(fig, ax, fig_dir, "collaboration_map")
 
 
+def fig_region_roles(d: Data, regions: pd.DataFrame, areas: pd.DataFrame, fig_dir: Path):
+    """Per macro-area and region, the share of its funding that came from coordinating (PI)
+    and from partner (RU) units."""
+    reg = regions.drop(NATIONAL)
+    reg = reg[reg["mur_total"] > 0].sort_values("pi_share_of_region_pct", ascending=False)
+    label = lambda n, r: f"{n} ({int(r['pi_units'] + r['ru_units'])})"
+    rows = ([(label(a, r), r) for a, r in areas.iterrows()] + [None]
+            + [(label(n.split("/")[0], r), r) for n, r in reg.iterrows()])
+    fig, ax = _axes(small=True)
+    fig.set_size_inches(12, 12)
+    y = np.arange(len(rows))[::-1]
+    for yy, row in zip(y, rows):
+        if row is None:
+            continue
+        pi = row[1]["pi_share_of_region_pct"]
+        ax.barh(yy, pi, color=PI_COLOR, label="as coordinator (PI)" if yy == y[0] else None)
+        ax.barh(yy, 100 - pi, left=pi, color=RU_COLOR, label="as partner (RU)" if yy == y[0] else None)
+    ax.set_yticks([yy for yy, r in zip(y, rows) if r is not None],
+                  [tex(r[0]) for r in rows if r is not None])
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.set_xlabel(r"Share of the region's funding / \%")
+    ax.set_xlim(0, 100)
+    ax.set_title(r"(number of funded units)", fontsize=20)
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.07), ncol=2, fontsize=20)
+    _save(fig, ax, fig_dir, "regions_roles")
+
+
+def fig_breadth(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: Optional[str] = None,
+                n_labels: int = 9):
+    """Funding of each institution against the number of sectors in which it has funded units."""
+    fig, ax = _axes(small=True)
+    rng = np.random.default_rng(0)
+    x = inst["n_sectors"].to_numpy() + rng.uniform(-0.18, 0.18, len(inst))
+    y = inst["share_of_budget_pct"].to_numpy()
+    hot = (inst["city"] == highlight).to_numpy()
+    ax.scatter(x[~hot], y[~hot], s=120, color=PI_COLOR, alpha=0.7, edgecolor="white", lw=1.0, zorder=3)
+    ax.scatter(x[hot], y[hot], s=160, color=RU_COLOR, alpha=0.9, edgecolor="white", lw=1.0, zorder=4)
+    which = sorted(set(range(min(n_labels, len(inst)))) | set(np.flatnonzero(hot)))
+    _place_labels(fig, ax, np.column_stack([x, y]), np.full(len(inst), np.sqrt(120 / np.pi)), which,
+                  [tex(inst["short_name"].iloc[i]) for i in which], backing=True,
+                  colors=[RU_COLOR if hot[i] else None for i in which])
+    ax.set_xlabel(r"Sectors with a funded unit / 1")
+    ax.set_ylabel(r"Share of total budget / \%")
+    ax.set_xlim(0, inst["n_sectors"].max() + 1), ax.set_ylim(0, 1.08 * y.max())
+    _save(fig, ax, fig_dir, "institution_breadth")
+
+
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
     styles = {"PI, funded": (PI_COLOR, "o"), "Partner-unit leaders, funded": (RU_COLOR, "^")}
     macros = ["PE", "LS", "SH", "All"]
@@ -526,13 +606,15 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     tab_dir.mkdir(exist_ok=True), fig_dir.mkdir(exist_ok=True)
     inst, regions, sec = institution_table(d), region_table(d), sector_table(d)
     kinds, gt = _money(d.units, "kind", d.budget), gender_table(d)
-    u40 = under40_table(d)
+    u40, areas, per_sector = under40_table(d), macro_area_table(d), institution_sector_table(d)
     inst.to_csv(tab_dir / "institutions.csv", encoding="utf-8-sig")
     regions.to_csv(tab_dir / "regions.csv", encoding="utf-8-sig")
     sec.to_csv(tab_dir / "sectors.csv", encoding="utf-8-sig")
     kinds.to_csv(tab_dir / "institution_types.csv", encoding="utf-8-sig")
     gt.to_csv(tab_dir / "gender.csv", index=False, encoding="utf-8-sig")
     u40.to_csv(tab_dir / "under40.csv", encoding="utf-8-sig")
+    areas.to_csv(tab_dir / "macro_areas.csv", encoding="utf-8-sig")
+    per_sector.to_csv(tab_dir / "institution_sectors.csv", index=False, encoding="utf-8-sig")
     global USE_LATEX
     USE_LATEX = use_latex
     fig_institutions(d, inst, fig_dir)
@@ -545,11 +627,22 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     fig_kinds(d, fig_dir)
     fig_collaboration(d, inst, fig_dir, highlight=highlight)
     fig_gender(d, gt, fig_dir)
+    fig_region_roles(d, regions, areas, fig_dir)
+    fig_breadth(d, inst, fig_dir, highlight)
     summary = dict(n_sectors=len(d.sectors), sectors=d.sectors, budget=d.budget,
                    funded=float(d.units["mur_contribution"].sum()),
                    n_projects=int(d.units["project_code"].nunique()),
                    n_units=int(len(d.units)), n_ranked=int(len(d.ranking)),
                    **concentration(inst))
+    if highlight:
+        summary["highlight"] = {
+            r["short_name"]: dict(share_of_budget_pct=float(r["share_of_budget_pct"]), rank=int(r["rank"]),
+                                  rank_in_type=int(r["rank_in_type"]), type=r["kind"],
+                                  n_institutions_of_type=int((inst["kind"] == r["kind"]).sum()),
+                                  projects=int(r["projects"]), pi_units=int(r["pi_units"]),
+                                  ru_units=int(r["ru_units"]), n_sectors=int(r["n_sectors"]),
+                                  mur_total=float(r["mur_total"]))
+            for _, r in inst[inst["city"] == highlight].iterrows()}
     (tab_dir / "summary.json").write_text(json.dumps(summary, indent=1))
     return summary
 

@@ -114,3 +114,23 @@ def test_under40_table_is_consistent():
     assert (u["funded_over40"] <= u["ranked_over40"]).all()
     assert (u["ranked_under40"] + u["ranked_over40"]).sum() == len(d.ranking)
     assert (u["funded_under40"] + u["funded_over40"]).sum() == d.units["project_code"].nunique()
+
+
+def test_institution_ranks_and_breadth():
+    d = analysis.load(OUT)
+    inst = analysis.institution_table(d)
+    assert (inst["mur_total"].diff().dropna() <= 0).all()
+    assert list(inst["rank"]) == list(range(1, len(inst) + 1))
+    assert (inst["n_sectors"] >= 1).all() and (inst["n_sectors"] <= len(d.sectors)).all()
+    per_sector = analysis.institution_sector_table(d)
+    assert per_sector["mur"].sum() == pytest.approx(d.units["mur_contribution"].sum())
+
+
+def test_macro_areas_cover_every_region_except_national_bodies():
+    d = analysis.load(OUT)
+    areas = analysis.macro_area_table(d)
+    regions = analysis.region_table(d)
+    assert areas["mur_total"].sum() == pytest.approx(
+        regions.drop(analysis.NATIONAL)["mur_total"].sum())
+    listed = {r for rs in analysis.MACRO_AREA.values() for r in rs}
+    assert listed == set(regions.index) - {analysis.NATIONAL}

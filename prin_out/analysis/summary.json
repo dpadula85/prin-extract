@@ -27,5 +27,19 @@
  "n_ranked": 235,
  "gini": 0.5518282012861788,
  "n_institutions": 84,
- "top10_share": 0.43245277635733914
+ "top10_share": 0.43245277635733914,
+ "highlight": {
+  "Siena": {
+   "share_of_budget_pct": 1.2057894125174917,
+   "rank": 26,
+   "rank_in_type": 24,
+   "type": "public_university",
+   "n_institutions_of_type": 58,
+   "projects": 8,
+   "pi_units": 5,
+   "ru_units": 3,
+   "n_sectors": 7,
+   "mur_total": 1977559.0
+  }
+ }
 }
