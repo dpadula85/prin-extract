@@ -1,0 +1,442 @@
+"""analysis.py - who gets the PRIN 2026 money: tables and figures from the parsed PDFs.
+
+Inputs are the outputs of prin_extract.py (prin_out/all_rows.csv, ranking.csv,
+decrees.json) and the hand-checked tables in data/ (institution -> city, region
+and type; given name -> gender; region boundaries). Everything refers to the
+sectors parsed so far, never to the whole call.
+
+Definitions (euros):
+  budget       sum, over the parsed sectors, of the funds the decrees make
+               available to the sector (under-40 pool + ordinary pool)
+  share        MUR contribution received by an institution or region,
+               divided by `budget`, in percent
+  PI / RU      coordinating unit / partner unit of a project; a project's
+               money is the sum of its units' MUR contributions
+
+National research bodies (CNR, INAF, INFN, INGV) are multi-site and have no
+region: they form their own bucket in the regional tables and are left off
+the maps. Gender is inferred from the first given name (gender.py) and is
+used only in aggregate.
+
+Tables go to prin_out/analysis/*.csv, figures to prin_out/figures/*.{pdf,png}.
+"""
+import argparse as arg
+import json
+import logging
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib import cm, colors
+from matplotlib.patches import Polygon
+from scipy import stats
+
+import gender
+from style import new_axes, save_centered
+
+log = logging.getLogger(__name__)
+
+DATA = Path(__file__).with_name("data")
+NATIONAL = "National research bodies"
+KIND_LABELS = {"public_university": "Public univ.", "private_university": "Private univ.",
+               "telematic": "Telematic univ.", "school": "Advanced schools",
+               "research_body": "Research bodies", "national_research_body": "National bodies",
+               "afam": "AFAM"}
+PI_COLOR, RU_COLOR, GREY = "#1f4e78", "#c8782a", "#9a9a9a"
+SMALL = {"xtick.labelsize": 22, "ytick.labelsize": 22, "font.size": 28}
+
+
+USE_LATEX = True
+
+
+def _axes(small: bool = False, tick: Optional[int] = None):
+    """Axes in the house style; `small` lowers the font sizes for figures with many labels.
+    The sizes are applied after `new_axes`, which resets the rcParams it owns."""
+    fig, ax = new_axes(USE_LATEX)
+    if small or tick:
+        plt.rcParams.update(SMALL)
+        ax.tick_params(axis="both", which="major", labelsize=tick or SMALL["xtick.labelsize"])
+        for label in (ax.xaxis.label, ax.yaxis.label):  # created with the axes at the full size
+            label.set_fontsize(SMALL["font.size"])
+    return fig, ax
+
+
+def tex(s: str) -> str:
+    """Escape the characters LaTeX treats specially in a label."""
+    for a, b in (("&", r"\&"), ("%", r"\%"), ("_", r"\_"), ("#", r"\#")):
+        s = s.replace(a, b)
+    return s
+
+
+@dataclass
+class Data:
+    units: pd.DataFrame
+    ranking: pd.DataFrame
+    budgets: pd.DataFrame
+    budget: float
+    sectors: list
+
+
+def load(out_dir: Path) -> Data:
+    """Units joined with the institution table, ranking with inferred gender, budgets."""
+    units = pd.read_csv(out_dir / "all_rows.csv", dtype={"cf": str})
+    inst = pd.read_csv(DATA / "institutions.csv", dtype={"cf": str})
+    unmapped = sorted(set(units["cf"]) - set(inst["cf"]))
+    if unmapped:
+        raise ValueError(f"institutions missing from data/institutions.csv: "
+                         f"{units[units['cf'].isin(unmapped)]['institution'].unique().tolist()}")
+    units = units.merge(inst, on="cf", how="left")
+    units["region"] = units["region"].fillna(NATIONAL)
+    ranking = pd.read_csv(out_dir / "ranking.csv")
+    manifest = json.loads((out_dir / "decrees.json").read_text())
+    budgets = pd.DataFrame(manifest["budgets"]).T.rename_axis("sector").reset_index()
+    sectors = sorted(units["sector"].unique(), key=lambda x: (x[:2], int(x[2:])))
+    budget = float(budgets.loc[budgets["sector"].isin(sectors), "total"].sum())
+    table = gender.load_table()
+    ranking["gender"] = [gender.infer(g.split()[0], table) if isinstance(g, str) and g else None
+                         for g in ranking["pi_given"]]
+    units["gender"] = [gender.infer(gender.first_given_from_surname_first(n), table)
+                       for n in units["name"]]
+    missing = gender.unresolved(
+        [g.split()[0] for g in ranking["pi_given"].dropna()]
+        + [gender.first_given_from_surname_first(n) for n in units["name"]], table)
+    if missing:
+        log.warning("given names not in data/given_names.csv: %s", ", ".join(missing))
+    return Data(units, ranking, budgets, budget, sectors)
+
+
+# ---------------------------------------------------------------- tables
+
+def _money(df: pd.DataFrame, by, budget: float) -> pd.DataFrame:
+    """Per group: projects, PI/RU units, MUR money split by role, share of the budget."""
+    g = df.groupby(by)
+    t = pd.DataFrame({
+        "projects": g["project_code"].nunique(),
+        "pi_units": g["role"].agg(lambda r: int((r == "PI").sum())),
+        "ru_units": g["role"].agg(lambda r: int((r == "RU").sum())),
+        "mur_total": g["mur_contribution"].sum(),
+        "mur_pi": g.apply(lambda x: x.loc[x["role"] == "PI", "mur_contribution"].sum(),
+                          include_groups=False),
+    })
+    t["mur_ru"] = t["mur_total"] - t["mur_pi"]
+    t["share_of_budget_pct"] = 100 * t["mur_total"] / budget
+    return t.sort_values("mur_total", ascending=False)
+
+
+def institution_table(d: Data) -> pd.DataFrame:
+    t = _money(d.units, "cf", d.budget)
+    info = d.units.drop_duplicates("cf").set_index("cf")[["short_name", "city", "region", "kind"]]
+    return info.join(t).sort_values("mur_total", ascending=False)
+
+
+def region_table(d: Data) -> pd.DataFrame:
+    regions = [f["properties"]["region"] for f in
+               json.loads((DATA / "italy_regions.geojson").read_text())["features"]]
+    t = _money(d.units, "region", d.budget)
+    return t.reindex(regions + [NATIONAL]).fillna(0.0)
+
+
+def sector_table(d: Data) -> pd.DataFrame:
+    rows = []
+    for sec in d.sectors:
+        funded = d.units[d.units["sector"] == sec]
+        rk = d.ranking[d.ranking["sector"] == sec]
+        b = d.budgets.set_index("sector").loc[sec]
+        last = rk.loc[rk["funded"], "score"].min()
+        first_out = rk.loc[~rk["funded"], "score"].max()
+        rows.append(dict(sector=sec, budget=b["total"], funded=funded["mur_contribution"].sum(),
+                         n_funded=funded["project_code"].nunique(), n_ranked=len(rk),
+                         last_funded_score=last, best_unfunded_score=first_out))
+    t = pd.DataFrame(rows).set_index("sector")
+    t["used_pct"] = 100 * t["funded"] / t["budget"]
+    return t
+
+
+def concentration(inst: pd.DataFrame) -> Dict[str, float]:
+    """Gini coefficient and top-10 share of the money, among institutions with funding."""
+    x = np.sort(inst["mur_total"].to_numpy())
+    cum = np.concatenate([[0.0], np.cumsum(x)]) / x.sum()
+    p = np.linspace(0.0, 1.0, len(cum))
+    return dict(gini=float(1 - 2 * np.trapezoid(cum, p)), n_institutions=int(len(x)),
+                top10_share=float(x[-10:].sum() / x.sum()))
+
+
+def wilson(k: int, n: int):
+    if n == 0:
+        return np.nan, np.nan, np.nan
+    ci = stats.binomtest(k, n).proportion_ci(method="wilson")
+    return k / n, ci.low, ci.high
+
+
+def gender_table(d: Data) -> pd.DataFrame:
+    """Female share (of persons with an inferred gender) in each group, Wilson 95% interval."""
+    rk, un = d.ranking.copy(), d.units.copy()
+    rk["macro"], un["macro"] = rk["sector"].str[:2], un["sector"].str[:2]
+    groups = {"PI, funded": rk[rk["funded"]], "PI, ranked not funded": rk[~rk["funded"]],
+              "Partner-unit leaders, funded": un[un["role"] == "RU"]}
+    rows = []
+    for label, df in groups.items():
+        for macro in ["PE", "LS", "SH", "All"]:
+            sel = df if macro == "All" else df[df["macro"] == macro]
+            known = sel["gender"].dropna()
+            f, lo, hi = wilson(int((known == "F").sum()), len(known))
+            rows.append(dict(group=label, macro=macro, n=len(sel), n_known=len(known),
+                             female_share=f, low=lo, high=hi))
+    return pd.DataFrame(rows)
+
+
+# --------------------------------------------------------------- figures
+
+def _save(fig, ax, fig_dir: Path, name: str):
+    save_centered(fig, ax, fig_dir / f"{name}.pdf")
+    fig.savefig(fig_dir / f"{name}.png", dpi=150)
+    plt.close(fig)
+
+
+def _stamp(d: Data) -> str:
+    return f"{len(d.sectors)} of 28 sectors"
+
+
+def fig_institutions(d: Data, inst: pd.DataFrame, fig_dir: Path, n: int = 20):
+    top = inst.head(n)[::-1]
+    fig, ax = _axes(small=True)
+    y = np.arange(len(top))
+    ax.barh(y, 100 * top["mur_pi"] / d.budget, color=PI_COLOR, label="as coordinator (PI)")
+    ax.barh(y, 100 * top["mur_ru"] / d.budget, left=100 * top["mur_pi"] / d.budget,
+            color=RU_COLOR, label="as partner (RU)")
+    ax.set_yticks(y, [tex(s) for s in top["short_name"]])
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.set_xlabel(r"Share of budget / \%")
+    ax.set_title(tex(f"Top {n} institutions, {_stamp(d)}"), fontsize=24)
+    ax.legend(loc="lower right")
+    _save(fig, ax, fig_dir, "institutions_share")
+
+
+def fig_concentration(d: Data, inst: pd.DataFrame, fig_dir: Path):
+    c = concentration(inst)
+    x = np.sort(inst["mur_total"].to_numpy())
+    cum = np.concatenate([[0.0], np.cumsum(x)]) / x.sum()
+    p = np.linspace(0.0, 1.0, len(cum))
+    fig, ax = _axes()
+    ax.plot(p, cum, color=PI_COLOR, lw=3)
+    ax.plot([0, 1], [0, 1], color=GREY, lw=1.5, ls="--")
+    ax.set_xlabel(r"Fraction of institutions / 1")
+    ax.set_ylabel(r"Fraction of funding / 1")
+    ax.text(0.04, 0.88, rf"Gini = {c['gini']:.2f}", fontsize=34, transform=ax.transAxes)
+    ax.text(0.04, 0.78, rf"top 10: {100 * c['top10_share']:.0f}\%", fontsize=34, transform=ax.transAxes)
+    ax.set_xlim(0, 1), ax.set_ylim(0, 1)
+    _save(fig, ax, fig_dir, "concentration")
+
+
+def _draw_regions(ax, values: Optional[pd.Series], cmap, norm, label_values: bool):
+    feats = json.loads((DATA / "italy_regions.geojson").read_text())["features"]
+    for f in feats:
+        name = f["properties"]["region"]
+        v = 0.0 if values is None else float(values.get(name, 0.0))
+        face = "#f2f2f2" if values is None or v <= 0 else cmap(norm(v))
+        biggest, area = None, -1.0
+        for poly in f["geometry"]["coordinates"]:
+            ring = np.asarray(poly[0])
+            ax.add_patch(Polygon(ring, closed=True, facecolor=face, edgecolor="white", lw=1.2))
+            x, y = ring[:, 0], ring[:, 1]
+            a = 0.5 * np.sum(x[:-1] * y[1:] - x[1:] * y[:-1])
+            if abs(a) > area:
+                area, biggest = abs(a), (ring, a)
+        if label_values and v > 0:
+            ring, a = biggest
+            x, y = ring[:, 0], ring[:, 1]
+            w = x[:-1] * y[1:] - x[1:] * y[:-1]
+            cx, cy = np.sum((x[:-1] + x[1:]) * w) / (6 * a), np.sum((y[:-1] + y[1:]) * w) / (6 * a)
+            dark = norm(v) > 0.55
+            ax.text(cx, cy, f"{v:.1f}", ha="center", va="center", fontsize=18,
+                    color="white" if dark else "black")
+    ax.set_xlim(6.4, 18.8), ax.set_ylim(35.9, 47.3)
+    ax.set_aspect(1 / np.cos(np.deg2rad(41.5)))
+    ax.set_xticks([]), ax.set_yticks([])
+    ax.xaxis.set_minor_locator(plt.NullLocator()), ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.tick_params(which="both", top=False, right=False, length=0)
+
+
+def fig_map_regions(d: Data, regions: pd.DataFrame, fig_dir: Path):
+    vals = regions["share_of_budget_pct"].drop(NATIONAL)
+    cmap, norm = plt.get_cmap("Blues"), colors.Normalize(0, float(vals.max()))
+    fig, ax = _axes(small=True)
+    _draw_regions(ax, vals, cmap, norm, label_values=True)
+    cb = fig.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, shrink=0.8)
+    cb.set_label(r"Share of budget / \%")
+    nat = regions.loc[NATIONAL, "share_of_budget_pct"]
+    ax.set_title(tex(f"{_stamp(d)}; national bodies not shown: {nat:.1f}% of budget"), fontsize=22)
+    _save(fig, ax, fig_dir, "map_regions_share")
+
+
+def fig_map_cities(d: Data, inst: pd.DataFrame, fig_dir: Path):
+    sited = inst[inst["region"] != NATIONAL].copy()
+    sited["lat"] = d.units.drop_duplicates("cf").set_index("cf").loc[sited.index, "lat"]
+    sited["lon"] = d.units.drop_duplicates("cf").set_index("cf").loc[sited.index, "lon"]
+    city = sited.groupby("city").agg(lat=("lat", "first"), lon=("lon", "first"),
+                                     mur=("mur_total", "sum")).sort_values("mur", ascending=False)
+    fig, ax = _axes(small=True)
+    _draw_regions(ax, None, None, None, label_values=False)
+    ax.scatter(city["lon"], city["lat"], s=2.2e3 * city["mur"] / city["mur"].max(),
+               color=PI_COLOR, alpha=0.65, edgecolor="white", lw=1.0, zorder=3)
+    for ref in (2.0, 10.0):
+        ax.scatter([], [], s=2.2e3 * ref * 1e6 / city["mur"].max(), color=PI_COLOR, alpha=0.65,
+                   edgecolor="white", label=rf"{ref:.0f} M EUR")
+    ax.legend(loc="lower left", labelspacing=2.2, borderpad=1.2, fontsize=20)
+    for name, r in city.head(8).iterrows():
+        ax.annotate(tex(name), (r["lon"], r["lat"]), xytext=(9, 6), textcoords="offset points",
+                    fontsize=18, zorder=4)
+    ax.set_title(tex(f"Area $\\propto$ MUR funding, {_stamp(d)}"), fontsize=22)
+    _save(fig, ax, fig_dir, "map_cities_funding")
+
+
+def fig_sectors(d: Data, sec: pd.DataFrame, fig_dir: Path):
+    fig, ax = _axes(small=True)
+    x = np.arange(len(sec))
+    ax.bar(x, sec["budget"] / 1e6, facecolor="none", edgecolor=GREY, lw=2.5, label="available")
+    ax.bar(x, sec["funded"] / 1e6, color=PI_COLOR, width=0.7, label="funded")
+    ax.set_xticks(x, sec.index, rotation=90)
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.set_ylabel(r"MUR funding / M EUR")
+    ax.legend(loc="upper right")
+    _save(fig, ax, fig_dir, "sector_budgets")
+
+
+def fig_ranking(d: Data, sec: pd.DataFrame, fig_dir: Path):
+    fig, ax = _axes(small=True)
+    x = np.arange(len(sec))
+    ax.bar(x, sec["n_funded"], color=PI_COLOR, label="funded")
+    ax.bar(x, sec["n_ranked"] - sec["n_funded"], bottom=sec["n_funded"], color=GREY,
+           label="ranked, not funded")
+    ax.set_xticks(x, sec.index, rotation=90)
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.set_ylabel(r"Projects / 1")
+    ax.legend(loc="upper right")
+    _save(fig, ax, fig_dir, "sector_ranking")
+
+
+def fig_money(d: Data, fig_dir: Path):
+    fig, ax = _axes()
+    bins = np.linspace(0, d.units["mur_contribution"].max() / 1e3, 26)
+    for role, color, label in (("PI", PI_COLOR, "coordinating units"), ("RU", RU_COLOR, "partner units")):
+        v = d.units.loc[d.units["role"] == role, "mur_contribution"] / 1e3
+        ax.hist(v, bins=bins, histtype="step", lw=3, color=color, density=True,
+                label=rf"{label}, median {np.median(v):.0f}")
+    ax.set_xlabel(r"MUR contribution per unit / k EUR")
+    ax.set_ylabel(r"Probability density / (k EUR)$^{-1}$")
+    ax.legend(loc="upper right")
+    _save(fig, ax, fig_dir, "money_per_unit")
+
+
+def fig_kinds(d: Data, fig_dir: Path):
+    t = _money(d.units, "kind", d.budget).reindex(list(KIND_LABELS)).dropna(subset=["mur_total"])
+    fig, ax = _axes(small=True)
+    y = np.arange(len(t))[::-1]
+    ax.barh(y, t["mur_pi"] / d.budget * 100, color=PI_COLOR, label="as coordinator (PI)")
+    ax.barh(y, t["mur_ru"] / d.budget * 100, left=t["mur_pi"] / d.budget * 100,
+            color=RU_COLOR, label="as partner (RU)")
+    ax.set_yticks(y, [tex(KIND_LABELS[k]) for k in t.index])
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.set_xlabel(r"Share of budget / \%")
+    ax.legend(loc="lower right")
+    _save(fig, ax, fig_dir, "institution_types")
+
+
+def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, n: int = 20):
+    top = list(inst.head(n).index)
+    names = [tex(s) for s in inst.head(n)["short_name"]]
+    pos = {cf: i for i, cf in enumerate(top)}
+    m = np.zeros((n, n))
+    for _, g in d.units.groupby("project_code"):
+        members = [pos[c] for c in set(g["cf"]) if c in pos]
+        for i in members:
+            for j in members:
+                m[i, j] += 1
+    fig, ax = _axes(tick=18)
+    fig.set_size_inches(14, 14)
+    im = ax.imshow(np.where(m > 0, m, np.nan), cmap="Blues", vmin=0)
+    ax.set_xticks(range(n), names, rotation=90)
+    ax.set_yticks(range(n), names)
+    ax.xaxis.set_minor_locator(plt.NullLocator()), ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.tick_params(which="both", top=False, right=False)
+    for i in range(n):
+        for j in range(n):
+            if m[i, j] > 0:
+                ax.text(j, i, f"{int(m[i, j])}", ha="center", va="center", fontsize=12,
+                        color="white" if m[i, j] > 0.6 * m.max() else "black")
+    fig.colorbar(im, ax=ax, shrink=0.8, label=r"Shared projects / 1")
+    _save(fig, ax, fig_dir, "collaboration")
+
+
+def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
+    styles = {"PI, funded": (PI_COLOR, "o"), "PI, ranked not funded": (GREY, "s"),
+              "Partner-unit leaders, funded": (RU_COLOR, "^")}
+    macros = ["PE", "LS", "SH", "All"]
+    fig, ax = _axes(small=True)
+    for k, (label, (color, marker)) in enumerate(styles.items()):
+        sub = gt[gt["group"] == label].set_index("macro").loc[macros]
+        x = np.arange(len(macros)) + (k - 1) * 0.2
+        ax.errorbar(x, 100 * sub["female_share"],
+                    yerr=100 * np.vstack([sub["female_share"] - sub["low"],
+                                          sub["high"] - sub["female_share"]]),
+                    fmt=marker, color=color, ms=12, capsize=6, lw=2.5, label=tex(label))
+    ax.set_xticks(range(len(macros)), macros)
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.set_ylabel(r"Female share / \%")
+    ax.set_ylim(0, 100)
+    ax.axhline(50, color=GREY, lw=1.2, ls="--")
+    ax.legend(loc="lower left", fontsize=20)
+    _save(fig, ax, fig_dir, "gender")
+
+
+# ------------------------------------------------------------------ main
+
+def run(out_dir: Path, use_latex: bool = True) -> Dict[str, float]:
+    d = load(out_dir)
+    tab_dir, fig_dir = out_dir / "analysis", out_dir / "figures"
+    tab_dir.mkdir(exist_ok=True), fig_dir.mkdir(exist_ok=True)
+    inst, regions, sec = institution_table(d), region_table(d), sector_table(d)
+    kinds, gt = _money(d.units, "kind", d.budget), gender_table(d)
+    inst.to_csv(tab_dir / "institutions.csv", encoding="utf-8-sig")
+    regions.to_csv(tab_dir / "regions.csv", encoding="utf-8-sig")
+    sec.to_csv(tab_dir / "sectors.csv", encoding="utf-8-sig")
+    kinds.to_csv(tab_dir / "institution_types.csv", encoding="utf-8-sig")
+    gt.to_csv(tab_dir / "gender.csv", index=False, encoding="utf-8-sig")
+    global USE_LATEX
+    USE_LATEX = use_latex
+    fig_institutions(d, inst, fig_dir)
+    fig_concentration(d, inst, fig_dir)
+    fig_map_regions(d, regions, fig_dir)
+    fig_map_cities(d, inst, fig_dir)
+    fig_sectors(d, sec, fig_dir)
+    fig_ranking(d, sec, fig_dir)
+    fig_money(d, fig_dir)
+    fig_kinds(d, fig_dir)
+    fig_collaboration(d, inst, fig_dir)
+    fig_gender(d, gt, fig_dir)
+    summary = dict(n_sectors=len(d.sectors), sectors=d.sectors, budget=d.budget,
+                   funded=float(d.units["mur_contribution"].sum()),
+                   n_projects=int(d.units["project_code"].nunique()),
+                   n_units=int(len(d.units)), n_ranked=int(len(d.ranking)),
+                   **concentration(inst))
+    (tab_dir / "summary.json").write_text(json.dumps(summary, indent=1))
+    return summary
+
+
+def main(argv=None) -> int:
+    ap = arg.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--out", default="prin_out", help="directory written by prin_extract.py")
+    ap.add_argument("--no-latex", action="store_true", help="render text with mathtext, not LaTeX")
+    a = ap.parse_args(argv)
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    s = run(Path(a.out), use_latex=not a.no_latex)
+    print(f"{s['n_projects']} projects, {s['funded'] / 1e6:.1f} of {s['budget'] / 1e6:.1f} M EUR "
+          f"in {s['n_sectors']} sectors; Gini {s['gini']:.2f}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

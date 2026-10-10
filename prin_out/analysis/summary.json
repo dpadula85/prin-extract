@@ -1,0 +1,31 @@
+{
+ "n_sectors": 18,
+ "sectors": [
+  "LS2",
+  "LS3",
+  "LS4",
+  "LS7",
+  "PE1",
+  "PE2",
+  "PE3",
+  "PE5",
+  "PE6",
+  "PE7",
+  "PE8",
+  "PE9",
+  "PE10",
+  "PE11",
+  "SH4",
+  "SH5",
+  "SH6",
+  "SH7"
+ ],
+ "budget": 164005337.86999997,
+ "funded": 155398008.0,
+ "n_projects": 144,
+ "n_units": 726,
+ "n_ranked": 235,
+ "gini": 0.5518282012861788,
+ "n_institutions": 84,
+ "top10_share": 0.43245277635733914
+}
