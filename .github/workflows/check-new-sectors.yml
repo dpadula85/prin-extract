@@ -1,15 +1,17 @@
 name: Check for new PRIN sectors
 
-# Daily: download what the MUR has published, and if a sector is new (or its decree
-# changed) re-run the analysis and the report and open a pull request with the result.
-# Nothing is committed to the default branch.
+# Every 6 hours: download what the MUR has published, and if a sector is new (or its
+# decree changed) regenerate all data, figures and the report and open a pull request
+# with the result. Nothing is committed to the default branch. Once all the sectors are
+# parsed the workflow disables itself.
 
 on:
   schedule:
-    - cron: "17 5 * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -86,3 +88,19 @@ jobs:
             report/report.tex
             report/report.pdf
             README.md
+
+      - name: Check whether all the sectors are parsed
+        id: complete
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import pandas as pd
+          import decrees
+          done = set(pd.read_csv("prin_out/all_rows.csv")["sector"]) >= set(decrees.ALL_SECTORS)
+          print("all=" + str(done).lower())
+          PY
+
+      - name: Stop the workflow, all the sectors are parsed
+        if: steps.complete.outputs.all == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow disable check-new-sectors.yml
