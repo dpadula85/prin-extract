@@ -394,25 +394,25 @@ def fig_map_cities(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: Option
 
 
 def fig_sectors(d: Data, sec: pd.DataFrame, u40: pd.DataFrame, fig_dir: Path):
-    """Per sector, two bars: the budget available against the money funded, and the
-    ring-fenced under-40 pool against the money that went to projects of under-40 PIs
-    (those projects can also be funded from the ordinary pool)."""
+    """One bar per sector, in percent of the total budget of the parsed sectors: the budget
+    available to the sector (outline) and the money funded, split into the projects of
+    under-40 PIs (green, on top) and the others (blue)."""
     fig, ax = _axes(small=True)
     x = np.arange(len(sec))
-    w = 0.38
-    for off, avail, got, color, names in (
-            (-w / 2, sec["budget"], sec["funded"], PI_COLOR, ("available", "funded")),
-            (w / 2, u40.loc[sec.index, "pool"], u40.loc[sec.index, "money_under40_projects"], U40_COLOR,
-             ("under-40 pool", tex("under-40 PIs' projects")))):
-        ax.bar(x + off, got / 1e6, width=0.8 * w, color=color, label=names[1], zorder=2)
-        ax.bar(x + off, avail / 1e6, width=w, facecolor="none", edgecolor="#555555", lw=2.0,
-               label=names[0], zorder=3)
+    pct = lambda v: 100 * v / d.budget
+    young = u40.loc[sec.index, "money_under40_projects"]
+    other = sec["funded"] - young
+    ax.bar(x, pct(other), color=PI_COLOR, width=0.7, label="funded, other projects", zorder=2)
+    ax.bar(x, pct(young), bottom=pct(other), color=U40_COLOR, width=0.7,
+           label=tex("funded, under-40 PIs' projects"), zorder=2)
+    ax.bar(x, pct(sec["budget"]), width=0.85, facecolor="none", edgecolor="#555555", lw=2.0,
+           label="available", zorder=3)
     ax.set_xticks(x, sec.index, rotation=90)
     ax.xaxis.set_minor_locator(plt.NullLocator())
-    ax.set_ylabel(r"MUR funding / M EUR")
-    handles, labels = ax.get_legend_handles_labels()  # fill, outline, fill, outline
-    ax.legend([handles[1], handles[0], handles[2]],
-              [r"available (budget or pool)", labels[0], labels[2]], loc="upper right", fontsize=20)
+    ax.set_ylabel(r"Share of total budget / \%")
+    ax.set_ylim(0, 1.3 * pct(sec["budget"]).max())
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles[::-1], labels[::-1], loc="upper right", fontsize=20)
     _save(fig, ax, fig_dir, "sector_budgets")
 
 
