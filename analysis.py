@@ -243,29 +243,25 @@ def fig_institutions(d: Data, inst: pd.DataFrame, fig_dir: Path, n: int = 20):
 
 
 def fig_budget_drop(d: Data, inst: pd.DataFrame, fig_dir: Path, n_named: int = 10):
-    """Budget not yet assigned once the k best-funded institutions are accounted for: it
-    starts at the budget of the parsed sectors and ends at what no unit received."""
+    """Budget not yet assigned once the k best-funded institutions are accounted for, in
+    percent of the budget of the parsed sectors."""
     ranked = inst.sort_values("mur_total", ascending=False)
-    left = (d.budget - np.concatenate([[0.0], np.cumsum(ranked["mur_total"].to_numpy())])) / 1e6
-    top = d.budget / 1e6
+    left = 100 * (1 - np.concatenate([[0.0], np.cumsum(ranked["mur_total"].to_numpy())]) / d.budget)
     k = np.arange(len(left))
     fig, ax = _axes(small=True)
     ax.step(k, left, where="post", color=PI_COLOR, lw=3)
-    ax.axhline(left[-1], color=GREY, lw=1.5, ls="--")
-    ax.annotate(rf"not assigned: {left[-1]:.1f} M EUR", (0.82 * len(ranked), left[-1]),
-                xytext=(0.82 * len(ranked), 0.2 * top), fontsize=22, ha="center", va="bottom",
-                arrowprops=dict(arrowstyle="-", color="0.5", lw=1.0, shrinkA=2, shrinkB=0))
-    for j, y_text in zip(range(1, n_named + 1), np.linspace(0.97 * top, 0.43 * top, n_named)):
-        share = 100 * (left[j - 1] - left[j]) / top
-        ax.annotate(tex(rf"{ranked['short_name'].iloc[j - 1]} ({share:.1f}%)"),
+    for j, y_text in zip(range(1, n_named + 1), np.linspace(97, 43, n_named)):
+        ax.annotate(tex(rf"{ranked['short_name'].iloc[j - 1]} ({left[j - 1] - left[j]:.1f}%)"),
                     (j, (left[j - 1] + left[j]) / 2), xytext=(0.27 * len(ranked), y_text),
                     textcoords="data", fontsize=22, va="center",
-                    arrowprops=dict(arrowstyle="-", color="0.5", lw=1.0, shrinkA=3, shrinkB=2, relpos=(0, 0.5)))
+                    arrowprops=dict(arrowstyle="-", color="0.5", lw=1.0, shrinkA=3, shrinkB=2,
+                                    relpos=(0, 0.5)))
     ax.set_xlabel(r"Institutions accounted for, best funded first / 1")
-    ax.set_ylabel(r"Budget left / M EUR")
-    ax.set_xlim(0, len(ranked)), ax.set_ylim(0, 1.02 * top)
-    sec = ax.secondary_yaxis("right", functions=(lambda y: 100 * y / top, lambda p: p * top / 100))
-    sec.set_ylabel(r"of budget / \%", fontsize=SMALL["font.size"])
+    ax.set_ylabel(r"Budget left / \% of total")
+    ax.set_xlim(0, len(ranked)), ax.set_ylim(0, 102)
+    top = d.budget / 1e6
+    sec = ax.secondary_yaxis("right", functions=(lambda y: y * top / 100, lambda m: 100 * m / top))
+    sec.set_ylabel(r"Budget left / M EUR", fontsize=SMALL["font.size"])
     sec.tick_params(labelsize=SMALL["xtick.labelsize"])
     _save(fig, ax, fig_dir, "budget_by_institution")
 
@@ -484,17 +480,10 @@ def fig_collaboration(d: Data, inst: pd.DataFrame, fig_dir: Path, min_shared: in
         ax.scatter(*xy[k], s=sizes[k], marker="D" if n == NATIONAL else "o", zorder=3,
                    color=RU_COLOR if n == highlight else (GREY if n == NATIONAL else PI_COLOR),
                    alpha=0.8, edgecolor="white", lw=1.0)
-    degree = Counter()
-    for (a, b), w in shown.items():
-        degree[a] += w
-        degree[b] += w
-    which = sorted({names.index(n) for n, _ in degree.most_common(10)}
-                   | ({names.index(highlight)} if highlight in names else set()))
-    _place_labels(fig, ax, xy, np.sqrt(sizes / np.pi), which,
-                  [tex("National bodies" if names[i] == NATIONAL else names[i]) for i in which],
-                  colors=[RU_COLOR if names[i] == highlight else None for i in which], backing=True)
-    ax.set_title(tex(f"Links: {min_shared}+ shared projects (width $\\propto$ number), "
-                     f"{_stamp(d)}"), fontsize=22)
+    nat = names.index(NATIONAL)
+    _place_labels(fig, ax, xy, np.sqrt(sizes / np.pi), [nat], [tex("National bodies")], backing=True)
+    note = f"; {highlight} in orange" if highlight else ""
+    ax.set_title(tex(f"{min_shared}+ shared projects{note}, {_stamp(d)}"), fontsize=22)
     _save(fig, ax, fig_dir, "collaboration_map")
 
 
