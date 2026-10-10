@@ -13,6 +13,7 @@ on:
 permissions:
   actions: write
   contents: write
+  issues: write
   pull-requests: write
 
 jobs:
@@ -75,6 +76,7 @@ jobs:
           PY
 
       - name: Open the pull request
+        id: cpr
         if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
@@ -98,6 +100,16 @@ jobs:
           done = set(pd.read_csv("prin_out/all_rows.csv")["sector"]) >= set(decrees.ALL_SECTORS)
           print("all=" + str(done).lower())
           PY
+
+      - name: Notify, all the sectors are parsed
+        if: steps.complete.outputs.all == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
+        run: |
+          gh issue create \
+            --title "All PRIN 2026 sectors are published and parsed" \
+            --body "@${{ github.repository_owner }} all 28 sectors are parsed. Pull request with the final data, figures and report: ${PR_URL:-none, the data were already up to date}. The workflow has disabled itself."
 
       - name: Stop the workflow, all the sectors are parsed
         if: steps.complete.outputs.all == 'true'
