@@ -844,7 +844,6 @@ def career_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
             a[f"{g}_{k}_pct"] = 100 * a[f"{g}_{k}"] / tot
     for k in ("po", "pa", "rtd"):
         a[f"leaders_per_1000_{k}"] = 1000 * a[f"leaders_{k}"] / a[f"staff_{k}"]
-        a[f"money_per_staff_{k}"] = a[f"money_{k}"] / a[f"staff_{k}"]
     a.index.name = "code"
     return dict(levels=t, areas=a)
 
@@ -930,7 +929,7 @@ def fig_distinct_gsd(d: Data, dist: pd.DataFrame, n_proj: int, fig_dir: Path):
     fig, ax = _axes(small=True)
     x = np.arange(len(dist))
     ax.bar(x - 0.2, dist["projects_pct"], width=0.4, color=PI_COLOR, label=f"funded projects ({n_proj})")
-    ax.bar(x + 0.2, dist["random_pct"], width=0.4, color=GREY, label="leaders assigned at random within the sector")
+    ax.bar(x + 0.2, dist["random_pct"], width=0.4, color=GREY, label="same leaders, shuffled between the projects of their sector")
     ax.set_xticks(x, [str(k) for k in dist.index])
     ax.xaxis.set_minor_locator(plt.NullLocator())
     ax.set_xlabel("Distinct GSDs among the leaders of the project"), ax.set_ylabel(r"Share of the projects / \%")

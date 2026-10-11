@@ -30,6 +30,7 @@ PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 \usepackage[margin=2.2cm]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{longtable}
 \usepackage{float}
 \usepackage{siunitx}
@@ -65,14 +66,19 @@ def table(header: List[str], rows: List[List[str]], colspec: str, size: str = ""
     first header row of (label, number of columns) spans, an empty label leaving its columns
     blank, each labelled span underlined by a cmidrule."""
     lines = [r"\begin{table}[H]", r"\centering", size, rf"\begin{{tabular}}{{{colspec}}}", r"\toprule"]
+    top = None
     if groups:
-        col, cells, rules = 1, [], []
+        col, cells, rules, second = 1, [], [], list(header)
         for label, n in groups:
-            cells.append(rf"\multicolumn{{{n}}}{{c}}{{{label}}}" if label else rf"\multicolumn{{{n}}}{{c}}{{}}")
             if label:
+                cells.append(rf"\multicolumn{{{n}}}{{c}}{{{label}}}")
                 rules.append(rf"\cmidrule(lr){{{col}-{col + n - 1}}}")
+            else:
+                cells += [rf"\multirow{{2}}{{*}}{{{header[j]}}}" for j in range(col - 1, col - 1 + n)]
+                second[col - 1:col - 1 + n] = [""] * n
             col += n
         lines += [" & ".join(cells) + r" \\", "".join(rules)]
+        header = second
     lines += [" & ".join(header) + r" \\", r"\midrule"]
     lines += [" & ".join(r) + r" \\" for r in rows]
     if total is not None:
@@ -355,15 +361,14 @@ City, region and type of each institution come from a hand-checked table of {ins
         comp_total = ["All areas"] + comp("All", ca.loc["All"])
         rate = lambda v: [f"{v[f'leaders_per_1000_{k}']:.1f}" for k in ("po", "pa", "rtd")]
         rows_rate = [[f"{c} {tex(an.CUN_AREAS.get(c, v['area']))}"] + rate(v) for c, v in ca.iloc[:-1].iterrows()]
-        money = lambda v: [f"{v[f'money_{k}_pct']:.1f}" for k in ("po", "pa", "rtd", "ru")] \
-            + [f"{v[f'money_per_staff_{k}'] / 1e3:.1f}" for k in ("po", "pa", "rtd")]
+        money = lambda v: [f"{v[f'money_{k}_pct']:.1f}" for k in ("po", "pa", "rtd", "ru")]
         rows_money = [[f"{c} {tex(an.CUN_AREAS.get(c, v['area']))}"] + money(v) for c, v in ca.iloc[:-1].iterrows()]
         money_total = ["All areas"] + money(ca.loc["All"])
         rate_total = ["All areas"] + rate(ca.loc["All"])
         parts.append(section(
             "Career level of the unit leaders",
             "To show the career level (full professor PO, associate professor PA, fixed-term researcher RTD) of the leaders of the funded units, the MUR money of their units, and, by CUN area, the share of each level among the leaders, and of the MUR money of their units, against its share among all the professors and researchers of the Italian universities (2024). The levels are from the same MUR directory lookup as the disciplinary group; PRIN sectors have no staff data, so the staff comparison is by CUN area.",
-            rf"The level was found for {n_lead} leaders. Full professors are {int(po['PI'])} of the {int(cl['PI'].sum())} PIs and {int(po['Partner-unit leaders'])} of the {int(cl['Partner-unit leaders'].sum())} partner-unit leaders; associate professors are {int(pa['PI'])} and {int(pa['Partner-unit leaders'])}; fixed-term researchers are {int(rt['PI'].sum())} and {int(rt['Partner-unit leaders'].sum())}. The units led by full professors received {cl.iloc[0]['budget_share_pct']:.1f}\% of the total budget, those led by associate professors {cl.iloc[1]['budget_share_pct']:.1f}\%, those led by fixed-term researchers {rt['budget_share_pct'].sum():.1f}\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are {ca.loc['All','staff_po_pct']:.1f}\% of the staff and {ca.loc['All','leaders_po_pct']:.1f}\% of the leaders, PA {ca.loc['All','staff_pa_pct']:.1f}\% and {ca.loc['All','leaders_pa_pct']:.1f}\%, RTD {ca.loc['All','staff_rtd_pct']:.1f}\% and {ca.loc['All','leaders_rtd_pct']:.1f}\%; the leaders per 1000 staff are {ca.loc['All','leaders_per_1000_po']:.1f} for PO, {ca.loc['All','leaders_per_1000_pa']:.1f} for PA and {ca.loc['All','leaders_per_1000_rtd']:.1f} for RTD. Of the MUR money of the units whose leader's level was found, PO received {ca.loc['All','money_po_pct']:.1f}\%, PA {ca.loc['All','money_pa_pct']:.1f}\% and RTD {ca.loc['All','money_rtd_pct']:.1f}\%, that is {ca.loc['All','money_per_staff_po'] / 1e3:.1f}, {ca.loc['All','money_per_staff_pa'] / 1e3:.1f} and {ca.loc['All','money_per_staff_rtd'] / 1e3:.1f} k EUR per staff member of the level. The tables give the same by CUN area.",
+            rf"The level was found for {n_lead} leaders. Full professors are {int(po['PI'])} of the {int(cl['PI'].sum())} PIs and {int(po['Partner-unit leaders'])} of the {int(cl['Partner-unit leaders'].sum())} partner-unit leaders; associate professors are {int(pa['PI'])} and {int(pa['Partner-unit leaders'])}; fixed-term researchers are {int(rt['PI'].sum())} and {int(rt['Partner-unit leaders'].sum())}. The units led by full professors received {cl.iloc[0]['budget_share_pct']:.1f}\% of the total budget, those led by associate professors {cl.iloc[1]['budget_share_pct']:.1f}\%, those led by fixed-term researchers {rt['budget_share_pct'].sum():.1f}\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are {ca.loc['All','staff_po_pct']:.1f}\% of the staff and {ca.loc['All','leaders_po_pct']:.1f}\% of the leaders, PA {ca.loc['All','staff_pa_pct']:.1f}\% and {ca.loc['All','leaders_pa_pct']:.1f}\%, RTD {ca.loc['All','staff_rtd_pct']:.1f}\% and {ca.loc['All','leaders_rtd_pct']:.1f}\%; the leaders per 1000 staff are {ca.loc['All','leaders_per_1000_po']:.1f} for PO, {ca.loc['All','leaders_per_1000_pa']:.1f} for PA and {ca.loc['All','leaders_per_1000_rtd']:.1f} for RTD. Of the MUR money of the units whose leader's level was found, PO received {ca.loc['All','money_po_pct']:.1f}\%, PA {ca.loc['All','money_pa_pct']:.1f}\% and RTD {ca.loc['All','money_rtd_pct']:.1f}\%. The tables give the same by CUN area.",
             table(["Level", "PI", "Partners", "Leaders", "PE", "LS", "SH", "Lead. (\\%)", "MUR (M EUR)", "Budget (\\%)", "Mean (k EUR)"],
                   rows, "lrrrrrrrrrr", "\\scriptsize\\setlength{\\tabcolsep}{2pt}",
                   total=["Total", str(int(cl["PI"].sum())), str(int(cl["Partner-unit leaders"].sum())), str(n_lead),
@@ -373,14 +378,13 @@ City, region and type of each institution come from a hand-checked table of {ins
                   note="Leaders found at the university of their unit; mean: MUR contribution per unit.")
             + "\n" + table(["CUN area", "Leaders", "PO", "PA", "RTD", "RU", "PO", "PA", "RTD", "RU"], rows_comp, "lrrrrrrrrr",
                   "\\scriptsize\\setlength{\\tabcolsep}{3pt}", total=comp_total,
-                  groups=[("", 2), ("Staff of the area (\\%)", 4), ("Leaders (\\%)", 4)],
+                  groups=[("", 1), ("", 1), ("Staff of the area (\\%)", 4), ("Leaders (\\%)", 4)],
                   note="RTD: fixed-term researchers; RU: permanent researchers.")
             + "\n" + table(["CUN area", "PO", "PA", "RTD"], rows_rate, "lrrr", "\\small", total=rate_total,
                   groups=[("", 1), ("Leaders per 1000 staff", 3)],
                   note="Staff of the same level and area (all staff, not only applicants).")
-            + "\n" + table(["CUN area", "PO", "PA", "RTD", "RU", "PO", "PA", "RTD"], rows_money, "lrrrrrrr",
-                  "\\scriptsize\\setlength{\\tabcolsep}{3pt}", total=money_total,
-                  groups=[("", 1), ("MUR money of the units (\\%)", 4), ("k EUR per staff member", 3)])
+            + "\n" + table(["CUN area", "PO", "PA", "RTD", "RU"], rows_money, "lrrrr", "\\small", total=money_total,
+                  groups=[("", 1), ("MUR money of the units (\\%)", 4)])
             + "\n" + figure("career_levels", "Share of the funded PIs and of the partner-unit leaders found in the MUR directory, by career level.", 0.75)))
 
     # ------------------------------------------------------ GSDs per project
@@ -404,7 +408,7 @@ City, region and type of each institution come from a hand-checked table of {ins
                   note="Projects by number of distinct GSDs and by number of units.")
             + "\n" + table(["Distinct areas"] + head[1:], dist_rows(da), "r" + "r" * (len(head) - 1), "\\small", total=dist_total(da),
                   note="Projects by number of distinct CUN areas (first two digits of the GSD).")
-            + "\n" + figure("distinct_gsd", "Share of the projects by number of distinct GSDs among the leaders of their units, against the random assignment of the leaders within the sector.", 0.75)))
+            + "\n" + figure("distinct_gsd", "Share of the projects by number of distinct GSDs among the leaders of their units, against the same leaders shuffled between the projects of their sector, each project keeping its number of units (mean of 2000 shuffles).", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet
     summ = json.loads((out_dir / "analysis" / "summary.json").read_text())
