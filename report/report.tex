@@ -7,7 +7,7 @@
 \usepackage{longtable}
 \usepackage{float}
 \usepackage{siunitx}
-\usepackage[hidelinks]{hyperref}
+\usepackage[colorlinks=true,linkcolor=black,urlcolor=blue]{hyperref}
 \usepackage[inline]{enumitem}
 \sisetup{range-phrase=--}
 \setlength{\parindent}{0pt}
@@ -36,9 +36,17 @@ available to each sector (under-40 pool plus ordinary pool): 164.01~M~EUR.
 144 funded projects and 726 funded units (144 PI, 582 RU) from Tabella B, receiving 155.40~M~EUR (94.75\% of the budget).
 Tabella A lists 235 ranked projects, 144 of them funded; it contains the projects the evaluation committees judged fundable, not all the projects submitted.
 Gender is inferred from the first given name with a table of 287 names (60 assigned by hand, 227 by the Italian ending rule); it is a binary inference used only in aggregate.
-City, region and type of each institution come from a hand-checked table of 84 institutions; regional boundaries are simplified ISTAT shapes.
-Resident population by region (1 January 2026) and professors, researchers and research fellows of the universities by region (2024, from the MUR statistical office open data) are in \texttt{data/}; their sources are given in the README.
-The GSD of the unit leaders was looked up by name in the staff search of the MUR portal Cerca Università (see \texttt{gsd.py}); only aggregates are kept in the repository.
+City, region and type of each institution come from a hand-checked table of 84 institutions.
+
+\subsubsection*{Sources}
+\begin{itemize}
+\item Decrees, Tabella A (ranking) and Tabella B (funded projects): the MUR \href{https://prin.mur.gov.it/Pages/Index/301}{PRIN 2026 page} and the pages and files linked in the table of decrees below.
+\item Regional boundaries: ISTAT administrative boundaries, simplified, from the \href{https://github.com/openpolis/geojson-italy}{openpolis/geojson-italy} repository.
+\item Resident population by region, 1 January 2026 (ISTAT figures): the \href{https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population}{table of Italian regions by population}, which cites \href{https://www.tuttitalia.it}{tuttitalia.it}.
+\item Professors, researchers and research fellows of the universities by region, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/46015a92-abe3-411c-af07-2532164cab59/download/personale_xgenere.csv}{personale\_xgenere.csv}, dataset \href{https://dati-ustat.mur.gov.it/dataset/personale-universitario}{2020--2024 Personale universitario} of the open data of the MUR statistical office (USTAT).
+\item Professors and researchers by CUN scientific-disciplinary area, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/a966dec6-b9a4-481c-92d2-485e799a9c1a/download/personale_docentedi-ruoloricercatorexareasd.csv}{personale\_docentedi-ruoloricercatorexareasd.csv}, same dataset.
+\item Disciplinary group (GSD 2024) of the unit leaders: looked up by name in the staff search of the MUR portal \href{https://cercauniversita.mur.gov.it}{Cerca Universit\`a} (see \texttt{gsd.py}); only aggregates are kept in the repository.
+\end{itemize}
 
 \section{Analyses}
 \subsection{Budget and funded money per sector}
