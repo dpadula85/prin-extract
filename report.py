@@ -37,6 +37,7 @@ PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 \sisetup{range-phrase=--}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{4pt}
+\emergencystretch=3em
 """
 
 
@@ -55,10 +56,14 @@ def join(items: List[str]) -> str:
     return ", ".join(items[:-1]) + " and " + items[-1]
 
 
-def table(header: List[str], rows: List[List[str]], colspec: str, size: str = "") -> str:
+def table(header: List[str], rows: List[List[str]], colspec: str, size: str = "",
+          total: Optional[List[str]] = None) -> str:
+    """A booktabs table; `total`, if given, is a last row set off by a midrule."""
     lines = [r"\begin{table}[H]", r"\centering", size, rf"\begin{{tabular}}{{{colspec}}}", r"\toprule",
              " & ".join(header) + r" \\", r"\midrule"]
     lines += [" & ".join(r) + r" \\" for r in rows]
+    if total is not None:
+        lines += [r"\midrule", " & ".join(total) + r" \\"]
     lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
     return "\n".join(x for x in lines if x)
 
@@ -155,7 +160,10 @@ City, region and type of each institution come from a hand-checked table of {ins
         "Institution types",
         "To show how the budget is divided among types of institution (public and private universities, telematic universities, advanced schools, research bodies).",
         rf"Public universities received {pct(kinds.loc['public_university', 'share_of_budget_pct'])} of the budget, national research bodies {pct(kinds.loc['national_research_body', 'share_of_budget_pct'])}, private universities {pct(kinds.loc['private_university', 'share_of_budget_pct'])}, advanced schools {pct(kinds.loc['school', 'share_of_budget_pct'])}, telematic universities {pct(kinds.loc['telematic', 'share_of_budget_pct'])}. The table gives the number of institutions and the shares by role.",
-        table(["Type", "Institutions", "Projects", "Share (\\%)", "as PI (\\%)", "as RU (\\%)"], rows, "lrrrrr")
+        table(["Type", "Institutions", "Projects", "Share (\\%)", "as PI (\\%)", "as RU (\\%)"], rows, "lrrrrr",
+              total=["Total", str(int(n_by_kind[kinds.index].sum())), str(n_proj),
+                     f"{kinds['share_of_budget_pct'].sum():.2f}", f"{100 * kinds['mur_pi'].sum() / B:.2f}",
+                     f"{100 * kinds['mur_ru'].sum() / B:.2f}"])
         + "\n" + figure("institution_types", "Share of the total budget by institution type, as coordinator (PI) and as partner (RU).", 0.7)))
 
     # ------------------------------------------------------------- 2.4 money
@@ -218,13 +226,17 @@ City, region and type of each institution come from a hand-checked table of {ins
         for _, r in sub.iterrows():
             rows.append([tex(g), r["macro"], str(int(r["n"])), f"{100 * r['female_share']:.0f}",
                          f"{100 * r['low']:.0f}--{100 * r['high']:.0f}"])
+    both = gt[gt["macro"] == "All"]
+    n_both, k_both = int(both["n_known"].sum()), int(round((both["female_share"] * both["n_known"]).sum()))
+    f_both, lo_both, hi_both = an.wilson(k_both, n_both)
+    gender_total = ["Total", "All", str(n_both), f"{100 * f_both:.0f}", f"{100 * lo_both:.0f}--{100 * hi_both:.0f}"]
     allpi = gt[(gt["group"] == "PI, funded") & (gt["macro"] == "All")].iloc[0]
     allru = gt[(gt["group"] == "Partner-unit leaders, funded") & (gt["macro"] == "All")].iloc[0]
     parts.append(section(
         "Gender of the unit leaders",
         "To show the share of women among the leaders of the funded units, with the uncertainty due to the small numbers, by macro-area (PE, LS, SH).",
         rf"Among the {int(allpi['n'])} funded PIs, {pct(100 * allpi['female_share'], 0)} are women (95\% interval {100 * allpi['low']:.0f}--{100 * allpi['high']:.0f}); among the {int(allru['n'])} leaders of funded partner units, {pct(100 * allru['female_share'], 0)} ({100 * allru['low']:.0f}--{100 * allru['high']:.0f}). The first given name was found in the name table for all {int(allpi['n_known'] + allru['n_known'])} leaders considered. The table gives the shares by macro-area.",
-        table(["Group", "Area", "Leaders", "Women (\\%)", "95\\% interval"], rows, "llrrr")
+        table(["Group", "Area", "Leaders", "Women (\\%)", "95\\% interval"], rows, "llrrr", total=gender_total)
         + "\n" + figure("gender", "Share of women among the leaders of the funded units, with Wilson 95\\% intervals; the dashed line marks 50\\%.", 0.7)))
 
 
@@ -242,7 +254,10 @@ City, region and type of each institution come from a hand-checked table of {ins
         "Budget, population and university staff by region",
         "To compare the share of the total budget gathered by each region, as in the regional map, with its share of the resident population and of the professors and researchers of its universities.",
         rf"Across the {len(drawn)} regions with funded units, the share of the budget has Pearson correlation {cors['population'][0]:.2f} and Spearman correlation {cors['population'][1]:.2f} with the share of the resident population, and {cors['staff'][0]:.2f} and {cors['staff'][1]:.2f} with the share of professors and researchers (the national research bodies are not regions and are left out; {join([tex(r.split('/')[0]) for r in ctx.index[ctx['budget_share_pct'] <= 0]])} has no funded unit and is left out). The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.",
-        table(["Region", "Population (\\%)", "Staff (\\%)", "Budget (\\%)", "Budget/population", "Budget/staff"], rows, "lrrrrr", "\\small")
+        table(["Region", "Population (\\%)", "Staff (\\%)", "Budget (\\%)", "Budget/population", "Budget/staff"], rows, "lrrrrr", "\\small\\setlength{\\tabcolsep}{4pt}",
+              total=["Total", f"{ctx['population_share_pct'].sum():.1f}", f"{ctx['staff_share_pct'].sum():.1f}",
+                     f"{ctx['budget_share_pct'].sum():.1f}", f"{ctx['budget_share_pct'].sum() / 100:.2f}",
+                     f"{ctx['budget_share_pct'].sum() / 100:.2f}"])
         + "\n" + figure("population_vs_budget", "Share of the budget of each region against its share of the resident population (1 January 2026); logarithmic axes, the dashed line marks equal shares. ER: Emilia-Romagna; FVG: Friuli-Venezia Giulia; TAA: Trentino-Alto Adige.", 0.75)
         + "\n" + figure("staff_vs_budget", "As above, against the share of professors and researchers of the universities of the region (2024).", 0.75)))
 
@@ -269,8 +284,13 @@ City, region and type of each institution come from a hand-checked table of {ins
             "Disciplinary group of the unit leaders",
             "To show the disciplinary group (GSD 2024) of the leaders of the funded units, by area of the National University Council (CUN), against the professors and researchers of the Italian universities.",
             rf"The GSD was found at the university of the unit for {n_found} of the {n_all} leaders ({pi_f} PI, {ru_f} partner-unit leaders). The other leaders are: found only at another university {other['other_university']}, in no record {other['not_found']} (research bodies and other institutions that are not universities, and people not listed), several records at the university {other['ambiguous']}, not looked up {other['not_looked_up']}. The three areas with most leaders are {top_txt}. The first table gives the leaders by CUN area (the first two digits of the GSD) and by ERC macro-area, the share of leaders and of staff, and the leaders per 1000 professors and researchers; the second the most frequent GSDs.",
-            table(["CUN area", "Staff", "PI", "Partners", "PE", "LS", "SH", "Lead. (\\%)", "Staff (\\%)", "Per 1000"], rows, "lrrrrrrrrr", "\\footnotesize")
-            + "\n" + table(["GSD", "PI", "Partners", "Leaders"], rows_codes, "lrrr", "\\small")
+            table(["CUN area", "Staff", "PI", "Partners", "PE", "LS", "SH", "Lead. (\\%)", "Staff (\\%)", "Per 1000"], rows, "lrrrrrrrrr", "\\footnotesize\\setlength{\\tabcolsep}{3pt}",
+                  total=["Total", str(int(ga["staff"].sum())), str(int(ga["PI"].sum())),
+                         str(int(ga["Partner-unit leaders"].sum())), str(int(gm["PE"].sum())), str(int(gm["LS"].sum())),
+                         str(int(gm["SH"].sum())), "100.0", "100.0", f"{1000 * ga['leaders'].sum() / ga['staff'].sum():.1f}"])
+            + "\n" + table(["GSD", "PI", "Partners", "Leaders"], rows_codes, "lrrr", "\\small",
+                  total=["Total, all GSDs", str(int(gc["PI"].sum())), str(int(gc["Partner-unit leaders"].sum())),
+                         str(int(gc["leaders"].sum()))])
             + "\n" + figure("gsd_areas", "Share of the funded unit leaders found in the MUR directory, and share of the professors and researchers (2024), by CUN area.", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet
@@ -298,7 +318,8 @@ City, region and type of each institution come from a hand-checked table of {ins
                   pct(100 * (peers["mur_pi"] / peers["mur_total"]).median(), 0)]]
         body = (table([tex(name), "Value", f"Median, {tex(an.KIND_LABELS[f['type']].lower())}"],
                       [[tex(a), b, c] for a, b, c in facts], "llr")
-                + "\n" + table(["Sector", "Role", "k EUR", "Project", "Coordinator", "Other institutions"], rows, "llrp{5.2cm}p{2.2cm}p{4cm}", r"\footnotesize")
+                + "\n" + table(["Sector", "Role", "k EUR", "Project", "Coordinator", "Other institutions"], rows, "llrp{4.6cm}p{2cm}p{3.6cm}", r"\footnotesize",
+                              total=["Total", "", f"{mine['mur_contribution'].sum() / 1e3:.0f}", "", "", ""])
                 + "\n" + figure("highlight_neighbours", rf"Share of the total budget of {tex(name)} and of the institutions ranked just above and below it.", 0.65)
                 + "\n" + figure("highlight_map", rf"Cities sharing funded projects with {tex(name)} (line width proportional to the number of projects).", 0.75))
         parts.append(section(
@@ -317,12 +338,18 @@ City, region and type of each institution come from a hand-checked table of {ins
             for s, r in sec.iterrows()]
     parts.append(r"\section{Sectors}" + "\n" + table(
         ["Sector", "Available", "Funded", "Funded (\\%)", "Projects", "Ranked", "Under-40 pool", "Under-40 PIs' projects"], rows,
-        "lrrrrrrr", r"\footnotesize"))
+        "lrrrrrrr", r"\footnotesize\setlength{\tabcolsep}{3pt}",
+        total=["Total", eur(sec["budget"].sum(), 2), eur(sec["funded"].sum(), 2),
+               f"{100 * sec['funded'].sum() / sec['budget'].sum():.1f}", str(int(sec["n_funded"].sum())),
+               str(int(sec["n_ranked"].sum())), eur(u40.loc[sec.index, "pool"].sum(), 2),
+               eur(u40.loc[sec.index, "money_under40_projects"].sum(), 2)]))
     rows = [[tex(n.split("/")[0]), f"{r['share_of_budget_pct']:.2f}", str(int(r["projects"])), str(int(r["pi_units"])),
              str(int(r["ru_units"])), "" if np.isnan(r["pi_share_of_region_pct"]) else f"{r['pi_share_of_region_pct']:.0f}"]
             for n, r in regions.iterrows()]
     parts.append(r"\section{Regions}" + "\n" + table(
-        ["Region", "Share (\\%)", "Projects", "PI units", "RU units", "As PI (\\%)"], rows, "lrrrrr", r"\footnotesize"))
+        ["Region", "Share (\\%)", "Projects", "PI units", "RU units", "As PI (\\%)"], rows, "lrrrrr", r"\footnotesize",
+        total=["Total", f"{regions['share_of_budget_pct'].sum():.2f}", str(n_proj), str(int(regions["pi_units"].sum())),
+               str(int(regions["ru_units"].sum())), f"{100 * regions['mur_pi'].sum() / regions['mur_total'].sum():.0f}"]))
     lines = [r"\section{All institutions}",
              "Institutions with at least one funded unit, by funding (the region of each is in the institution table of the analysis output); share of the total budget, MUR contribution, projects, units as coordinator (PI) and partner (RU), sectors with a funded unit.", "",
              r"{\footnotesize\setlength{\tabcolsep}{2.5pt}", r"\begin{longtable}{rlllrrrrrr}", r"\toprule",
@@ -332,7 +359,11 @@ City, region and type of each institution come from a hand-checked table of {ins
                                  f"{r['share_of_budget_pct']:.2f}", f"{r['mur_total'] / 1e3:.0f}",
                                  str(int(r["projects"])), str(int(r["pi_units"])), str(int(r["ru_units"])),
                                  str(int(r["n_sectors"]))]) + r" \\")
-    lines += [r"\bottomrule", r"\end{longtable}", "}"]
+    lines += [r"\midrule",
+              " & ".join(["", "Total", "", "", f"{inst['share_of_budget_pct'].sum():.2f}", f"{inst['mur_total'].sum() / 1e3:.0f}",
+                          str(n_proj), str(int(inst["pi_units"].sum())), str(int(inst["ru_units"].sum())),
+                          str(len(d.sectors))]) + r" \\",
+              r"\bottomrule", r"\end{longtable}", "}"]
     parts.append("\n".join(lines))
 
     head = rf"""{PREAMBLE}\title{{PRIN 2026: funded projects}}
