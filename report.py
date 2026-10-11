@@ -205,7 +205,7 @@ City, region and type of each institution come from a hand-checked table of {ins
     macro = "; ".join(f"{tex(a)} {pct(r['pi_share_of_region_pct'], 0)}" for a, r in areas.iterrows())
     no_pi = [n.split("/")[0] for n, r in regions.drop(NATIONAL).iterrows() if r["mur_total"] > 0 and r["pi_units"] == 0]
     parts.append(section(
-        "Geography",
+        "Money by region and city",
         "To show where the money went: by region, by city, and, per region and macro-area, which part of the funding came from units coordinating projects and which from partner units.",
         rf"The regions with the largest shares are {join([f'{tex(n.split(chr(47))[0])} ({pct(r.share_of_budget_pct)})' for n, r in reg.head(3).iterrows()])}. "
         rf"National research bodies (CNR, INAF, INFN, INGV), which have no region, received {pct(regions.loc[NATIONAL, 'share_of_budget_pct'])}. "
