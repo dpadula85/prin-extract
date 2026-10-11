@@ -796,6 +796,56 @@ def gsd_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     return dict(status=status, areas=areas, codes=codes, macro=macro)
 
 
+CAREER_LEVELS = {"Ordinario": "Full professor (PO)", "Associato": "Associate professor (PA)",
+                 "Ricercatori a tempo determinato L.79/2022": "Fixed-term (RTD, L. 79/2022)",
+                 "Ricercatori a tempo determinato L.240/10 tipo B": "Fixed-term (RTD-B)",
+                 "Ricercatori a tempo determinato L.240/10 tipo A": "Fixed-term (RTD-A)",
+                 "Ricercatore": "Permanent researcher"}
+
+
+def career_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+    """The career level of the unit leaders found in the MUR directory (see gsd.py): per
+    level, the PIs and the partner-unit leaders, their ERC macro-areas, and the MUR money of
+    their units. Only leaders found at the university of their unit count."""
+    u = d.units[["sector", "role", "name", "institution", "mur_contribution"]].merge(
+        cache[["name", "institution", "status", "role"]].rename(columns={"role": "career"}),
+        on=["name", "institution"], how="left")
+    found = u[u["status"] == "found"].copy()
+    found["level"] = found["career"].map(CAREER_LEVELS)
+    found["macro"] = found["sector"].str[:2]
+    levels = list(CAREER_LEVELS.values())
+    t = pd.DataFrame(index=levels)
+    for role, col in (("PI", "PI"), ("RU", "Partner-unit leaders")):
+        t[col] = found[found["role"] == role].groupby("level").size().reindex(levels).fillna(0).astype(int)
+    t["leaders"] = t["PI"] + t["Partner-unit leaders"]
+    for m in ("PE", "LS", "SH"):
+        t[m] = found[found["macro"] == m].groupby("level").size().reindex(levels).fillna(0).astype(int)
+    t["leaders_share_pct"] = 100 * t["leaders"] / t["leaders"].sum()
+    t["mur_total"] = found.groupby("level")["mur_contribution"].sum().reindex(levels).fillna(0.0)
+    t["budget_share_pct"] = 100 * t["mur_total"] / d.budget
+    t["mean_per_unit"] = t["mur_total"] / t["leaders"].where(t["leaders"] > 0)
+    t.index.name = "level"
+    return dict(levels=t)
+
+
+def fig_career(d: Data, t: pd.DataFrame, fig_dir: Path):
+    """Per career level, the share of the funded PIs and of the partner-unit leaders found
+    in the MUR directory."""
+    t = t[t["leaders"] > 0].iloc[::-1]
+    fig, ax = _axes(small=True)
+    fig.set_size_inches(14, 9)
+    y = np.arange(len(t))
+    for off, col, color in ((0.2, "PI", PI_COLOR), (-0.2, "Partner-unit leaders", RU_COLOR)):
+        ax.barh(y + off, 100 * t[col] / t[col].sum(), height=0.4, color=color,
+                label=f"{col} ({int(t[col].sum())})")
+    ax.set_yticks(y, [tex(l) for l in t.index])
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.set_xlabel(r"Share of the leaders / \%")
+    ax.legend(title=tex(f"{_stamp(d)}; leaders at a university"), loc="lower center",
+              bbox_to_anchor=(0.5, 1.01), ncol=2, fontsize=20, title_fontsize=20)
+    _save(fig, ax, fig_dir, "career_levels")
+
+
 CUN_AREAS = {"01": "Mathematics, computer science", "02": "Physics", "03": "Chemistry", "04": "Earth sciences",
              "05": "Biology", "06": "Medicine", "07": "Agriculture, veterinary", "08": "Civil eng., architecture",
              "09": "Industrial, information eng.", "10": "Antiquity, philology, arts", "11": "History, philosophy, psychology",
@@ -925,6 +975,10 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
             t.to_csv(tab_dir / f"gsd_{name}.csv", encoding="utf-8-sig")
         fig_gsd_areas(d, gt_gsd["areas"], int(gt_gsd["areas"]["leaders"].sum()), fig_dir)
         fig_gsd_staff_budget(d, gt_gsd["areas"], fig_dir)
+        gt_career = career_tables(d, gsd.load_cache())
+        for name, t in gt_career.items():
+            t.to_csv(tab_dir / f"career_{name}.csv", encoding="utf-8-sig")
+        fig_career(d, gt_career["levels"], fig_dir)
     fig_region_roles(d, regions, areas, fig_dir)
     fig_breadth(d, inst, fig_dir, highlight)
     if highlight:

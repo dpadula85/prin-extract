@@ -126,7 +126,7 @@ City, region and type of each institution come from a hand-checked table of {ins
 \item Resident population by region, 1 January 2026 (ISTAT figures): the \href{{https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population}}{{table of Italian regions by population}}, which cites \href{{https://www.tuttitalia.it}}{{tuttitalia.it}}.
 \item Professors, researchers and research fellows of the universities by region, 2024: \href{{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/46015a92-abe3-411c-af07-2532164cab59/download/personale_xgenere.csv}}{{personale\_xgenere.csv}}, dataset \href{{https://dati-ustat.mur.gov.it/dataset/personale-universitario}}{{2020--2024 Personale universitario}} of the open data of the MUR statistical office (USTAT). The staff is all the university staff in post, not those who applied to the programme, for which no data are available.
 \item Professors and researchers by CUN scientific-disciplinary area, 2024: \href{{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/a966dec6-b9a4-481c-92d2-485e799a9c1a/download/personale_docentedi-ruoloricercatorexareasd.csv}}{{personale\_docentedi-ruoloricercatorexareasd.csv}}, same dataset.
-\item Disciplinary group (GSD 2024) of the unit leaders: looked up by name in the staff search of the MUR portal \href{{https://cercauniversita.mur.gov.it}}{{Cerca Universit\`a}} (see \texttt{{gsd.py}}); only aggregates are kept in the repository.
+\item Disciplinary group (GSD 2024) and career level of the unit leaders: looked up by name in the staff search of the MUR portal \href{{https://cercauniversita.mur.gov.it}}{{Cerca Universit\`a}} (see \texttt{{gsd.py}}); only aggregates are kept in the repository.
 \end{{itemize}}
 """)
 
@@ -309,6 +309,30 @@ City, region and type of each institution come from a hand-checked table of {ins
                          str(int(gc["leaders"].sum()))])
             + "\n" + figure("gsd_staff_vs_budget", "Share of the budget received by the units whose leader's GSD was found, against the share of the professors and researchers (2024), by CUN area, numbered as in the table above; logarithmic axes, the dashed line marks equal shares. The staff is all the professors and researchers of the Italian universities, not only the applicants.", 0.75)
             + "\n" + figure("gsd_areas", "Share of the funded unit leaders found in the MUR directory, and share of all the professors and researchers of the Italian universities (2024, not only the applicants), by CUN area.", 0.75)))
+
+    # ------------------------------------------------------------ career level
+    if (gsd_dir / "career_levels.csv").exists():
+        cl = pd.read_csv(gsd_dir / "career_levels.csv", index_col=0)
+        cl = cl[cl["leaders"] > 0]
+        n_lead = int(cl["leaders"].sum())
+        po, pa = cl.iloc[0], cl.iloc[1]
+        rt = cl[cl.index.str.startswith("Fixed-term")]
+        rows = [[tex(lv), str(int(v["PI"])), str(int(v["Partner-unit leaders"])), str(int(v["leaders"])),
+                 str(int(v["PE"])), str(int(v["LS"])), str(int(v["SH"])),
+                 f"{v['leaders_share_pct']:.1f}", f"{v['mur_total'] / 1e6:.2f}", f"{v['budget_share_pct']:.1f}",
+                 f"{v['mean_per_unit'] / 1e3:.0f}"] for lv, v in cl.iterrows()]
+        parts.append(section(
+            "Career level of the unit leaders",
+            "To show the career level (full professor, associate professor, fixed-term researcher) of the leaders of the funded units, and the MUR money of their units, from the same MUR directory lookup as the disciplinary group.",
+            rf"The level was found for {n_lead} leaders. Full professors are {int(po['PI'])} of the {int(cl['PI'].sum())} PIs and {int(po['Partner-unit leaders'])} of the {int(cl['Partner-unit leaders'].sum())} partner-unit leaders; associate professors are {int(pa['PI'])} and {int(pa['Partner-unit leaders'])}; fixed-term researchers are {int(rt['PI'].sum())} and {int(rt['Partner-unit leaders'].sum())}. The units led by full professors received {cl.iloc[0]['budget_share_pct']:.1f}\% of the total budget, those led by associate professors {cl.iloc[1]['budget_share_pct']:.1f}\%, those led by fixed-term researchers {rt['budget_share_pct'].sum():.1f}\%. The mean MUR contribution per unit is in the last column. No count of the staff by level is available, so the shares are not compared with the national staff.",
+            table(["Level", "PI", "Partners", "Leaders", "PE", "LS", "SH", "Lead. (\\%)", "MUR (M EUR)", "Budget (\\%)", "Mean (k EUR)"],
+                  rows, "lrrrrrrrrrr", "\\scriptsize\\setlength{\\tabcolsep}{2pt}",
+                  total=["Total", str(int(cl["PI"].sum())), str(int(cl["Partner-unit leaders"].sum())), str(n_lead),
+                         str(int(cl["PE"].sum())), str(int(cl["LS"].sum())), str(int(cl["SH"].sum())), "100.0",
+                         f"{cl['mur_total'].sum() / 1e6:.2f}", f"{cl['budget_share_pct'].sum():.1f}",
+                         f"{cl['mur_total'].sum() / n_lead / 1e3:.0f}"],
+                  note="Leaders found at the university of their unit; mean: MUR contribution per unit.")
+            + "\n" + figure("career_levels", "Share of the funded PIs and of the partner-unit leaders found in the MUR directory, by career level.", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet
     summ = json.loads((out_dir / "analysis" / "summary.json").read_text())
