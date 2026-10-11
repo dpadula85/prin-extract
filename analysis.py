@@ -823,7 +823,8 @@ def fig_gsd_areas(d: Data, areas: pd.DataFrame, n_found: int, fig_dir: Path):
 def fig_gsd_staff_budget(d: Data, areas: pd.DataFrame, fig_dir: Path):
     """Per CUN area, the share of the total budget received by the units whose leader's GSD
     is in the area, against the share of the professors and researchers of the area, on
-    logarithmic axes with the line of equal shares."""
+    logarithmic axes with the line of equal shares. The points are labelled with the CUN area
+    number (the names are in the table of the report)."""
     lo, hi, ticks = 0.15, 25, [0.2, 0.5, 1, 2, 5, 10, 20]
     xs, ys = areas["staff_share_pct"], areas["budget_share_pct"]
     fig, ax = _axes(tick=30)
@@ -838,7 +839,7 @@ def fig_gsd_staff_budget(d: Data, areas: pd.DataFrame, fig_dir: Path):
         axis.set_minor_locator(plt.NullLocator())
     ax.set_xlabel(r"Share of professors and researchers / \%"), ax.set_ylabel(r"Share of budget / \%")
     ax.set_title(tex(f"{_stamp(d)}; units whose leader's GSD was found, by CUN area"), fontsize=18)
-    _label_with_leaders(fig, ax, xs, ys, [tex(CUN_AREAS.get(c, c)) for c in areas.index],
+    _label_with_leaders(fig, ax, xs, ys, [str(c) for c in areas.index],
                         np.geomspace(lo, hi, 400))
     _save(fig, ax, fig_dir, "gsd_staff_vs_budget")
 

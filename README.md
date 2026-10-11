@@ -152,6 +152,7 @@ Checks: for each Tabella B PDF, the number of parsed units equals the number of 
 
 - Tabella A contains the projects the evaluation committees judged fundable, not all the projects submitted, so **no success rate (by institution, region, age or gender) can be computed**.
 - The parsing depends on the PDF layout: verify any figure you rely on against the official tables.
+- The shares of staff (by region and by CUN area) are taken over all the professors and researchers of the Italian universities, not over those who applied to the programme, because the number of applicants is not available.
 - The GSD comes from a lookup by name: a leader with a common name may be missed or reported as ambiguous, and leaders who are not university staff have none. The match rate is stated in the report.
 - Under-40 projects can also be funded through the ordinary ranking, so the money going to them is not the use of the under-40 pool.
 

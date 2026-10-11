@@ -44,7 +44,7 @@ City, region and type of each institution come from a hand-checked table of 84 i
 \item Decrees, Tabella A (ranking) and Tabella B (funded projects): the MUR \href{https://prin.mur.gov.it/Pages/Index/301}{PRIN 2026 page} and the pages and files linked in the table of decrees below.
 \item Regional boundaries: ISTAT administrative boundaries, simplified, from the \href{https://github.com/openpolis/geojson-italy}{openpolis/geojson-italy} repository.
 \item Resident population by region, 1 January 2026 (ISTAT figures): the \href{https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population}{table of Italian regions by population}, which cites \href{https://www.tuttitalia.it}{tuttitalia.it}.
-\item Professors, researchers and research fellows of the universities by region, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/46015a92-abe3-411c-af07-2532164cab59/download/personale_xgenere.csv}{personale\_xgenere.csv}, dataset \href{https://dati-ustat.mur.gov.it/dataset/personale-universitario}{2020--2024 Personale universitario} of the open data of the MUR statistical office (USTAT).
+\item Professors, researchers and research fellows of the universities by region, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/46015a92-abe3-411c-af07-2532164cab59/download/personale_xgenere.csv}{personale\_xgenere.csv}, dataset \href{https://dati-ustat.mur.gov.it/dataset/personale-universitario}{2020--2024 Personale universitario} of the open data of the MUR statistical office (USTAT). The staff is all the university staff in post, not those who applied to the programme, for which no data are available.
 \item Professors and researchers by CUN scientific-disciplinary area, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/a966dec6-b9a4-481c-92d2-485e799a9c1a/download/personale_docentedi-ruoloricercatorexareasd.csv}{personale\_docentedi-ruoloricercatorexareasd.csv}, same dataset.
 \item Disciplinary group (GSD 2024) of the unit leaders: looked up by name in the staff search of the MUR portal \href{https://cercauniversita.mur.gov.it}{Cerca Universit\`a} (see \texttt{gsd.py}); only aggregates are kept in the repository.
 \end{itemize}
@@ -198,7 +198,7 @@ Total & All & 726 & 36 & 33--40 \\
 \subsection{Budget, population and university staff by region}
 \textbf{Purpose.} To compare the share of the total budget gathered by each region, as in the regional map, with its share of the resident population and of the professors and researchers of its universities.
 
-\textbf{Result.} Across the 19 regions with funded units, the share of the budget has Pearson correlation 0.91 and Spearman correlation 0.83 with the share of the resident population, and 0.96 and 0.88 with the share of professors and researchers (the national research bodies are not regions and are left out of the correlations; Valle d'Aosta has no funded unit and is left out). The national research bodies (CNR, INAF, INFN and INGV) belong to no region and received 9.4\% of the budget; a further 5.2\% of the budget was not assigned. The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.
+\textbf{Result.} Across the 19 regions with funded units, the share of the budget has Pearson correlation 0.91 and Spearman correlation 0.83 with the share of the resident population, and 0.96 and 0.88 with the share of professors and researchers (the national research bodies are not regions and are left out of the correlations; Valle d'Aosta has no funded unit and is left out). The national research bodies (CNR, INAF, INFN and INGV) belong to no region and received 9.4\% of the budget; a further 5.2\% of the budget was not assigned. The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff. The staff shares refer to all the professors and researchers of the Italian universities, not to those who applied to the programme, for which no data are available.
 
 \begin{table}[H]
 \centering
@@ -242,13 +242,13 @@ Total & 100.0 & 100.0 & 94.8 & -- & -- \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\textwidth]{../prin_out/figures/staff_vs_budget.pdf}
-\caption{As above, against the share of professors and researchers of the universities of the region (2024).}
+\caption{As above, against the share of professors and researchers of the universities of the region (2024), over all the Italian university staff and not only the applicants.}
 \end{figure}
 
 \subsection{Disciplinary group of the unit leaders}
 \textbf{Purpose.} To show the disciplinary group (GSD 2024) of the leaders of the funded units, by area of the National University Council (CUN), against the professors and researchers of the Italian universities.
 
-\textbf{Result.} The GSD was found at the university of the unit for 655 of the 726 leaders (134 PI, 521 partner-unit leaders). The other leaders are: found only at another university 3, in no record 65 (research bodies and other institutions that are not universities, and people not listed), several records at the university 3, not looked up 0. The three areas with most leaders are 06 Scienze mediche (113), 09 Ingegneria industriale e dell'informazione (103) and 05 Scienze biologiche (77). The units whose leader's GSD was found received 84.3\% of the budget; by CUN area, the share of the budget has Pearson correlation 0.70 and Spearman correlation 0.57 with the share of the professors and researchers. The first table gives the leaders by CUN area (the first two digits of the GSD) and by ERC macro-area, the share of leaders, of staff and of the budget, and the leaders per 1000 professors and researchers; the second the most frequent GSDs.
+\textbf{Result.} The GSD was found at the university of the unit for 655 of the 726 leaders (134 PI, 521 partner-unit leaders). The other leaders are: found only at another university 3, in no record 65 (research bodies and other institutions that are not universities, and people not listed), several records at the university 3, not looked up 0. The three areas with most leaders are 06 Scienze mediche (113), 09 Ingegneria industriale e dell'informazione (103) and 05 Scienze biologiche (77). The units whose leader's GSD was found received 84.3\% of the budget; by CUN area, the share of the budget has Pearson correlation 0.70 and Spearman correlation 0.57 with the share of the professors and researchers. The first table gives the leaders by CUN area (the first two digits of the GSD) and by ERC macro-area, the share of leaders, of staff and of the budget, and the leaders per 1000 professors and researchers; the second the most frequent GSDs. The staff shares refer to all the professors and researchers of the Italian universities, not to those who applied to the programme, for which no data are available.
 
 \begin{table}[H]
 \centering
@@ -274,6 +274,7 @@ CUN area & Staff & PI & Partners & PE & LS & SH & Lead. (\%) & Staff (\%) & Budg
 \midrule
 Total & 64633 & 134 & 521 & 329 & 178 & 148 & 100.0 & 100.0 & 84.3 & 10.1 \\
 \bottomrule
+\multicolumn{11}{l}{\footnotesize Staff: all professors and researchers of the Italian universities, not only applicants.} \\
 \end{tabular}
 \end{table}
 \begin{table}[H]
@@ -306,12 +307,12 @@ Total, all GSDs & 134 & 521 & 655 \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\textwidth]{../prin_out/figures/gsd_staff_vs_budget.pdf}
-\caption{Share of the budget received by the units whose leader's GSD was found, against the share of the professors and researchers (2024), by CUN area; logarithmic axes, the dashed line marks equal shares.}
+\caption{Share of the budget received by the units whose leader's GSD was found, against the share of the professors and researchers (2024), by CUN area, numbered as in the table above; logarithmic axes, the dashed line marks equal shares. The staff is all the professors and researchers of the Italian universities, not only the applicants.}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\textwidth]{../prin_out/figures/gsd_areas.pdf}
-\caption{Share of the funded unit leaders found in the MUR directory, and share of the professors and researchers (2024), by CUN area.}
+\caption{Share of the funded unit leaders found in the MUR directory, and share of all the professors and researchers of the Italian universities (2024, not only the applicants), by CUN area.}
 \end{figure}
 
 \subsection{Institution fact sheet: Siena}
