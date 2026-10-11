@@ -5,7 +5,8 @@ name: Check for new PRIN sectors
 # with the result. Nothing is committed to the default branch. Once all the sectors are
 # parsed the workflow disables itself. The GSD of the unit leaders is looked up by name in the
 # MUR staff directory (gsd.py); the answers are kept in the Actions cache between runs, so a
-# run asks only about leaders it has not seen (the first run asks about all of them).
+# run asks only about leaders it has not seen. The first run starts from the repository secret
+# GSD_CACHE (the gzipped, base64 cache), if set, and asks about all of them otherwise.
 
 on:
   schedule:
@@ -55,6 +56,16 @@ jobs:
           path: cache
           key: gsd-lookup-${{ github.run_id }}
           restore-keys: gsd-lookup-
+
+      - name: Seed the GSD lookups from the repository secret
+        if: steps.changes.outputs.changed == 'true' && hashFiles('cache/gsd_lookup.csv') == ''
+        env:
+          GSD_CACHE: ${{ secrets.GSD_CACHE }}
+        run: |
+          if [ -n "$GSD_CACHE" ]; then
+            mkdir -p cache
+            echo "$GSD_CACHE" | base64 -d | gunzip > cache/gsd_lookup.csv
+          fi
 
       - name: Look up the GSD of the new unit leaders
         id: gsd
