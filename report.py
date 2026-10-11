@@ -57,14 +57,18 @@ def join(items: List[str]) -> str:
 
 
 def table(header: List[str], rows: List[List[str]], colspec: str, size: str = "",
-          total: Optional[List[str]] = None) -> str:
-    """A booktabs table; `total`, if given, is a last row set off by a midrule."""
+          total: Optional[List[str]] = None, note: str = "") -> str:
+    """A booktabs table; `total`, if given, is a last row set off by a midrule; `note` is
+    set in a small row under the bottom rule, inside the table."""
     lines = [r"\begin{table}[H]", r"\centering", size, rf"\begin{{tabular}}{{{colspec}}}", r"\toprule",
              " & ".join(header) + r" \\", r"\midrule"]
     lines += [" & ".join(r) + r" \\" for r in rows]
     if total is not None:
         lines += [r"\midrule", " & ".join(total) + r" \\"]
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    lines += [r"\bottomrule"]
+    if note:
+        lines += [rf"\multicolumn{{{len(header)}}}{{l}}{{\footnotesize {note}}} \\"]
+    lines += [r"\end{tabular}", r"\end{table}"]
     return "\n".join(x for x in lines if x)
 
 
@@ -260,8 +264,8 @@ City, region and type of each institution come from a hand-checked table of {ins
         rf"Across the {len(drawn)} regions with funded units, the share of the budget has Pearson correlation {cors['population'][0]:.2f} and Spearman correlation {cors['population'][1]:.2f} with the share of the resident population, and {cors['staff'][0]:.2f} and {cors['staff'][1]:.2f} with the share of professors and researchers (the national research bodies are not regions and are left out of the correlations; {join([tex(r.split('/')[0]) for r in ctx.index[ctx['budget_share_pct'] <= 0]])} has no funded unit and is left out). The national research bodies ({bodies}) belong to no region and received {nat_pct:.1f}\% of the budget; a further {unassigned_pct:.1f}\% of the budget was not assigned. The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.",
         table(["Region", "Population (\\%)", "Staff (\\%)", "Budget (\\%)", "Budget/population", "Budget/staff"], rows, "lrrrrr", "\\small\\setlength{\\tabcolsep}{4pt}",
               total=["Total", f"{ctx['population_share_pct'].sum():.1f}", f"{ctx['staff_share_pct'].sum():.1f}",
-                     f"{ctx['budget_share_pct'].sum() + nat_pct:.1f}", "--", "--"])
-        + "\n" + rf"{{\footnotesize $^\dagger$ {bodies}: they belong to no region, so no population or staff is attributed to them.}}"
+                     f"{ctx['budget_share_pct'].sum() + nat_pct:.1f}", "--", "--"],
+              note=rf"$^\dagger$ {bodies}: no region, so no population or staff is attributed to them.")
         + "\n" + figure("population_vs_budget", f"Share of the budget of each region against its share of the resident population (1 January 2026); logarithmic axes, the dashed line marks equal shares; the national research bodies ({nat_pct:.1f}\\% of the budget) are not shown. ER: Emilia-Romagna; FVG: Friuli-Venezia Giulia; TAA: Trentino-Alto Adige.", 0.75)
         + "\n" + figure("staff_vs_budget", "As above, against the share of professors and researchers of the universities of the region (2024).", 0.75)))
 
@@ -280,21 +284,26 @@ City, region and type of each institution come from a hand-checked table of {ins
         top_txt = join([tex(f"{c} {a}") + f" ({int(n)})" for c, a, n in zip(top.index, top["area"], top["leaders"])])
         rows = [[f"{c} {tex(a.split(',')[0][:30])}", f"{int(v['staff'])}", f"{int(v['PI'])}", f"{int(v['Partner-unit leaders'])}",
                  f"{int(gm.loc[c, 'PE'])}", f"{int(gm.loc[c, 'LS'])}", f"{int(gm.loc[c, 'SH'])}",
-                 f"{v['leaders_share_pct']:.1f}", f"{v['staff_share_pct']:.1f}", f"{v['leaders_per_1000_staff']:.1f}"]
+                 f"{v['leaders_share_pct']:.1f}", f"{v['staff_share_pct']:.1f}", f"{v['budget_share_pct']:.1f}",
+                 f"{v['leaders_per_1000_staff']:.1f}"]
                 for (c, v), a in zip(ga.iterrows(), ga["area"])]
+        cor = (stats.pearsonr(ga["staff_share_pct"], ga["budget_share_pct"]).statistic,
+               stats.spearmanr(ga["staff_share_pct"], ga["budget_share_pct"]).statistic)
         rows_codes = [[tex(g), str(int(v["PI"])), str(int(v["Partner-unit leaders"])), str(int(v["leaders"]))]
                       for g, v in gc.head(15).iterrows()]
         parts.append(section(
             "Disciplinary group of the unit leaders",
             "To show the disciplinary group (GSD 2024) of the leaders of the funded units, by area of the National University Council (CUN), against the professors and researchers of the Italian universities.",
-            rf"The GSD was found at the university of the unit for {n_found} of the {n_all} leaders ({pi_f} PI, {ru_f} partner-unit leaders). The other leaders are: found only at another university {other['other_university']}, in no record {other['not_found']} (research bodies and other institutions that are not universities, and people not listed), several records at the university {other['ambiguous']}, not looked up {other['not_looked_up']}. The three areas with most leaders are {top_txt}. The first table gives the leaders by CUN area (the first two digits of the GSD) and by ERC macro-area, the share of leaders and of staff, and the leaders per 1000 professors and researchers; the second the most frequent GSDs.",
-            table(["CUN area", "Staff", "PI", "Partners", "PE", "LS", "SH", "Lead. (\\%)", "Staff (\\%)", "Per 1000"], rows, "lrrrrrrrrr", "\\footnotesize\\setlength{\\tabcolsep}{3pt}",
+            rf"The GSD was found at the university of the unit for {n_found} of the {n_all} leaders ({pi_f} PI, {ru_f} partner-unit leaders). The other leaders are: found only at another university {other['other_university']}, in no record {other['not_found']} (research bodies and other institutions that are not universities, and people not listed), several records at the university {other['ambiguous']}, not looked up {other['not_looked_up']}. The three areas with most leaders are {top_txt}. The units whose leader's GSD was found received {ga['budget_share_pct'].sum():.1f}\% of the budget; by CUN area, the share of the budget has Pearson correlation {cor[0]:.2f} and Spearman correlation {cor[1]:.2f} with the share of the professors and researchers. The first table gives the leaders by CUN area (the first two digits of the GSD) and by ERC macro-area, the share of leaders, of staff and of the budget, and the leaders per 1000 professors and researchers; the second the most frequent GSDs.",
+            table(["CUN area", "Staff", "PI", "Partners", "PE", "LS", "SH", "Lead. (\\%)", "Staff (\\%)", "Budget (\\%)", "Per 1000"], rows, "lrrrrrrrrrr", "\\scriptsize\\setlength{\\tabcolsep}{2.5pt}",
                   total=["Total", str(int(ga["staff"].sum())), str(int(ga["PI"].sum())),
                          str(int(ga["Partner-unit leaders"].sum())), str(int(gm["PE"].sum())), str(int(gm["LS"].sum())),
-                         str(int(gm["SH"].sum())), "100.0", "100.0", f"{1000 * ga['leaders'].sum() / ga['staff'].sum():.1f}"])
+                         str(int(gm["SH"].sum())), "100.0", "100.0", f"{ga['budget_share_pct'].sum():.1f}",
+                         f"{1000 * ga['leaders'].sum() / ga['staff'].sum():.1f}"])
             + "\n" + table(["GSD", "PI", "Partners", "Leaders"], rows_codes, "lrrr", "\\small",
                   total=["Total, all GSDs", str(int(gc["PI"].sum())), str(int(gc["Partner-unit leaders"].sum())),
                          str(int(gc["leaders"].sum()))])
+            + "\n" + figure("gsd_staff_vs_budget", "Share of the budget received by the units whose leader's GSD was found, against the share of the professors and researchers (2024), by CUN area; logarithmic axes, the dashed line marks equal shares.", 0.75)
             + "\n" + figure("gsd_areas", "Share of the funded unit leaders found in the MUR directory, and share of the professors and researchers (2024), by CUN area.", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet

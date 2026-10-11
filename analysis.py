@@ -766,7 +766,7 @@ def gsd_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     aggregates: the outcome of the lookup, the leaders and the staff by CUN area (the first
     two digits of the GSD code are the area), the leaders by GSD, and the leaders of each
     ERC macro-area by CUN area. Only leaders found at the university of their unit count."""
-    u = d.units[["sector", "role", "name", "institution"]].merge(
+    u = d.units[["sector", "role", "name", "institution", "mur_contribution"]].merge(
         cache[["name", "institution", "status", "gsd"]], on=["name", "institution"], how="left")
     u["status"] = u["status"].fillna("not_looked_up")
     u["group"] = u["role"].map({"PI": "PI", "RU": "Partner-unit leaders"})
@@ -782,6 +782,8 @@ def gsd_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     for g in ("PI", "Partner-unit leaders"):
         areas[g] = found[found["group"] == g].groupby("area").size().reindex(areas.index).fillna(0).astype(int)
     areas["leaders"] = areas["PI"] + areas["Partner-unit leaders"]
+    areas["mur_total"] = found.groupby("area")["mur_contribution"].sum().reindex(areas.index).fillna(0.0)
+    areas["budget_share_pct"] = 100 * areas["mur_total"] / d.budget
     areas["leaders_share_pct"] = 100 * areas["leaders"] / areas["leaders"].sum()
     areas["staff_share_pct"] = 100 * areas["staff"] / areas["staff"].sum()
     areas["leaders_per_1000_staff"] = 1000 * areas["leaders"] / areas["staff"]
@@ -816,6 +818,29 @@ def fig_gsd_areas(d: Data, areas: pd.DataFrame, n_found: int, fig_dir: Path):
     ax.legend(title=tex(f"{_stamp(d)}; leaders at a university, GSD 2024 area (CUN)"), loc="lower center",
               bbox_to_anchor=(0.5, 1.01), ncol=1, fontsize=20, title_fontsize=20)
     _save(fig, ax, fig_dir, "gsd_areas")
+
+
+def fig_gsd_staff_budget(d: Data, areas: pd.DataFrame, fig_dir: Path):
+    """Per CUN area, the share of the total budget received by the units whose leader's GSD
+    is in the area, against the share of the professors and researchers of the area, on
+    logarithmic axes with the line of equal shares."""
+    lo, hi, ticks = 0.15, 25, [0.2, 0.5, 1, 2, 5, 10, 20]
+    xs, ys = areas["staff_share_pct"], areas["budget_share_pct"]
+    fig, ax = _axes(tick=30)
+    for label in (ax.xaxis.label, ax.yaxis.label):
+        label.set_fontsize(34)
+    ax.plot([lo, hi], [lo, hi], color="grey", lw=1.5, ls="--", zorder=1)
+    ax.scatter(xs, ys, s=200, color="#1f4e9c", zorder=3)
+    ax.set_xscale("log"), ax.set_yscale("log")
+    ax.set_xlim(lo, hi), ax.set_ylim(lo, hi)
+    for axis in (ax.xaxis, ax.yaxis):
+        axis.set_ticks(ticks), axis.set_ticklabels([str(t) for t in ticks])
+        axis.set_minor_locator(plt.NullLocator())
+    ax.set_xlabel(r"Share of professors and researchers / \%"), ax.set_ylabel(r"Share of budget / \%")
+    ax.set_title(tex(f"{_stamp(d)}; units whose leader's GSD was found, by CUN area"), fontsize=18)
+    _label_with_leaders(fig, ax, xs, ys, [tex(CUN_AREAS.get(c, c)) for c in areas.index],
+                        np.geomspace(lo, hi, 400))
+    _save(fig, ax, fig_dir, "gsd_staff_vs_budget")
 
 
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
@@ -898,6 +923,7 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
         for name, t in gt_gsd.items():
             t.to_csv(tab_dir / f"gsd_{name}.csv", encoding="utf-8-sig")
         fig_gsd_areas(d, gt_gsd["areas"], int(gt_gsd["areas"]["leaders"].sum()), fig_dir)
+        fig_gsd_staff_budget(d, gt_gsd["areas"], fig_dir)
     fig_region_roles(d, regions, areas, fig_dir)
     fig_breadth(d, inst, fig_dir, highlight)
     if highlight:
