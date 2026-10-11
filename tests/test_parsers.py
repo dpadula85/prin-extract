@@ -152,3 +152,16 @@ def test_readme_results_block_numbers_come_from_the_tables():
     d = analysis.load(OUT)
     assert f"{d.budget / 1e6:.2f} M EUR" in block
     assert f"{d.units['project_code'].nunique()}, {len(d.units)}" in block
+
+
+def test_region_context_tables_cover_the_regions_of_the_map():
+    """Population and staff tables list the same regions as the map; the shares add to 100."""
+    regions = [f["properties"]["region"] for f in
+               json.loads((ROOT / "data" / "italy_regions.geojson").read_text())["features"]]
+    pop = pd.read_csv(ROOT / "data" / "population_regions.csv", index_col=0)
+    staff = pd.read_csv(ROOT / "data" / "university_staff.csv", index_col=0)
+    assert set(pop.index) == set(regions) == set(staff.index)
+    ctx = analysis.region_context_table(pd.read_csv(OUT / "analysis" / "regions.csv", index_col=0))
+    for col in ("budget_share_pct", "population_share_pct", "staff_share_pct"):
+        assert ctx[col].sum() == pytest.approx(100.0)
+    assert pop["population"].sum() == 58942828

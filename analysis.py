@@ -225,6 +225,25 @@ def gender_table(d: Data) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+REGION_CONTEXT = {"population": "population_regions.csv", "staff": "university_staff.csv"}
+
+
+def region_context_table(regions: pd.DataFrame) -> pd.DataFrame:
+    """Per region, the share of the regional budget (national bodies left out) beside the
+    share of the resident population (1 January 2026) and of the professors and researchers
+    (2024) of the region. The ratio is the budget share divided by the other share."""
+    pop = pd.read_csv(DATA / REGION_CONTEXT["population"], index_col=0)["population"]
+    st = pd.read_csv(DATA / REGION_CONTEXT["staff"], index_col=0)
+    reg = regions.drop(NATIONAL)
+    t = pd.DataFrame({"mur_total": reg["mur_total"], "population": pop.reindex(reg.index),
+                      "staff": (st["professors"] + st["researchers"]).reindex(reg.index)})
+    for col, name in (("mur_total", "budget"), ("population", "population"), ("staff", "staff")):
+        t[f"{name}_share_pct"] = 100 * t[col] / t[col].sum()
+    t["budget_over_population"] = t["budget_share_pct"] / t["population_share_pct"]
+    t["budget_over_staff"] = t["budget_share_pct"] / t["staff_share_pct"]
+    return t
+
+
 def under40_table(d: Data) -> pd.DataFrame:
     """Per sector: the ring-fenced under-40 pool, the MUR money that went to the funded
     projects of under-40 PIs, and how many of those were funded below the best unfunded
@@ -630,6 +649,113 @@ def fig_ego_map(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str):
     _save(fig, ax, fig_dir, "highlight_map")
 
 
+def _ccw(a, b, c) -> bool:
+    return (c[1] - a[1]) * (b[0] - a[0]) > (b[1] - a[1]) * (c[0] - a[0])
+
+
+def _segments_cross(s1, s2) -> int:
+    a, b, c, d = s1[:2], s1[2:], s2[:2], s2[2:]
+    return int(_ccw(a, c, d) != _ccw(b, c, d) and _ccw(a, b, c) != _ccw(a, b, d))
+
+
+def _segment_hits_box(seg, box) -> int:
+    """Whether the segment passes through the box, not counting its two ends."""
+    t = np.linspace(0.12, 0.88, 40)
+    x, y = seg[0] + t * (seg[2] - seg[0]), seg[1] + t * (seg[3] - seg[1])
+    return int(np.any((x > box[0]) & (x < box[2]) & (y > box[1]) & (y < box[3])))
+
+
+LABEL_DIRECTIONS = ((1, 0), (-1, 0), (0, 1), (0, -1), (.7, .7), (-.7, .7), (.7, -.7), (-.7, -.7),
+                    (1, .4), (1, -.4), (-1, .4), (-1, -.4), (.4, 1), (-.4, 1), (.4, -1), (-.4, -1))
+
+
+def _label_with_leaders(fig, ax, xs, ys, labels, diagonal, fontsize=20, r_pts=9, forced=None):
+    """Write each label at the nearest of sixteen directions and four distances where it
+    overlaps no earlier label, no point and not the diagonal, and its leader line crosses no
+    point, label or earlier leader. The densest points are labelled first; `forced` maps a
+    label to (dx, dy, distance in points) where the search settles for a bad position."""
+    fig.canvas.draw()
+    rend, sc = fig.canvas.get_renderer(), fig.dpi / 72.0
+    xy = ax.transData.transform(np.c_[xs, ys])
+    pts = [(c[0] - r_pts * sc, c[1] - r_pts * sc, c[0] + r_pts * sc, c[1] + r_pts * sc) for c in xy]
+    frame = ax.get_window_extent(rend)
+    line = ax.transData.transform(np.c_[diagonal, diagonal])
+    pad, placed, segs = 3 * sc, [], []
+    dens = [sum(np.hypot(*(xy[i] - xy[j])) < 150 * sc for j in range(len(xy))) for i in range(len(xy))]
+    for i in sorted(range(len(xy)), key=lambda i: -dens[i]):
+        probe = ax.text(0, 0, labels[i], fontsize=fontsize)
+        ext = probe.get_window_extent(rend)
+        probe.remove()
+        w, h = ext.width, ext.height
+        dists = (r_pts + 6, 2.5 * r_pts + 8, 4 * r_pts + 12, 6 * r_pts + 16)
+        dirs = LABEL_DIRECTIONS
+        if forced and labels[i] in forced:
+            dirs, dists = (forced[labels[i]][:2],), (forced[labels[i]][2],)
+        best = None
+        for dist in dists:
+            for dx, dy in dirs:
+                x0 = xy[i][0] + dx * dist * sc - (0 if dx > 0.3 else w if dx < -0.3 else w / 2)
+                y0 = xy[i][1] + dy * dist * sc - (0 if dy > 0.3 else h if dy < -0.3 else h / 2)
+                box = (x0 - pad, y0 - pad, x0 + w + pad, y0 + h + pad)
+                seg = (xy[i][0], xy[i][1], min(max(xy[i][0], box[0] + pad), box[2] - pad),
+                       min(max(xy[i][1], box[1] + pad), box[3] - pad))
+                pen = sum(_overlap(box, q) for q in placed) + sum(_overlap(box, q) for q in pts)
+                pen += 80 * (sum(_segments_cross(seg, q) for q in segs)
+                             + sum(_segment_hits_box(seg, pts[j]) for j in range(len(pts)) if j != i)
+                             + sum(_segment_hits_box(seg, q) for q in placed))
+                pen += 50 * np.sum((line[:, 0] > box[0]) & (line[:, 0] < box[2])
+                                   & (line[:, 1] > box[1]) & (line[:, 1] < box[3]))
+                pen += 10 * (w * h - _overlap(box, (frame.x0, frame.y0, frame.x1, frame.y1)))
+                if best is None or pen < best[0]:
+                    best = (pen, dx, dy, dist, box, seg)
+                if pen == 0:
+                    break
+            if best[0] == 0:
+                break
+        _, dx, dy, dist, box, seg = best
+        placed.append(box), segs.append(seg)
+        ha = "left" if dx > 0.3 else "right" if dx < -0.3 else "center"
+        va = "bottom" if dy > 0.3 else "top" if dy < -0.3 else "center"
+        ax.annotate(labels[i], (xs.iloc[i], ys.iloc[i]), xytext=(dx * dist, dy * dist),
+                    textcoords="offset points", ha=ha, va=va, fontsize=fontsize, zorder=6,
+                    arrowprops=dict(arrowstyle="-", color="grey", lw=0.8, shrinkA=2, shrinkB=r_pts))
+
+
+REGION_ABBREVIATIONS = {"Valle d'Aosta/Vallée d'Aoste": "VdA", "Trentino-Alto Adige/Südtirol": "TAA",
+                        "Friuli-Venezia Giulia": "FVG", "Emilia-Romagna": "ER"}
+CONTEXT_FIGURES = (("population", "Share of resident population / \\%", "population_vs_budget", {}),
+                   ("staff", "Share of professors and researchers / \\%", "staff_vs_budget",
+                    {"ER": (0.4, -1, 50)}))
+
+
+def fig_region_context(d: Data, ctx: pd.DataFrame, fig_dir: Path):
+    """Share of the budget of each region against its share of the population and of the
+    professors and researchers, on logarithmic axes with the line of equal shares. Regions
+    that received nothing cannot be drawn and are named in the title."""
+    lo, hi, ticks = 0.15, 25, [0.2, 0.5, 1, 2, 5, 10, 20]
+    drawn = ctx[ctx["budget_share_pct"] > 0]
+    absent = ctx.index[ctx["budget_share_pct"] <= 0]
+    for column, xlabel, name, forced in CONTEXT_FIGURES:
+        xs, ys = drawn[f"{column}_share_pct"], drawn["budget_share_pct"]
+        fig, ax = _axes(tick=30)
+        for label in (ax.xaxis.label, ax.yaxis.label):
+            label.set_fontsize(34)
+        diagonal = np.geomspace(lo, hi, 400)
+        ax.plot([lo, hi], [lo, hi], color="grey", lw=1.5, ls="--", zorder=1)
+        ax.scatter(xs, ys, s=200, color="#1f4e9c", zorder=3)
+        ax.set_xscale("log"), ax.set_yscale("log")
+        ax.set_xlim(lo, hi), ax.set_ylim(lo, hi)
+        for axis in (ax.xaxis, ax.yaxis):
+            axis.set_ticks(ticks), axis.set_ticklabels([str(t) for t in ticks])
+            axis.set_minor_locator(plt.NullLocator())
+        ax.set_xlabel(xlabel), ax.set_ylabel(r"Share of budget / \%")
+        gone = ", ".join(r.split("/")[0] for r in absent)
+        ax.set_title(tex(f"{_stamp(d)}; national bodies excluded; {gone} (0%) not shown"), fontsize=18)
+        _label_with_leaders(fig, ax, xs, ys, [tex(REGION_ABBREVIATIONS.get(r, r)) for r in xs.index],
+                            diagonal, forced=forced)
+        _save(fig, ax, fig_dir, name)
+
+
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
     styles = {"PI, funded": (PI_COLOR, "o"), "Partner-unit leaders, funded": (RU_COLOR, "^")}
     macros = ["PE", "LS", "SH", "All"]
@@ -682,8 +808,10 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     inst, regions, sec = institution_table(d), region_table(d), sector_table(d)
     kinds, gt = _money(d.units, "kind", d.budget), gender_table(d)
     u40, areas, per_sector = under40_table(d), macro_area_table(d), institution_sector_table(d)
+    ctx = region_context_table(regions)
     inst.to_csv(tab_dir / "institutions.csv", encoding="utf-8-sig")
     regions.to_csv(tab_dir / "regions.csv", encoding="utf-8-sig")
+    ctx.to_csv(tab_dir / "regions_context.csv", encoding="utf-8-sig")
     sec.to_csv(tab_dir / "sectors.csv", encoding="utf-8-sig")
     kinds.to_csv(tab_dir / "institution_types.csv", encoding="utf-8-sig")
     gt.to_csv(tab_dir / "gender.csv", index=False, encoding="utf-8-sig")
@@ -702,6 +830,7 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     fig_kinds(d, fig_dir)
     fig_collaboration(d, inst, fig_dir, highlight=highlight)
     fig_gender(d, gt, fig_dir)
+    fig_region_context(d, ctx, fig_dir)
     fig_region_roles(d, regions, areas, fig_dir)
     fig_breadth(d, inst, fig_dir, highlight)
     if highlight:

@@ -108,6 +108,7 @@ Provisional: 18 of 28 sectors. Regenerate with `python3 analysis.py` and `python
 | Share of the budget by sector, with the under-40 PIs' projects | How the funded money compares with the budget of each sector |
 | Share by institution type, region, macro-area | Where the money went |
 | PI and RU split by region | Which part of a region's money came from coordinating and which from partner units |
+| Budget against resident population and university staff, by region | Whether the regional shares of the budget follow the regional shares of the population and of the professors and researchers |
 | Money per unit | The distribution of the contribution to a single unit |
 | Gender of unit leaders | The share of women among PIs and partner-unit leaders, with Wilson 95% intervals |
 | Per-institution tables, collaboration graph, breadth | In `prin_out/analysis/` and the report: ranks, shared projects between cities, sectors per institution |
@@ -120,6 +121,8 @@ Definitions: the *budget* is the sum, over the parsed sectors, of the funds the 
 |---|---|---|
 | `institutions.csv` | tax code, short name, city, region, coordinates, type of each institution | when a new sector brings an institution not listed: `analysis.py` stops with its name |
 | `given_names.csv` | first given name, gender (F or M), and whether it was assigned by hand or by the Italian ending rule | `analysis.py` logs a warning with the names it does not find; a missing name falls back on the ending rule |
+| `population_regions.csv` | resident population of each region on 1 January 2026 (ISTAT figures as listed in the [Wikipedia table of Italian regions by population](https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population), which cites [tuttitalia.it](https://www.tuttitalia.it)) | when a new ISTAT release is wanted |
+| `university_staff.csv` | professors (ordinary and associate), researchers (permanent and fixed-term) and research fellows of the universities of each region, 2024: sum over the universities of the `N_PERS` column of [`personale_xgenere.csv`](https://dati-ustat.mur.gov.it/dataset/personale-universitario), dataset "2020-2024 Personale universitario" of the MUR statistical office (USTAT) | when a new year is released |
 | `italy_regions.geojson` | simplified region boundaries (ISTAT administrative boundaries, via the openpolis/geojson-italy repository) | never |
 
 Gender is inferred from the first given name only, is binary, and is meant for aggregate use.

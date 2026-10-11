@@ -109,6 +109,7 @@ available to each sector (under-40 pool plus ordinary pool): {eur(B, 2)}.
 Tabella A lists {len(d.ranking)} ranked projects, {int(d.ranking['funded'].sum())} of them funded; it contains the projects the evaluation committees judged fundable, not all the projects submitted.
 Gender is inferred from the first given name with a table of {len(names)} names ({int(basis.get('curated', 0))} assigned by hand, {int(basis.get('ending', 0))} by the Italian ending rule); it is a binary inference used only in aggregate.
 City, region and type of each institution come from a hand-checked table of {inst.shape[0]} institutions; regional boundaries are simplified ISTAT shapes.
+Resident population by region (1 January 2026) and professors, researchers and research fellows of the universities by region (2024, from the MUR statistical office open data) are in \texttt{{data/}}; their sources are given in the README.
 """)
 
     # ------------------------------------------------------------- 2.1 sectors
@@ -216,6 +217,25 @@ City, region and type of each institution come from a hand-checked table of {ins
         rf"Among the {int(allpi['n'])} funded PIs, {pct(100 * allpi['female_share'], 0)} are women (95\% interval {100 * allpi['low']:.0f}--{100 * allpi['high']:.0f}); among the {int(allru['n'])} leaders of funded partner units, {pct(100 * allru['female_share'], 0)} ({100 * allru['low']:.0f}--{100 * allru['high']:.0f}). The first given name was found in the name table for all {int(allpi['n_known'] + allru['n_known'])} leaders considered. The table gives the shares by macro-area.",
         table(["Group", "Area", "Leaders", "Women (\\%)", "95\\% interval"], rows, "llrrr")
         + "\n" + figure("gender", "Share of women among the leaders of the funded units, with Wilson 95\\% intervals; the dashed line marks 50\\%.", 0.7)))
+
+
+    # ------------------------------------------------- 2.8b budget, population, staff
+    ctx = an.region_context_table(regions)
+    drawn = ctx[ctx["budget_share_pct"] > 0]
+    cors = {}
+    for col in ("population", "staff"):
+        x, y = drawn[f"{col}_share_pct"], drawn["budget_share_pct"]
+        cors[col] = (stats.pearsonr(x, y).statistic, stats.spearmanr(x, y).statistic)
+    rows = [[tex(r.split("/")[0]), f"{v['population_share_pct']:.1f}", f"{v['staff_share_pct']:.1f}",
+             f"{v['budget_share_pct']:.1f}", f"{v['budget_over_population']:.2f}", f"{v['budget_over_staff']:.2f}"]
+            for r, v in ctx.sort_values("budget_over_staff", ascending=False).iterrows()]
+    parts.append(section(
+        "Budget, population and university staff by region",
+        "To compare the share of the budget of each region with its share of the resident population and of the professors and researchers of its universities.",
+        rf"Across the {len(drawn)} regions with funded units, the share of the budget has Pearson correlation {cors['population'][0]:.2f} and Spearman correlation {cors['population'][1]:.2f} with the share of the resident population, and {cors['staff'][0]:.2f} and {cors['staff'][1]:.2f} with the share of professors and researchers (national research bodies excluded; {join([tex(r.split('/')[0]) for r in ctx.index[ctx['budget_share_pct'] <= 0]])} has no funded unit and is left out). The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.",
+        table(["Region", "Population (\\%)", "Staff (\\%)", "Budget (\\%)", "Budget/population", "Budget/staff"], rows, "lrrrrr", "\\small")
+        + "\n" + figure("population_vs_budget", "Share of the budget of each region against its share of the resident population (1 January 2026); logarithmic axes, the dashed line marks equal shares. ER: Emilia-Romagna; FVG: Friuli-Venezia Giulia; TAA: Trentino-Alto Adige.", 0.75)
+        + "\n" + figure("staff_vs_budget", "As above, against the share of professors and researchers of the universities of the region (2024).", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet
     summ = json.loads((out_dir / "analysis" / "summary.json").read_text())
