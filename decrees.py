@@ -158,6 +158,10 @@ def sector_table(manifest: dict, rows: List[dict]) -> str:
             lines.append(f"| {sec} | published, not parsed | {link} | {budget} | | |")
         else:
             lines.append(f"| {sec} | not yet published | | {budget} | | |")
+    budget = sum(bud.get(sec, {}).get("total") or 0 for sec in ALL_SECTORS if sec in parsed)
+    funded = sum(r["mur_contribution"] for r in rows if r["sector"] in ALL_SECTORS)
+    n_projects = len({r["project_code"] for r in rows if r["sector"] in ALL_SECTORS})
+    lines.append(f"| **Total, parsed sectors** | | | **{budget / 1e6:.2f}** | **{funded / 1e6:.2f}** | **{n_projects}** |")
     done = sum(sec in parsed for sec in ALL_SECTORS)
     return f"{done} of {len(ALL_SECTORS)} sectors parsed.\n\n" + "\n".join(lines)
 
