@@ -45,7 +45,7 @@ City, region and type of each institution come from a hand-checked table of 84 i
 \item Regional boundaries: ISTAT administrative boundaries, simplified, from the repository \href{https://github.com/openpolis/geojson-italy}{geojson-italy} of openpolis.
 \item Resident population by region, 1 January 2026 (ISTAT figures): the \href{https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population}{table of Italian regions by population}, which cites \href{https://www.tuttitalia.it}{tuttitalia.it}.
 \item Professors, researchers and research fellows of the universities by region, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/46015a92-abe3-411c-af07-2532164cab59/download/personale_xgenere.csv}{personale\_xgenere.csv}, dataset \href{https://dati-ustat.mur.gov.it/dataset/personale-universitario}{2020--2024 Personale universitario} of the open data of the MUR statistical office (USTAT). The staff is all the university staff in post, not those who applied to the programme, for which no data are available.
-\item Professors and researchers by CUN scientific-disciplinary area, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/a966dec6-b9a4-481c-92d2-485e799a9c1a/download/personale_docentedi-ruoloricercatorexareasd.csv}{personale\_docentedi-ruoloricercatorexareasd.csv}, same dataset.
+\item Professors and researchers by CUN scientific-disciplinary area, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/a966dec6-b9a4-481c-92d2-485e799a9c1a/download/personale_docentedi-ruoloricercatorexareasd.csv}{personale\_docentedi-ruoloricercatorexareasd.csv}, same dataset; the same file by qualification (PO, PA, RTD, RU) gives data/staff_by_area_level.csv.
 \item Disciplinary group (GSD 2024) and career level of the unit leaders: looked up by name in the staff search of the MUR portal \href{https://cercauniversita.mur.gov.it}{Cerca Universit\`a} (see \texttt{gsd.py}); only aggregates are kept in the repository.
 \end{itemize}
 
@@ -320,9 +320,9 @@ Total, all GSDs & 134 & 521 & 655 \\
 \end{figure}
 
 \subsubsection{Career level of the unit leaders}
-\textbf{Purpose.} To show the career level (full professor, associate professor, fixed-term researcher) of the leaders of the funded units, and the MUR money of their units, from the same MUR directory lookup as the disciplinary group.
+\textbf{Purpose.} To show the career level (full professor PO, associate professor PA, fixed-term researcher RTD) of the leaders of the funded units, the MUR money of their units, and, by CUN area, the share of each level among the leaders against its share among all the professors and researchers of the Italian universities (2024). The levels are from the same MUR directory lookup as the disciplinary group; PRIN sectors have no staff data, so the staff comparison is by CUN area.
 
-\textbf{Result.} The level was found for 655 leaders. Full professors are 84 of the 134 PIs and 213 of the 521 partner-unit leaders; associate professors are 36 and 233; fixed-term researchers are 14 and 73. The units led by full professors received 39.5\% of the total budget, those led by associate professors 33.4\%, those led by fixed-term researchers 11.1\%. The mean MUR contribution per unit is in the last column. No count of the staff by level is available, so the shares are not compared with the national staff.
+\textbf{Result.} The level was found for 655 leaders. Full professors are 84 of the 134 PIs and 213 of the 521 partner-unit leaders; associate professors are 36 and 233; fixed-term researchers are 14 and 73. The units led by full professors received 39.5\% of the total budget, those led by associate professors 33.4\%, those led by fixed-term researchers 11.1\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are 27.4\% of the staff and 45.3\% of the leaders, PA 43.1\% and 41.1\%, RTD 22.9\% and 13.3\%; the leaders per 1000 staff are 16.8 for PO, 9.7 for PA and 5.9 for RTD. The tables give the same by CUN area.
 
 \begin{table}[H]
 \centering
@@ -341,6 +341,60 @@ Permanent researcher & 0 & 2 & 2 & 1 & 0 & 1 & 0.3 & 0.42 & 0.3 & 212 \\
 Total & 134 & 521 & 655 & 329 & 178 & 148 & 100.0 & 138.29 & 84.3 & 211 \\
 \bottomrule
 \multicolumn{11}{l}{\footnotesize Leaders found at the university of their unit; mean: MUR contribution per unit.} \\
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\scriptsize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+CUN area & Lead. & PO & PA & RTD & RU & PO & PA & RTD & RU \\
+\midrule
+01 Scienze matematiche e informat & 44 & 29.6 & 41.8 & 21.8 & 6.8 & 61.4 & 31.8 & 6.8 & 0.0 \\
+02 Scienze fisiche & 68 & 25.6 & 45.7 & 25.2 & 3.5 & 41.2 & 45.6 & 13.2 & 0.0 \\
+03 Scienze chimiche & 56 & 23.1 & 47.8 & 22.1 & 6.9 & 44.6 & 48.2 & 7.1 & 0.0 \\
+04 Scienze della terra & 23 & 23.3 & 50.1 & 20.7 & 5.9 & 43.5 & 43.5 & 8.7 & 4.3 \\
+05 Scienze biologiche & 77 & 21.5 & 45.5 & 24.3 & 8.7 & 42.9 & 42.9 & 14.3 & 0.0 \\
+06 Scienze mediche & 113 & 23.8 & 43.2 & 24.0 & 9.0 & 56.6 & 29.2 & 14.2 & 0.0 \\
+07 Scienze agrarie e veterinarie & 2 & 25.7 & 45.8 & 21.4 & 7.1 & 0.0 & 0.0 & 50.0 & 50.0 \\
+08 Ingegneria civile e Architettu & 30 & 26.7 & 44.7 & 24.6 & 4.0 & 56.7 & 40.0 & 3.3 & 0.0 \\
+09 Ingegneria industriale e dell' & 103 & 29.7 & 36.8 & 30.2 & 3.4 & 46.6 & 40.8 & 12.6 & 0.0 \\
+10 Scienze dell'antichità & 46 & 25.4 & 48.0 & 20.9 & 5.7 & 30.4 & 47.8 & 21.7 & 0.0 \\
+11 Scienze storiche & 57 & 26.7 & 45.9 & 22.6 & 4.8 & 29.8 & 49.1 & 21.1 & 0.0 \\
+12 Scienze giuridiche & 5 & 37.1 & 37.2 & 15.2 & 10.6 & 80.0 & 20.0 & 0.0 & 0.0 \\
+13 Scienze economiche e statistic & 27 & 34.8 & 38.2 & 20.4 & 6.5 & 33.3 & 48.1 & 18.5 & 0.0 \\
+14 Scienze politiche e sociali & 4 & 25.7 & 47.0 & 20.6 & 6.8 & 25.0 & 75.0 & 0.0 & 0.0 \\
+\midrule
+All areas & 655 & 27.4 & 43.1 & 22.9 & 6.6 & 45.3 & 41.1 & 13.3 & 0.3 \\
+\bottomrule
+\multicolumn{10}{l}{\footnotesize Columns 3--6: \% of the area staff; 7--10: \% of the leaders. RU: permanent researchers.} \\
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{lrrr}
+\toprule
+CUN area & PO & PA & RTD \\
+\midrule
+01 Scienze matematiche e informat & 24.7 & 9.1 & 3.7 \\
+02 Scienze fisiche & 38.6 & 23.9 & 12.6 \\
+03 Scienze chimiche & 32.5 & 17.0 & 5.4 \\
+04 Scienze della terra & 36.4 & 16.9 & 8.2 \\
+05 Scienze biologiche & 27.9 & 13.2 & 8.2 \\
+06 Scienze mediche & 27.3 & 7.8 & 6.8 \\
+07 Scienze agrarie e veterinarie & 0.0 & 0.0 & 1.4 \\
+08 Ingegneria civile e Architettu & 15.5 & 6.5 & 1.0 \\
+09 Ingegneria industriale e dell' & 21.8 & 15.4 & 5.8 \\
+10 Scienze dell'antichità & 10.4 & 8.7 & 9.0 \\
+11 Scienze storiche & 12.4 & 11.9 & 10.4 \\
+12 Scienze giuridiche & 2.1 & 0.5 & 0.0 \\
+13 Scienze economiche e statistic & 4.4 & 5.8 & 4.2 \\
+14 Scienze politiche e sociali & 1.9 & 3.1 & 0.0 \\
+\midrule
+All areas & 16.8 & 9.7 & 5.9 \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Leaders per 1000 staff of the same level and area (all staff, not only applicants).} \\
 \end{tabular}
 \end{table}
 \begin{figure}[H]

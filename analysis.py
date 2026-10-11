@@ -825,7 +825,25 @@ def career_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     t["budget_share_pct"] = 100 * t["mur_total"] / d.budget
     t["mean_per_unit"] = t["mur_total"] / t["leaders"].where(t["leaders"] > 0)
     t.index.name = "level"
-    return dict(levels=t)
+    # the same leaders by CUN area and level, against the staff of the area (2024)
+    staff = pd.read_csv(DATA / "staff_by_area_level.csv", index_col=0, dtype={"code": str})
+    staff.index = staff.index.map(lambda c: f"{int(c):02d}")
+    found["area"] = cache.set_index(["name", "institution"])["gsd"].reindex(
+        pd.MultiIndex.from_frame(found[["name", "institution"]])).str[:2].to_numpy()
+    found["short"] = found["career"].map({"Ordinario": "po", "Associato": "pa", "Ricercatore": "ru"}).fillna("rtd")
+    lead = found.pivot_table(index="area", columns="short", values="name", aggfunc="count", fill_value=0)
+    lead = lead.reindex(index=staff.index, columns=["po", "pa", "rtd", "ru"], fill_value=0)
+    a = pd.concat([staff[["area"]], staff[["po", "pa", "rtd", "ru"]].add_prefix("staff_"),
+                   lead.add_prefix("leaders_")], axis=1)
+    a.loc["All"] = [""] + [int(a[c].sum()) for c in a.columns[1:]]
+    for g in ("staff", "leaders"):
+        tot = a[[f"{g}_{k}" for k in ("po", "pa", "rtd", "ru")]].sum(axis=1)
+        for k in ("po", "pa", "rtd", "ru"):
+            a[f"{g}_{k}_pct"] = 100 * a[f"{g}_{k}"] / tot
+    for k in ("po", "pa", "rtd"):
+        a[f"leaders_per_1000_{k}"] = 1000 * a[f"leaders_{k}"] / a[f"staff_{k}"]
+    a.index.name = "code"
+    return dict(levels=t, areas=a)
 
 
 def fig_career(d: Data, t: pd.DataFrame, fig_dir: Path):
