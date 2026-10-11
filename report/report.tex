@@ -107,6 +107,27 @@ Total & 84 & 144 & 94.75 & 24.26 & 70.49 \\
 \caption{Histogram of the MUR contribution of the partner units; the dashed line is the median.}
 \end{figure}
 
+\subsubsection{Units per project}
+\textbf{Purpose.} To show how many units (the coordinating unit and the partner units, each at a different institution) the funded projects have.
+
+\textbf{Result.} The 144 funded projects have between 4 and 6 units: 44 with 4 units (30.6\%), 50 with 5 units (34.7\%) and 50 with 6 units (34.7\%). The table gives them by ERC macro-area, the share of all the units, and the mean MUR contribution per project and per unit.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{rrrrrrrrr}
+\toprule
+Units & Projects & Projects (\%) & PE & LS & SH & Units (\%) & Per project (k EUR) & Per unit (k EUR) \\
+\midrule
+4 & 44 & 30.6 & 19 & 14 & 11 & 24.2 & 1063 & 266 \\
+5 & 50 & 34.7 & 27 & 9 & 14 & 34.4 & 1077 & 215 \\
+6 & 50 & 34.7 & 28 & 15 & 7 & 41.3 & 1095 & 183 \\
+\midrule
+Total & 144 & 100.0 & 74 & 38 & 32 & 100.0 & 1079 & 214 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Institutions}
 \subsubsection{Funding by institution}
 \textbf{Purpose.} To show which institutions received the largest shares of the budget and how the budget is divided among institutions.
@@ -322,7 +343,7 @@ Total, all GSDs & 134 & 521 & 655 \\
 \subsubsection{Career level of the unit leaders}
 \textbf{Purpose.} To show the career level (full professor PO, associate professor PA, fixed-term researcher RTD) of the leaders of the funded units, the MUR money of their units, and, by CUN area, the share of each level among the leaders, and of the MUR money of their units, against its share among all the professors and researchers of the Italian universities (2024). The levels are from the same MUR directory lookup as the disciplinary group; PRIN sectors have no staff data, so the staff comparison is by CUN area.
 
-\textbf{Result.} The level was found for 655 leaders. Full professors are 84 of the 134 PIs and 213 of the 521 partner-unit leaders; associate professors are 36 and 233; fixed-term researchers are 14 and 73. The units led by full professors received 39.5\% of the total budget, those led by associate professors 33.4\%, those led by fixed-term researchers 11.1\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are 27.4\% of the staff and 45.3\% of the leaders, PA 43.1\% and 41.1\%, RTD 22.9\% and 13.3\%; the leaders per 1000 staff are 16.8 for PO, 9.7 for PA and 5.9 for RTD. Of the MUR money of the units whose leader's level was found, PO received 46.9\\%, PA 39.6\\% and RTD 13.2\\%, that is 3.7, 2.0 and 1.2 k EUR per staff member of the level. The tables give the same by CUN area.
+\textbf{Result.} The level was found for 655 leaders. Full professors are 84 of the 134 PIs and 213 of the 521 partner-unit leaders; associate professors are 36 and 233; fixed-term researchers are 14 and 73. The units led by full professors received 39.5\% of the total budget, those led by associate professors 33.4\%, those led by fixed-term researchers 11.1\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are 27.4\% of the staff and 45.3\% of the leaders, PA 43.1\% and 41.1\%, RTD 22.9\% and 13.3\%; the leaders per 1000 staff are 16.8 for PO, 9.7 for PA and 5.9 for RTD. Of the MUR money of the units whose leader's level was found, PO received 46.9\%, PA 39.6\% and RTD 13.2\%, that is 3.7, 2.0 and 1.2 k EUR per staff member of the level. The tables give the same by CUN area.
 
 \begin{table}[H]
 \centering
@@ -428,6 +449,55 @@ All areas & 46.9 & 39.6 & 13.2 & 0.3 & 3.7 & 2.0 & 1.2 \\
 \centering
 \includegraphics[width=0.75\textwidth]{../prin_out/figures/career_levels.pdf}
 \caption{Share of the funded PIs and of the partner-unit leaders found in the MUR directory, by career level.}
+\end{figure}
+
+\subsubsection{GSDs within a project}
+\textbf{Purpose.} To show how many different disciplinary groups (GSD 2024) are among the leaders of the units of a project, and the same for the CUN areas, against the same count when the leaders are assigned to projects at random within the sector, keeping the number of units of each project.
+
+\textbf{Result.} The GSD of every leader was found for 80 of the 144 projects. In these, the mean number of distinct GSDs is 2.27 (0.46 per unit) against 3.45 for the random assignment; 22 projects (27.5\%) have a single GSD, against 2.4\% for the random assignment. For the CUN areas, the mean is 1.62 against 2.04, and 41 projects (51.2\%) have a single area against 25.1\%. The random assignment is the mean over 2000 draws within each sector, among the leaders of the projects counted here.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+Distinct GSDs & 4 units & 5 units & 6 units & Projects & Projects (\%) & Random (\%) \\
+\midrule
+1 & 7 & 5 & 10 & 22 & 27.5 & 2.4 \\
+2 & 11 & 8 & 9 & 28 & 35.0 & 15.7 \\
+3 & 4 & 7 & 7 & 18 & 22.5 & 33.7 \\
+4 & 4 & 3 & 3 & 10 & 12.5 & 33.3 \\
+5 & 0 & 1 & 1 & 2 & 2.5 & 13.0 \\
+6 & 0 & 0 & 0 & 0 & 0.0 & 1.9 \\
+\midrule
+Total & 26 & 24 & 30 & 80 & 100.0 & 100.0 \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize Projects by number of distinct GSDs and by number of units.} \\
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{rrrrrrr}
+\toprule
+Distinct areas & 4 units & 5 units & 6 units & Projects & Projects (\%) & Random (\%) \\
+\midrule
+1 & 15 & 8 & 18 & 41 & 51.2 & 25.1 \\
+2 & 8 & 12 & 9 & 29 & 36.2 & 49.7 \\
+3 & 3 & 4 & 2 & 9 & 11.2 & 21.3 \\
+4 & 0 & 0 & 1 & 1 & 1.2 & 3.7 \\
+5 & 0 & 0 & 0 & 0 & 0.0 & 0.2 \\
+6 & 0 & 0 & 0 & 0 & 0.0 & 0.0 \\
+\midrule
+Total & 26 & 24 & 30 & 80 & 100.0 & 100.0 \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize Projects by number of distinct CUN areas (first two digits of the GSD).} \\
+\end{tabular}
+\end{table}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{../prin_out/figures/distinct_gsd.pdf}
+\caption{Share of the projects by number of distinct GSDs among the leaders of their units, against the random assignment of the leaders within the sector.}
 \end{figure}
 
 \subsection{Institution fact sheet: Siena}

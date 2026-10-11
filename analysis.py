@@ -867,6 +867,78 @@ def fig_career(d: Data, t: pd.DataFrame, fig_dir: Path):
     _save(fig, ax, fig_dir, "career_levels")
 
 
+def project_tables(d: Data, cache: pd.DataFrame, n_shuffle: int = 2000, seed: int = 0) -> Dict[str, pd.DataFrame]:
+    """The funded projects by number of units, and by number of distinct GSDs among the
+    leaders of their units. The GSD counts use only the projects whose leaders were all found
+    in the MUR directory (see gsd.py). `random` repeats the count after assigning the leaders of
+    those projects to projects at random within the sector, keeping the number of units of
+    each project (mean over `n_shuffle` assignments)."""
+    u = d.units[["sector", "project_code", "role", "name", "institution", "mur_contribution"]].merge(
+        cache[["name", "institution", "status", "gsd"]], on=["name", "institution"], how="left")
+    u["found"] = u["status"] == "found"
+    u["macro"] = u["sector"].str[:2]
+    proj = u.groupby("project_code").agg(units=("name", "size"), macro=("macro", "first"), sector=("sector", "first"),
+                                         money=("mur_contribution", "sum"), complete=("found", "all"))
+    size = pd.DataFrame(index=sorted(proj["units"].unique()))
+    size["projects"] = proj.groupby("units").size()
+    size["projects_pct"] = 100 * size["projects"] / len(proj)
+    for m in ("PE", "LS", "SH"):
+        size[m] = proj[proj["macro"] == m].groupby("units").size().reindex(size.index).fillna(0).astype(int)
+    size["mur_total"] = proj.groupby("units")["money"].sum()
+    size["mur_per_project"] = size["mur_total"] / size["projects"]
+    size["mur_per_unit"] = size["mur_total"] / (size["projects"] * size.index)
+    size["units_pct"] = 100 * size["projects"] * size.index / len(u)
+    size.index.name = "units"
+
+    comp = u[u["project_code"].isin(proj.index[proj["complete"]])].copy()
+    comp["area"] = comp["gsd"].str[:2]
+    codes = comp.groupby("project_code")["gsd"].apply(list)
+    areas = comp.groupby("project_code")["area"].apply(list)
+    n_units = proj.loc[codes.index, "units"]
+    sectors = proj.loc[codes.index, "sector"]
+    rng = np.random.default_rng(seed)
+    kmax = int(n_units.max())
+    rows = {}
+    for label, lists in (("gsd", codes), ("area", areas)):
+        obs = lists.map(lambda v: len(set(v)))
+        rnd = np.zeros(kmax)
+        mean_rnd = 0.0
+        for _, idx in sectors.groupby(sectors):
+            pool = np.array([x for p in idx.index for x in lists[p]])
+            sizes = [len(lists[p]) for p in idx.index]
+            cuts = np.cumsum(sizes)[:-1]
+            counts = np.array([[len(set(g)) for g in np.split(rng.permutation(pool), cuts)] for _ in range(n_shuffle)])
+            rnd += np.array([(counts == k).sum() for k in range(1, kmax + 1)]) / n_shuffle
+            mean_rnd += counts.mean(axis=0).sum()
+        dist = pd.DataFrame(index=range(1, kmax + 1))
+        for n in sorted(n_units.unique()):
+            dist[f"{n} units"] = obs[n_units == n].value_counts().reindex(dist.index).fillna(0).astype(int)
+        dist["projects"] = obs.value_counts().reindex(dist.index).fillna(0).astype(int)
+        dist["projects_pct"] = 100 * dist["projects"] / len(obs)
+        dist["random_pct"] = 100 * rnd / len(obs)
+        dist.index.name = f"distinct_{label}"
+        rows[f"distinct_{label}"] = dist
+        rows[f"mean_{label}"] = pd.DataFrame(dict(projects=[len(obs)], observed=[obs.mean()], random=[mean_rnd / len(obs)],
+                                                  per_unit=[(obs / n_units).mean()]), index=[label])
+    return dict(size=size, distinct_gsd=rows["distinct_gsd"], distinct_area=rows["distinct_area"],
+                means=pd.concat([rows["mean_gsd"], rows["mean_area"]]))
+
+
+def fig_distinct_gsd(d: Data, dist: pd.DataFrame, n_proj: int, fig_dir: Path):
+    """Share of the projects with k distinct GSDs among the leaders, against the same share
+    when the leaders are assigned to projects at random within the sector."""
+    fig, ax = _axes(small=True)
+    x = np.arange(len(dist))
+    ax.bar(x - 0.2, dist["projects_pct"], width=0.4, color=PI_COLOR, label=f"funded projects ({n_proj})")
+    ax.bar(x + 0.2, dist["random_pct"], width=0.4, color=GREY, label="leaders assigned at random within the sector")
+    ax.set_xticks(x, [str(k) for k in dist.index])
+    ax.xaxis.set_minor_locator(plt.NullLocator())
+    ax.set_xlabel("Distinct GSDs among the leaders of the project"), ax.set_ylabel(r"Share of the projects / \%")
+    ax.legend(title=tex(f"{_stamp(d)}; projects whose leaders were all found"), loc="lower center",
+              bbox_to_anchor=(0.5, 1.01), ncol=1, fontsize=20, title_fontsize=20)
+    _save(fig, ax, fig_dir, "distinct_gsd")
+
+
 CUN_AREAS = {"01": "Mathematics, computer science", "02": "Physics", "03": "Chemistry", "04": "Earth sciences",
              "05": "Biology", "06": "Medicine", "07": "Agriculture, veterinary", "08": "Civil eng., architecture",
              "09": "Industrial, information eng.", "10": "Antiquity, philology, arts", "11": "History, philosophy, psychology",
@@ -1000,6 +1072,10 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
         for name, t in gt_career.items():
             t.to_csv(tab_dir / f"career_{name}.csv", encoding="utf-8-sig")
         fig_career(d, gt_career["levels"], fig_dir)
+        gt_proj = project_tables(d, gsd.load_cache())
+        for name, t in gt_proj.items():
+            t.to_csv(tab_dir / f"project_{name}.csv", encoding="utf-8-sig")
+        fig_distinct_gsd(d, gt_proj["distinct_gsd"], int(gt_proj["means"].loc["gsd", "projects"]), fig_dir)
     fig_region_roles(d, regions, areas, fig_dir)
     fig_breadth(d, inst, fig_dir, highlight)
     if highlight:

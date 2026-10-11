@@ -174,6 +174,19 @@ City, region and type of each institution come from a hand-checked table of {ins
         rf"The {len(pi_v)} coordinating units received a median of {qp[1]:.0f}~k~EUR (quartiles {qp[0]:.0f} and {qp[2]:.0f}; range {mnp:.0f} to {mxp:.0f}~k~EUR). The {len(ru_v)} partner units received a median of {qr[1]:.0f}~k~EUR (quartiles {qr[0]:.0f} and {qr[2]:.0f}; range {mnr:.0f} to {mxr:.0f}~k~EUR).",
         figure("money_per_unit_coordinating", "Histogram of the MUR contribution of the coordinating units; the dashed line is the median.", 0.6)
         + "\n" + figure("money_per_unit_partner", "Histogram of the MUR contribution of the partner units; the dashed line is the median.", 0.6)))
+    if (out_dir / "analysis" / "project_size.csv").exists():
+        ps = pd.read_csv(out_dir / "analysis" / "project_size.csv", index_col=0)
+        rows = [[str(n), str(int(v["projects"])), f"{v['projects_pct']:.1f}", str(int(v["PE"])), str(int(v["LS"])), str(int(v["SH"])),
+                 f"{v['units_pct']:.1f}", f"{v['mur_per_project'] / 1e3:.0f}", f"{v['mur_per_unit'] / 1e3:.0f}"] for n, v in ps.iterrows()]
+        by_n = join([f"{int(v['projects'])} with {n} units ({v['projects_pct']:.1f}\\%)" for n, v in ps.iterrows()])
+        parts.append(section(
+            "Units per project",
+            "To show how many units (the coordinating unit and the partner units, each at a different institution) the funded projects have.",
+            rf"The {int(ps['projects'].sum())} funded projects have between {ps.index.min()} and {ps.index.max()} units: {by_n}. The table gives them by ERC macro-area, the share of all the units, and the mean MUR contribution per project and per unit.",
+            table(["Units", "Projects", "Projects (\\%)", "PE", "LS", "SH", "Units (\\%)", "Per project (k EUR)", "Per unit (k EUR)"], rows, "rrrrrrrrr",
+                  "\\small", total=["Total", str(int(ps["projects"].sum())), "100.0", str(int(ps["PE"].sum())), str(int(ps["LS"].sum())), str(int(ps["SH"].sum())),
+                  "100.0", f"{ps['mur_total'].sum() / ps['projects'].sum() / 1e3:.0f}",
+                  f"{ps['mur_total'].sum() / (ps['projects'] * ps.index).sum() / 1e3:.0f}"])))
     parts.append(r"\subsection{Institutions}")
 
     # -------------------------------------------------------- 2.2 institutions
@@ -338,7 +351,7 @@ City, region and type of each institution come from a hand-checked table of {ins
         parts.append(section(
             "Career level of the unit leaders",
             "To show the career level (full professor PO, associate professor PA, fixed-term researcher RTD) of the leaders of the funded units, the MUR money of their units, and, by CUN area, the share of each level among the leaders, and of the MUR money of their units, against its share among all the professors and researchers of the Italian universities (2024). The levels are from the same MUR directory lookup as the disciplinary group; PRIN sectors have no staff data, so the staff comparison is by CUN area.",
-            rf"The level was found for {n_lead} leaders. Full professors are {int(po['PI'])} of the {int(cl['PI'].sum())} PIs and {int(po['Partner-unit leaders'])} of the {int(cl['Partner-unit leaders'].sum())} partner-unit leaders; associate professors are {int(pa['PI'])} and {int(pa['Partner-unit leaders'])}; fixed-term researchers are {int(rt['PI'].sum())} and {int(rt['Partner-unit leaders'].sum())}. The units led by full professors received {cl.iloc[0]['budget_share_pct']:.1f}\% of the total budget, those led by associate professors {cl.iloc[1]['budget_share_pct']:.1f}\%, those led by fixed-term researchers {rt['budget_share_pct'].sum():.1f}\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are {ca.loc['All','staff_po_pct']:.1f}\% of the staff and {ca.loc['All','leaders_po_pct']:.1f}\% of the leaders, PA {ca.loc['All','staff_pa_pct']:.1f}\% and {ca.loc['All','leaders_pa_pct']:.1f}\%, RTD {ca.loc['All','staff_rtd_pct']:.1f}\% and {ca.loc['All','leaders_rtd_pct']:.1f}\%; the leaders per 1000 staff are {ca.loc['All','leaders_per_1000_po']:.1f} for PO, {ca.loc['All','leaders_per_1000_pa']:.1f} for PA and {ca.loc['All','leaders_per_1000_rtd']:.1f} for RTD. Of the MUR money of the units whose leader's level was found, PO received {ca.loc['All','money_po_pct']:.1f}\\%, PA {ca.loc['All','money_pa_pct']:.1f}\\% and RTD {ca.loc['All','money_rtd_pct']:.1f}\\%, that is {ca.loc['All','money_per_staff_po'] / 1e3:.1f}, {ca.loc['All','money_per_staff_pa'] / 1e3:.1f} and {ca.loc['All','money_per_staff_rtd'] / 1e3:.1f} k EUR per staff member of the level. The tables give the same by CUN area.",
+            rf"The level was found for {n_lead} leaders. Full professors are {int(po['PI'])} of the {int(cl['PI'].sum())} PIs and {int(po['Partner-unit leaders'])} of the {int(cl['Partner-unit leaders'].sum())} partner-unit leaders; associate professors are {int(pa['PI'])} and {int(pa['Partner-unit leaders'])}; fixed-term researchers are {int(rt['PI'].sum())} and {int(rt['Partner-unit leaders'].sum())}. The units led by full professors received {cl.iloc[0]['budget_share_pct']:.1f}\% of the total budget, those led by associate professors {cl.iloc[1]['budget_share_pct']:.1f}\%, those led by fixed-term researchers {rt['budget_share_pct'].sum():.1f}\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are {ca.loc['All','staff_po_pct']:.1f}\% of the staff and {ca.loc['All','leaders_po_pct']:.1f}\% of the leaders, PA {ca.loc['All','staff_pa_pct']:.1f}\% and {ca.loc['All','leaders_pa_pct']:.1f}\%, RTD {ca.loc['All','staff_rtd_pct']:.1f}\% and {ca.loc['All','leaders_rtd_pct']:.1f}\%; the leaders per 1000 staff are {ca.loc['All','leaders_per_1000_po']:.1f} for PO, {ca.loc['All','leaders_per_1000_pa']:.1f} for PA and {ca.loc['All','leaders_per_1000_rtd']:.1f} for RTD. Of the MUR money of the units whose leader's level was found, PO received {ca.loc['All','money_po_pct']:.1f}\%, PA {ca.loc['All','money_pa_pct']:.1f}\% and RTD {ca.loc['All','money_rtd_pct']:.1f}\%, that is {ca.loc['All','money_per_staff_po'] / 1e3:.1f}, {ca.loc['All','money_per_staff_pa'] / 1e3:.1f} and {ca.loc['All','money_per_staff_rtd'] / 1e3:.1f} k EUR per staff member of the level. The tables give the same by CUN area.",
             table(["Level", "PI", "Partners", "Leaders", "PE", "LS", "SH", "Lead. (\\%)", "MUR (M EUR)", "Budget (\\%)", "Mean (k EUR)"],
                   rows, "lrrrrrrrrrr", "\\scriptsize\\setlength{\\tabcolsep}{2pt}",
                   total=["Total", str(int(cl["PI"].sum())), str(int(cl["Partner-unit leaders"].sum())), str(n_lead),
@@ -355,6 +368,29 @@ City, region and type of each institution come from a hand-checked table of {ins
                   "\\scriptsize\\setlength{\\tabcolsep}{3pt}", total=money_total,
                   note="Columns 2--5: \\% of the MUR money of the units; 6--8: k EUR per staff member of the level.")
             + "\n" + figure("career_levels", "Share of the funded PIs and of the partner-unit leaders found in the MUR directory, by career level.", 0.75)))
+
+    # ------------------------------------------------------ GSDs per project
+    if (gsd_dir / "project_distinct_gsd.csv").exists():
+        dg = pd.read_csv(gsd_dir / "project_distinct_gsd.csv", index_col=0)
+        da = pd.read_csv(gsd_dir / "project_distinct_area.csv", index_col=0)
+        mn = pd.read_csv(gsd_dir / "project_means.csv", index_col=0)
+        n_c, n_all_p = int(mn.loc["gsd", "projects"]), int(units["project_code"].nunique())
+        cols = [c for c in dg.columns if c.endswith("units")]
+        def dist_rows(t):
+            return [[str(k)] + [str(int(v[c])) for c in cols] + [str(int(v["projects"])), f"{v['projects_pct']:.1f}", f"{v['random_pct']:.1f}"]
+                    for k, v in t.iterrows()]
+        def dist_total(t):
+            return ["Total"] + [str(int(t[c].sum())) for c in cols] + [str(int(t["projects"].sum())), "100.0", f"{t['random_pct'].sum():.1f}"]
+        head = [r"Distinct"] + [c.replace(" units", "") + " units" for c in cols] + ["Projects", "Projects (\\%)", "Random (\\%)"]
+        parts.append(section(
+            "GSDs within a project",
+            "To show how many different disciplinary groups (GSD 2024) are among the leaders of the units of a project, and the same for the CUN areas, against the same count when the leaders are assigned to projects at random within the sector, keeping the number of units of each project.",
+            rf"The GSD of every leader was found for {n_c} of the {n_all_p} projects. In these, the mean number of distinct GSDs is {mn.loc['gsd', 'observed']:.2f} ({mn.loc['gsd', 'per_unit']:.2f} per unit) against {mn.loc['gsd', 'random']:.2f} for the random assignment; {int(dg.loc[1, 'projects'])} projects ({dg.loc[1, 'projects_pct']:.1f}\%) have a single GSD, against {dg.loc[1, 'random_pct']:.1f}\% for the random assignment. For the CUN areas, the mean is {mn.loc['area', 'observed']:.2f} against {mn.loc['area', 'random']:.2f}, and {int(da.loc[1, 'projects'])} projects ({da.loc[1, 'projects_pct']:.1f}\%) have a single area against {da.loc[1, 'random_pct']:.1f}\%. The random assignment is the mean over 2000 draws within each sector, among the leaders of the projects counted here.",
+            table(["Distinct GSDs"] + head[1:], dist_rows(dg), "r" + "r" * (len(head) - 1), "\\small", total=dist_total(dg),
+                  note="Projects by number of distinct GSDs and by number of units.")
+            + "\n" + table(["Distinct areas"] + head[1:], dist_rows(da), "r" + "r" * (len(head) - 1), "\\small", total=dist_total(da),
+                  note="Projects by number of distinct CUN areas (first two digits of the GSD).")
+            + "\n" + figure("distinct_gsd", "Share of the projects by number of distinct GSDs among the leaders of their units, against the random assignment of the leaders within the sector.", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet
     summ = json.loads((out_dir / "analysis" / "summary.json").read_text())
