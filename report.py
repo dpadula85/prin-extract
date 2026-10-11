@@ -78,8 +78,8 @@ def figure(name: str, caption: str, width: float = 0.8) -> str:
                       rf"\caption{{{caption}}}", r"\end{figure}"])
 
 
-def section(title: str, purpose: str, result: str, body: str) -> str:
-    return "\n".join([rf"\subsection{{{title}}}", rf"\textbf{{Purpose.}} {purpose}", "",
+def section(title: str, purpose: str, result: str, body: str, level: str = "subsubsection") -> str:
+    return "\n".join([rf"\{level}{{{title}}}", rf"\textbf{{Purpose.}} {purpose}", "",
                       rf"\textbf{{Result.}} {result}", "", body, ""])
 
 
@@ -130,11 +130,13 @@ City, region and type of each institution come from a hand-checked table of {ins
 \end{{itemize}}
 """)
 
+    parts.append(r"\section{Analyses}")
+    parts.append(r"\subsection{Budget and its distribution}")
+
     # ------------------------------------------------------------- 2.1 sectors
     lo, hi = sec["used_pct"].idxmin(), sec["used_pct"].idxmax()
     below = u40[u40["funded_below_ordinary_cut"] > 0]
     over_pool = int((u40["money_under40_projects"] > u40["pool"]).sum())
-    parts.append(r"\section{Analyses}")
     parts.append(section(
         "Budget and funded money per sector",
         "To compare, sector by sector, the money funded with the budget the decrees make available, and to separate the money that went to projects whose PI is under 40.",
@@ -142,17 +144,6 @@ City, region and type of each institution come from a hand-checked table of {ins
         rf"{int(u40['funded_under40'].sum())} of the {n_proj} funded projects have an under-40 PI; they received {eur(u40['money_under40_projects'].sum(), 2)} ({pct(100 * u40['money_under40_projects'].sum() / funded)} of the funded money). The under-40 pools of the {len(d.sectors)} sectors add up to {eur(u40['pool'].sum(), 2)}; in {over_pool} sectors the money of the under-40 PIs' projects is larger than the sector's pool. "
         rf"{int(u40['funded_below_ordinary_cut'].sum())} funded under-40 projects rank below the best unfunded project of an over-40 PI ({join(list(below.index))}).",
         figure("sector_budgets", rf"Per sector, in percent of the total budget: budget available (outline) and funded money, split into projects of under-40 PIs (green) and the others (blue). {len(d.sectors)} of 28 sectors.", 0.85)))
-
-    # -------------------------------------------------------- 2.2 institutions
-    ranked = inst.sort_values("mur_total", ascending=False)
-    cum = 100 * ranked["mur_total"].cumsum() / B
-    parts.append(section(
-        "Funding by institution",
-        "To show which institutions received the largest shares of the budget and how the budget is divided among institutions.",
-        rf"{len(ranked)} institutions have at least one funded unit. The largest share is that of {tex(ranked['short_name'].iloc[0])} ({pct(ranked['share_of_budget_pct'].iloc[0])}), followed by {tex(ranked['short_name'].iloc[1])} ({pct(ranked['share_of_budget_pct'].iloc[1])}) and {tex(ranked['short_name'].iloc[2])} ({pct(ranked['share_of_budget_pct'].iloc[2])}). "
-        rf"The 10 best-funded institutions received {pct(cum.iloc[9])} of the budget and the 20 best-funded {pct(cum.iloc[19])}; after accounting for them, {pct(100 - cum.iloc[9])} and {pct(100 - cum.iloc[19])} of the budget are left.",
-        figure("institutions_share", "Share of the total budget of the 20 best-funded institutions, as coordinator (PI) and as partner (RU).", 0.7)
-        + "\n" + figure("budget_by_institution", "Budget left, in percent of the total, as the institutions are accounted for from the best funded to the least funded; the ten largest steps are named.", 0.8)))
 
     # -------------------------------------------------------------- 2.3 types
     kinds = an._money(units, "kind", B).reindex(list(an.KIND_LABELS)).dropna(subset=["mur_total"])
@@ -183,6 +174,28 @@ City, region and type of each institution come from a hand-checked table of {ins
         rf"The {len(pi_v)} coordinating units received a median of {qp[1]:.0f}~k~EUR (quartiles {qp[0]:.0f} and {qp[2]:.0f}; range {mnp:.0f} to {mxp:.0f}~k~EUR). The {len(ru_v)} partner units received a median of {qr[1]:.0f}~k~EUR (quartiles {qr[0]:.0f} and {qr[2]:.0f}; range {mnr:.0f} to {mxr:.0f}~k~EUR).",
         figure("money_per_unit_coordinating", "Histogram of the MUR contribution of the coordinating units; the dashed line is the median.", 0.6)
         + "\n" + figure("money_per_unit_partner", "Histogram of the MUR contribution of the partner units; the dashed line is the median.", 0.6)))
+    parts.append(r"\subsection{Institutions}")
+
+    # -------------------------------------------------------- 2.2 institutions
+    ranked = inst.sort_values("mur_total", ascending=False)
+    cum = 100 * ranked["mur_total"].cumsum() / B
+    parts.append(section(
+        "Funding by institution",
+        "To show which institutions received the largest shares of the budget and how the budget is divided among institutions.",
+        rf"{len(ranked)} institutions have at least one funded unit. The largest share is that of {tex(ranked['short_name'].iloc[0])} ({pct(ranked['share_of_budget_pct'].iloc[0])}), followed by {tex(ranked['short_name'].iloc[1])} ({pct(ranked['share_of_budget_pct'].iloc[1])}) and {tex(ranked['short_name'].iloc[2])} ({pct(ranked['share_of_budget_pct'].iloc[2])}). "
+        rf"The 10 best-funded institutions received {pct(cum.iloc[9])} of the budget and the 20 best-funded {pct(cum.iloc[19])}; after accounting for them, {pct(100 - cum.iloc[9])} and {pct(100 - cum.iloc[19])} of the budget are left.",
+        figure("institutions_share", "Share of the total budget of the 20 best-funded institutions, as coordinator (PI) and as partner (RU).", 0.7)
+        + "\n" + figure("budget_by_institution", "Budget left, in percent of the total, as the institutions are accounted for from the best funded to the least funded; the ten largest steps are named.", 0.8)))
+
+    # ---------------------------------------------------------------- 2.7 breadth
+    rho = stats.spearmanr(inst["n_sectors"], inst["mur_total"])
+    widest = inst[inst["n_sectors"] == inst["n_sectors"].max()]
+    parts.append(section(
+        "Breadth across sectors",
+        "To show in how many sectors each institution has funded units, against the share of the budget it received.",
+        rf"The number of sectors with at least one funded unit has median {inst['n_sectors'].median():.0f} across the {len(inst)} institutions; {int((inst['n_sectors'] == 1).sum())} institutions have funded units in one sector only. The maximum, {int(widest['n_sectors'].iloc[0])} sectors, is reached by {join([tex(n) for n in widest['short_name']])}. The Spearman correlation between the number of sectors and the money received is {rho.statistic:.2f} (p = {rho.pvalue:.1g}).",
+        figure("institution_breadth", "Share of the total budget of each institution against the number of sectors with a funded unit (horizontal jitter added).", 0.75)))
+    parts.append(r"\subsection{Geography}")
 
     # ------------------------------------------------------------ 2.5 geography
     reg = regions.drop(NATIONAL).sort_values("share_of_budget_pct", ascending=False)
@@ -215,35 +228,6 @@ City, region and type of each institution come from a hand-checked table of {ins
         rf"{len(shared)} pairs of nodes share at least one funded project and {sum(1 for v in shared.values() if v >= 8)} share eight or more. The pairs sharing the most projects are {pair_txt}.",
         figure("collaboration_map", rf"Pairs of cities sharing at least 8 funded projects (line width proportional to the number); circle area proportional to the money; the diamond is the national research bodies. {len(d.sectors)} of 28 sectors.", 0.75)))
 
-    # ---------------------------------------------------------------- 2.7 breadth
-    rho = stats.spearmanr(inst["n_sectors"], inst["mur_total"])
-    widest = inst[inst["n_sectors"] == inst["n_sectors"].max()]
-    parts.append(section(
-        "Breadth across sectors",
-        "To show in how many sectors each institution has funded units, against the share of the budget it received.",
-        rf"The number of sectors with at least one funded unit has median {inst['n_sectors'].median():.0f} across the {len(inst)} institutions; {int((inst['n_sectors'] == 1).sum())} institutions have funded units in one sector only. The maximum, {int(widest['n_sectors'].iloc[0])} sectors, is reached by {join([tex(n) for n in widest['short_name']])}. The Spearman correlation between the number of sectors and the money received is {rho.statistic:.2f} (p = {rho.pvalue:.1g}).",
-        figure("institution_breadth", "Share of the total budget of each institution against the number of sectors with a funded unit (horizontal jitter added).", 0.75)))
-
-    # ------------------------------------------------------------------ 2.8 gender
-    rows = []
-    for g, sub in gt.groupby("group", sort=False):
-        for _, r in sub.iterrows():
-            rows.append([tex(g), r["macro"], str(int(r["n"])), f"{100 * r['female_share']:.0f}",
-                         f"{100 * r['low']:.0f}--{100 * r['high']:.0f}"])
-    both = gt[gt["macro"] == "All"]
-    n_both, k_both = int(both["n_known"].sum()), int(round((both["female_share"] * both["n_known"]).sum()))
-    f_both, lo_both, hi_both = an.wilson(k_both, n_both)
-    gender_total = ["Total", "All", str(n_both), f"{100 * f_both:.0f}", f"{100 * lo_both:.0f}--{100 * hi_both:.0f}"]
-    allpi = gt[(gt["group"] == "PI, funded") & (gt["macro"] == "All")].iloc[0]
-    allru = gt[(gt["group"] == "Partner-unit leaders, funded") & (gt["macro"] == "All")].iloc[0]
-    parts.append(section(
-        "Gender of the unit leaders",
-        "To show the share of women among the leaders of the funded units, with the uncertainty due to the small numbers, by macro-area (PE, LS, SH).",
-        rf"Among the {int(allpi['n'])} funded PIs, {pct(100 * allpi['female_share'], 0)} are women (95\% interval {100 * allpi['low']:.0f}--{100 * allpi['high']:.0f}); among the {int(allru['n'])} leaders of funded partner units, {pct(100 * allru['female_share'], 0)} ({100 * allru['low']:.0f}--{100 * allru['high']:.0f}). The first given name was found in the name table for all {int(allpi['n_known'] + allru['n_known'])} leaders considered. The table gives the shares by macro-area.",
-        table(["Group", "Area", "Leaders", "Women (\\%)", "95\\% interval"], rows, "llrrr", total=gender_total)
-        + "\n" + figure("gender", "Share of women among the leaders of the funded units, with Wilson 95\\% intervals; the dashed line marks 50\\%.", 0.7)))
-
-
     # ------------------------------------------------- 2.8b budget, population, staff
     ctx = an.region_context_table(regions)
     drawn = ctx[ctx["budget_share_pct"] > 0]
@@ -268,7 +252,26 @@ City, region and type of each institution come from a hand-checked table of {ins
               note=rf"$^\dagger$ {bodies}: no region, so no population or staff is attributed to them.")
         + "\n" + figure("population_vs_budget", f"Share of the budget of each region against its share of the resident population (1 January 2026); logarithmic axes, the dashed line marks equal shares; the national research bodies ({nat_pct:.1f}\\% of the budget) are not shown. ER: Emilia-Romagna; FVG: Friuli-Venezia Giulia; TAA: Trentino-Alto Adige.", 0.75)
         + "\n" + figure("staff_vs_budget", "As above, against the share of professors and researchers of the universities of the region (2024), over all the Italian university staff and not only the applicants.", 0.75)))
+    parts.append(r"\subsection{People}")
 
+    # ------------------------------------------------------------------ 2.8 gender
+    rows = []
+    for g, sub in gt.groupby("group", sort=False):
+        for _, r in sub.iterrows():
+            rows.append([tex(g), r["macro"], str(int(r["n"])), f"{100 * r['female_share']:.0f}",
+                         f"{100 * r['low']:.0f}--{100 * r['high']:.0f}"])
+    both = gt[gt["macro"] == "All"]
+    n_both, k_both = int(both["n_known"].sum()), int(round((both["female_share"] * both["n_known"]).sum()))
+    f_both, lo_both, hi_both = an.wilson(k_both, n_both)
+    gender_total = ["Total", "All", str(n_both), f"{100 * f_both:.0f}", f"{100 * lo_both:.0f}--{100 * hi_both:.0f}"]
+    allpi = gt[(gt["group"] == "PI, funded") & (gt["macro"] == "All")].iloc[0]
+    allru = gt[(gt["group"] == "Partner-unit leaders, funded") & (gt["macro"] == "All")].iloc[0]
+    parts.append(section(
+        "Gender of the unit leaders",
+        "To show the share of women among the leaders of the funded units, with the uncertainty due to the small numbers, by macro-area (PE, LS, SH).",
+        rf"Among the {int(allpi['n'])} funded PIs, {pct(100 * allpi['female_share'], 0)} are women (95\% interval {100 * allpi['low']:.0f}--{100 * allpi['high']:.0f}); among the {int(allru['n'])} leaders of funded partner units, {pct(100 * allru['female_share'], 0)} ({100 * allru['low']:.0f}--{100 * allru['high']:.0f}). The first given name was found in the name table for all {int(allpi['n_known'] + allru['n_known'])} leaders considered. The table gives the shares by macro-area.",
+        table(["Group", "Area", "Leaders", "Women (\\%)", "95\\% interval"], rows, "llrrr", total=gender_total)
+        + "\n" + figure("gender", "Share of women among the leaders of the funded units, with Wilson 95\\% intervals; the dashed line marks 50\\%.", 0.7)))
 
     # ------------------------------------------------------------------- 2.10 GSD
     gsd_dir = out_dir / "analysis"
@@ -340,7 +343,7 @@ City, region and type of each institution come from a hand-checked table of {ins
             f"Institution fact sheet: {tex(name)}",
             "To collect the figures of one institution and compare them with the other institutions of the same type.",
             rf"{tex(name)} received {eur(f['mur_total'], 2)} ({pct(f['share_of_budget_pct'], 2)} of the budget) in {f['projects']} projects, {f['pi_units']} as coordinator and {f['ru_units']} as partner, in {f['n_sectors']} sectors; it ranks {f['rank']} of {len(inst)} institutions and {f['rank_in_type']} of {f['n_institutions_of_type']} within its type.",
-            body))
+            body, level="subsection"))
 
     # ------------------------------------------------------------- appendices
     parts.append(r"\appendix")
