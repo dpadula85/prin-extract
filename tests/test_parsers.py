@@ -161,7 +161,24 @@ def test_region_context_tables_cover_the_regions_of_the_map():
     pop = pd.read_csv(ROOT / "data" / "population_regions.csv", index_col=0)
     staff = pd.read_csv(ROOT / "data" / "university_staff.csv", index_col=0)
     assert set(pop.index) == set(regions) == set(staff.index)
-    ctx = analysis.region_context_table(pd.read_csv(OUT / "analysis" / "regions.csv", index_col=0))
-    for col in ("budget_share_pct", "population_share_pct", "staff_share_pct"):
+    regions_table = pd.read_csv(OUT / "analysis" / "regions.csv", index_col=0)
+    ctx = analysis.region_context_table(regions_table)
+    for col in ("population_share_pct", "staff_share_pct"):
         assert ctx[col].sum() == pytest.approx(100.0)
+    assert ctx["budget_share_pct"].equals(regions_table.drop(analysis.NATIONAL)["share_of_budget_pct"])
     assert pop["population"].sum() == 58942828
+
+
+def test_gsd_name_and_university_matching():
+    import gsd
+    assert gsd.search_names("ARCA SEDDA Manuel") == ("ARCA SEDDA", "Manuel")
+    assert gsd.search_names("CIURLI Stefano Luciano") == ("CIURLI", "Stefano")
+    same = gsd.same_university
+    assert same('Università "Campus Bio-Medico" di ROMA', 'Univ. "Campus Bio-Medico" di ROMA')
+    assert same('Università degli Studi di ROMA "La Sapienza"', 'ROMA "La Sapienza"')
+    assert not same('Università degli Studi di ROMA "La Sapienza"', "ROMA TRE")
+    assert not same("Politecnico di BARI", "BARI")
+    assert same("Università degli Studi INSUBRIA Varese-Como", "INSUBRIA")
+    assert same('Università degli Studi della Campania "Luigi Vanvitelli"', 'CAMPANIA - "L. VANVITELLI"')
+    assert same("Università degli Studi dell'AQUILA", "L'AQUILA")
+    assert not same("Università degli Studi di MILANO", "MILANO-BICOCCA")

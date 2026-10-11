@@ -21,6 +21,7 @@ Optional: a LaTeX installation (figures use LaTeX text; `analysis.py --no-latex`
 | The tables of all funded units and of the ranking | `python3 prin_extract.py --csv` | network, or the PDFs already in `prin_pdfs/` with `--no-download` | `prin_out/all_rows.csv`, `ranking.csv`, `decrees.json`, the Excel file, the sector table below |
 | The projects of one or more institutions | `python3 prin_extract.py --uni 80002070524 --csv` | same | one CSV and one Excel sheet per `--uni` |
 | Tables and figures of the analysis | `python3 analysis.py` | the output of `prin_extract.py --csv` | `prin_out/analysis/*.csv`, `prin_out/figures/*.{pdf,png}` |
+| The GSD of the unit leaders | `python3 gsd.py` (then `analysis.py`) | network, `prin_out/all_rows.csv` | `cache/gsd_lookup.csv` (not versioned); `analysis.py` then writes `prin_out/analysis/gsd_*.csv` |
 | The PDF report | `python3 report.py` | the output of `analysis.py`, `pdflatex` | `report/report.pdf`, the results block below |
 
 `--uni` takes a case-insensitive substring of the institution name or an 11-digit tax code (codice fiscale), matched exactly. Prefer the tax code: `MILANO` also matches Politecnico and Bicocca, whereas `80012650158` is only Statale. `analysis.py` and `report.py` take `--highlight CITY` (default Siena) to colour one city on the maps and to write an institution fact sheet in the report; `report.py --no-compile` writes the LaTeX source only.
@@ -28,6 +29,8 @@ Optional: a LaTeX installation (figures use LaTeX text; `analysis.py --no-latex`
 ## Automatic updates
 
 [.github/workflows/check-new-sectors.yml](.github/workflows/check-new-sectors.yml) runs every 6 hours (and on demand from the Actions tab) until all 28 sectors are parsed. It runs `prin_extract.py`; if a sector is new or a decree changed, it installs LaTeX, regenerates all tables, figures and the report with `analysis.py` and `report.py`, runs the tests, and opens a pull request with the new PDFs, tables, figures, report and README, listing the new sectors and whether the tests and the analysis passed. Nothing is committed to the default branch. When all 28 sectors are in `prin_out/all_rows.csv` the workflow opens an issue that mentions the repository owner (GitHub sends the email) and disables itself. `analysis.py` also appends the shares of institutions and regions to `prin_out/history.csv` whenever the set of parsed sectors changes, so the numbers can be followed as sectors are published.
+
+When a sector is new, the workflow also runs `gsd.py` (the GSD lookup, not blocking: the pull request is opened even if it fails). The answers are kept in the GitHub Actions cache between runs, so each run asks the MUR portal only about the leaders of the new sector; the first run asks about all of them (about 35 minutes), and so does the first run after GitHub drops an unused cache (after 7 days).
 
 ## Sectors
 
@@ -109,6 +112,7 @@ Provisional: 18 of 28 sectors. Regenerate with `python3 analysis.py` and `python
 | Share by institution type, region, macro-area | Where the money went |
 | PI and RU split by region | Which part of a region's money came from coordinating and which from partner units |
 | Budget against resident population and university staff, by region | Whether the regional shares of the budget follow the regional shares of the population and of the professors and researchers |
+| Disciplinary group (GSD) of the unit leaders | The CUN area and GSD 2024 of the leaders found in the MUR staff directory, against the professors and researchers of the Italian universities (`python3 gsd.py` first) |
 | Money per unit | The distribution of the contribution to a single unit |
 | Gender of unit leaders | The share of women among PIs and partner-unit leaders, with Wilson 95% intervals |
 | Per-institution tables, collaboration graph, breadth | In `prin_out/analysis/` and the report: ranks, shared projects between cities, sectors per institution |
@@ -123,6 +127,7 @@ Definitions: the *budget* is the sum, over the parsed sectors, of the funds the 
 | `given_names.csv` | first given name, gender (F or M), and whether it was assigned by hand or by the Italian ending rule | `analysis.py` logs a warning with the names it does not find; a missing name falls back on the ending rule |
 | `population_regions.csv` | resident population of each region on 1 January 2026 (ISTAT figures as listed in the [Wikipedia table of Italian regions by population](https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population), which cites [tuttitalia.it](https://www.tuttitalia.it)) | when a new ISTAT release is wanted |
 | `university_staff.csv` | professors (ordinary and associate), researchers (permanent and fixed-term) and research fellows of the universities of each region, 2024: sum over the universities of the `N_PERS` column of [`personale_xgenere.csv`](https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/46015a92-abe3-411c-af07-2532164cab59/download/personale_xgenere.csv) ("Personale per genere"), from the dataset ["2020-2024 Personale universitario"](https://dati-ustat.mur.gov.it/dataset/personale-universitario) of the MUR statistical office (USTAT) | when a new year is released |
+| `staff_by_area.csv` | professors and researchers of the Italian universities by CUN scientific-disciplinary area, 2024: sum of `N_PERS_DR` over the universities, research fellows left out, of [`personale_docentedi-ruoloricercatorexareasd.csv`](https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/a966dec6-b9a4-481c-92d2-485e799a9c1a/download/personale_docentedi-ruoloricercatorexareasd.csv) (same MUR dataset as above) | when a new year is released |
 | `italy_regions.geojson` | simplified region boundaries (ISTAT administrative boundaries, via the openpolis/geojson-italy repository) | never |
 
 Gender is inferred from the first given name only, is binary, and is meant for aggregate use.
@@ -138,7 +143,8 @@ Gender is inferred from the first given name only, is binary, and is meant for a
 1. `decrees.py` scrapes the PRIN page and the MUR pages it links to, keeps the current decree of each sector, and downloads the decree and Tabella A (`prin_pdfs/decrees/`, `prin_pdfs/tabella_a/`). The funds table is read from the decrees; every decree must give the same numbers.
 2. `prin_extract.py` downloads Tabella B, accepting only files that really start with `%PDF-` (the server sometimes answers with an HTML page), flattens the text and applies two regular expressions: one for a unit (`n  PI|RU  name  CODE_unit  institution  tax code  four amounts`) and one for a title. The project code links them. Duplicate (project, unit) pairs across files are dropped, keeping the newest file.
 3. `tabella_a.py` reads the ranking in content-stream order (rank, code, title lines, name lines, score, tie-break cells) and the text colour of each cell to flag under-40 PIs.
-4. `analysis.py` joins the units with `data/`, and writes tables and figures. `report.py` writes `report/report.tex` from the same tables and compiles it.
+4. `gsd.py` looks up each funded unit leader by surname and first given name in the staff search of the MUR portal [Cerca Università](https://cercauniversita.mur.gov.it), first among professors and permanent researchers, then among fixed-term researchers, and keeps the GSD 2024 of the record at the leader's own university. Leaders of research bodies and of other institutions that are not universities are not in that directory. Answers are cached in `cache/gsd_lookup.csv`, which is not versioned because it names individuals, and the next run asks only about leaders not yet in it (about 1.5 s per query). `python3 gsd.py --limit 20` tries it on 20 leaders. Only aggregates reach `prin_out/analysis/gsd_*.csv` and the report.
+5. `analysis.py` joins the units with `data/`, and writes tables and figures. `report.py` writes `report/report.tex` from the same tables and compiles it.
 
 Checks: for each Tabella B PDF, the number of parsed units equals the number of `CODE_unit` identifiers in its text and the number of titles equals the number of projects; every funded project is in the ranking and the PI names of the two tables agree; the funded money of a sector never exceeds its budget; the regional shares add up to the funded money. Tabella B titles that carry page-footer text or are cut at a page break are replaced by those of Tabella A.
 
@@ -146,6 +152,7 @@ Checks: for each Tabella B PDF, the number of parsed units equals the number of 
 
 - Tabella A contains the projects the evaluation committees judged fundable, not all the projects submitted, so **no success rate (by institution, region, age or gender) can be computed**.
 - The parsing depends on the PDF layout: verify any figure you rely on against the official tables.
+- The GSD comes from a lookup by name: a leader with a common name may be missed or reported as ambiguous, and leaders who are not university staff have none. The match rate is stated in the report.
 - Under-40 projects can also be funded through the ordinary ranking, so the money going to them is not the use of the under-40 pool.
 
 ## When something goes wrong
@@ -175,9 +182,11 @@ They run on the PDFs and tables in the repository, without network, in a few sec
 | `tabella_a.py` | the ranking and the under-40 flag |
 | `analysis.py`, `style.py` | tables and figures; matplotlib style |
 | `gender.py` | gender from the first given name |
+| `gsd.py` | GSD of the unit leaders from the MUR staff directory |
 | `report.py` | the LaTeX report and the results block above |
 | `common.py` | helpers shared by the modules |
 | `data/` | hand-made tables |
+| `cache/` | the per-leader GSD lookups (not versioned) |
 | `prin_pdfs/` | the PDFs as downloaded (`decrees/`, `tabella_a/`, and Tabella B) |
 | `prin_out/` | all outputs |
 | `report/` | the report |

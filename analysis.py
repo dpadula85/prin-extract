@@ -39,6 +39,7 @@ from matplotlib.ticker import MaxNLocator
 from scipy import stats
 
 import gender
+import gsd
 from style import new_axes, save_centered
 
 log = logging.getLogger(__name__)
@@ -229,16 +230,19 @@ REGION_CONTEXT = {"population": "population_regions.csv", "staff": "university_s
 
 
 def region_context_table(regions: pd.DataFrame) -> pd.DataFrame:
-    """Per region, the share of the regional budget (national bodies left out) beside the
-    share of the resident population (1 January 2026) and of the professors and researchers
-    (2024) of the region. The ratio is the budget share divided by the other share."""
+    """Per region, the share of the total budget (as in the regional map) beside the share of
+    the resident population (1 January 2026) and of the professors and researchers (2024) of
+    the Italian regions. The budget shares do not add up to 100: national research bodies
+    and the budget not yet assigned are not regions. The ratio is the budget share divided by
+    the other share."""
     pop = pd.read_csv(DATA / REGION_CONTEXT["population"], index_col=0)["population"]
     st = pd.read_csv(DATA / REGION_CONTEXT["staff"], index_col=0)
     reg = regions.drop(NATIONAL)
     t = pd.DataFrame({"mur_total": reg["mur_total"], "population": pop.reindex(reg.index),
                       "staff": (st["professors"] + st["researchers"]).reindex(reg.index)})
-    for col, name in (("mur_total", "budget"), ("population", "population"), ("staff", "staff")):
-        t[f"{name}_share_pct"] = 100 * t[col] / t[col].sum()
+    t["budget_share_pct"] = reg["share_of_budget_pct"]
+    for col in ("population", "staff"):
+        t[f"{col}_share_pct"] = 100 * t[col] / t[col].sum()
     t["budget_over_population"] = t["budget_share_pct"] / t["population_share_pct"]
     t["budget_over_staff"] = t["budget_share_pct"] / t["staff_share_pct"]
     return t
@@ -728,13 +732,14 @@ CONTEXT_FIGURES = (("population", "Share of resident population / \\%", "populat
                     {"ER": (0.4, -1, 50)}))
 
 
-def fig_region_context(d: Data, ctx: pd.DataFrame, fig_dir: Path):
+def fig_region_context(d: Data, ctx: pd.DataFrame, regions: pd.DataFrame, fig_dir: Path):
     """Share of the budget of each region against its share of the population and of the
     professors and researchers, on logarithmic axes with the line of equal shares. Regions
     that received nothing cannot be drawn and are named in the title."""
     lo, hi, ticks = 0.15, 25, [0.2, 0.5, 1, 2, 5, 10, 20]
     drawn = ctx[ctx["budget_share_pct"] > 0]
     absent = ctx.index[ctx["budget_share_pct"] <= 0]
+    nat = float(regions.loc[NATIONAL, "share_of_budget_pct"])
     for column, xlabel, name, forced in CONTEXT_FIGURES:
         xs, ys = drawn[f"{column}_share_pct"], drawn["budget_share_pct"]
         fig, ax = _axes(tick=30)
@@ -750,10 +755,67 @@ def fig_region_context(d: Data, ctx: pd.DataFrame, fig_dir: Path):
             axis.set_minor_locator(plt.NullLocator())
         ax.set_xlabel(xlabel), ax.set_ylabel(r"Share of budget / \%")
         gone = ", ".join(r.split("/")[0] for r in absent)
-        ax.set_title(tex(f"{_stamp(d)}; national bodies excluded; {gone} (0%) not shown"), fontsize=18)
+        ax.set_title(tex(f"{_stamp(d)}; national bodies not shown ({nat:.1f}% of budget); {gone} (0%) not shown"), fontsize=18)
         _label_with_leaders(fig, ax, xs, ys, [tex(REGION_ABBREVIATIONS.get(r, r)) for r in xs.index],
                             diagonal, forced=forced)
         _save(fig, ax, fig_dir, name)
+
+
+def gsd_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+    """The GSD 2024 of the unit leaders found in the MUR directory (see gsd.py), as
+    aggregates: the outcome of the lookup, the leaders and the staff by CUN area (the first
+    two digits of the GSD code are the area), the leaders by GSD, and the leaders of each
+    ERC macro-area by CUN area. Only leaders found at the university of their unit count."""
+    u = d.units[["sector", "role", "name", "institution"]].merge(
+        cache[["name", "institution", "status", "gsd"]], on=["name", "institution"], how="left")
+    u["status"] = u["status"].fillna("not_looked_up")
+    u["group"] = u["role"].map({"PI": "PI", "RU": "Partner-unit leaders"})
+    u["macro"] = u["sector"].str[:2]
+    status = u.pivot_table(index="group", columns="status", values="name", aggfunc="count", fill_value=0)
+    status["leaders"] = status.sum(axis=1)
+    found = u[u["status"] == "found"].copy()
+    found["area"] = found["gsd"].str[:2]
+    staff = pd.read_csv(DATA / "staff_by_area.csv", index_col=0, dtype={"code": str})
+    staff.index = staff.index.map(lambda c: f"{int(c):02d}")
+    staff["staff"] = staff["professors"] + staff["researchers"]
+    areas = staff[["area", "staff"]].copy()
+    for g in ("PI", "Partner-unit leaders"):
+        areas[g] = found[found["group"] == g].groupby("area").size().reindex(areas.index).fillna(0).astype(int)
+    areas["leaders"] = areas["PI"] + areas["Partner-unit leaders"]
+    areas["leaders_share_pct"] = 100 * areas["leaders"] / areas["leaders"].sum()
+    areas["staff_share_pct"] = 100 * areas["staff"] / areas["staff"].sum()
+    areas["leaders_per_1000_staff"] = 1000 * areas["leaders"] / areas["staff"]
+    codes = (found.groupby(["gsd", "group"]).size().unstack(fill_value=0)
+             .reindex(columns=["PI", "Partner-unit leaders"], fill_value=0))
+    codes["leaders"] = codes.sum(axis=1)
+    codes = codes.sort_values(["leaders", "PI"], ascending=False)
+    macro = found.pivot_table(index="area", columns="macro", values="name", aggfunc="count", fill_value=0)
+    macro = macro.reindex(columns=["PE", "LS", "SH"], fill_value=0).reindex(areas.index, fill_value=0)
+    return dict(status=status, areas=areas, codes=codes, macro=macro)
+
+
+CUN_AREAS = {"01": "Mathematics, computer science", "02": "Physics", "03": "Chemistry", "04": "Earth sciences",
+             "05": "Biology", "06": "Medicine", "07": "Agriculture, veterinary", "08": "Civil eng., architecture",
+             "09": "Industrial, information eng.", "10": "Antiquity, philology, arts", "11": "History, philosophy, psychology",
+             "12": "Law", "13": "Economics, statistics", "14": "Political, social sciences"}
+
+
+def fig_gsd_areas(d: Data, areas: pd.DataFrame, n_found: int, fig_dir: Path):
+    """Per CUN area, the share of the funded unit leaders whose GSD was found and the share
+    of the professors and researchers of the Italian universities."""
+    t = areas.sort_values("leaders_share_pct")
+    fig, ax = _axes(small=True)
+    fig.set_size_inches(14, 12)
+    y = np.arange(len(t))
+    ax.barh(y + 0.2, t["leaders_share_pct"], height=0.4, color=PI_COLOR, label=f"funded unit leaders ({n_found})")
+    ax.barh(y - 0.2, t["staff_share_pct"], height=0.4, color=GREY, label="professors and researchers (2024)")
+    ax.set_yticks(y, [f"{c} {tex(CUN_AREAS.get(c, a))}" for c, a in zip(t.index, t["area"])])
+    ax.yaxis.set_minor_locator(plt.NullLocator())
+    ax.set_xlim(0, 1.1 * float(max(t["leaders_share_pct"].max(), t["staff_share_pct"].max())))
+    ax.set_xlabel(r"Share of the total / \%")
+    ax.legend(title=tex(f"{_stamp(d)}; leaders at a university, GSD 2024 area (CUN)"), loc="lower center",
+              bbox_to_anchor=(0.5, 1.01), ncol=1, fontsize=20, title_fontsize=20)
+    _save(fig, ax, fig_dir, "gsd_areas")
 
 
 def fig_gender(d: Data, gt: pd.DataFrame, fig_dir: Path):
@@ -830,7 +892,12 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     fig_kinds(d, fig_dir)
     fig_collaboration(d, inst, fig_dir, highlight=highlight)
     fig_gender(d, gt, fig_dir)
-    fig_region_context(d, ctx, fig_dir)
+    fig_region_context(d, ctx, regions, fig_dir)
+    if gsd.CACHE.exists():
+        gt_gsd = gsd_tables(d, gsd.load_cache())
+        for name, t in gt_gsd.items():
+            t.to_csv(tab_dir / f"gsd_{name}.csv", encoding="utf-8-sig")
+        fig_gsd_areas(d, gt_gsd["areas"], int(gt_gsd["areas"]["leaders"].sum()), fig_dir)
     fig_region_roles(d, regions, areas, fig_dir)
     fig_breadth(d, inst, fig_dir, highlight)
     if highlight:

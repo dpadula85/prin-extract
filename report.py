@@ -110,6 +110,7 @@ Tabella A lists {len(d.ranking)} ranked projects, {int(d.ranking['funded'].sum()
 Gender is inferred from the first given name with a table of {len(names)} names ({int(basis.get('curated', 0))} assigned by hand, {int(basis.get('ending', 0))} by the Italian ending rule); it is a binary inference used only in aggregate.
 City, region and type of each institution come from a hand-checked table of {inst.shape[0]} institutions; regional boundaries are simplified ISTAT shapes.
 Resident population by region (1 January 2026) and professors, researchers and research fellows of the universities by region (2024, from the MUR statistical office open data) are in \texttt{{data/}}; their sources are given in the README.
+The GSD of the unit leaders was looked up by name in the staff search of the MUR portal Cerca Università (see \texttt{{gsd.py}}); only aggregates are kept in the repository.
 """)
 
     # ------------------------------------------------------------- 2.1 sectors
@@ -231,11 +232,38 @@ Resident population by region (1 January 2026) and professors, researchers and r
             for r, v in ctx.sort_values("budget_over_staff", ascending=False).iterrows()]
     parts.append(section(
         "Budget, population and university staff by region",
-        "To compare the share of the budget of each region with its share of the resident population and of the professors and researchers of its universities.",
-        rf"Across the {len(drawn)} regions with funded units, the share of the budget has Pearson correlation {cors['population'][0]:.2f} and Spearman correlation {cors['population'][1]:.2f} with the share of the resident population, and {cors['staff'][0]:.2f} and {cors['staff'][1]:.2f} with the share of professors and researchers (national research bodies excluded; {join([tex(r.split('/')[0]) for r in ctx.index[ctx['budget_share_pct'] <= 0]])} has no funded unit and is left out). The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.",
+        "To compare the share of the total budget gathered by each region, as in the regional map, with its share of the resident population and of the professors and researchers of its universities.",
+        rf"Across the {len(drawn)} regions with funded units, the share of the budget has Pearson correlation {cors['population'][0]:.2f} and Spearman correlation {cors['population'][1]:.2f} with the share of the resident population, and {cors['staff'][0]:.2f} and {cors['staff'][1]:.2f} with the share of professors and researchers (the national research bodies are not regions and are left out; {join([tex(r.split('/')[0]) for r in ctx.index[ctx['budget_share_pct'] <= 0]])} has no funded unit and is left out). The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.",
         table(["Region", "Population (\\%)", "Staff (\\%)", "Budget (\\%)", "Budget/population", "Budget/staff"], rows, "lrrrrr", "\\small")
         + "\n" + figure("population_vs_budget", "Share of the budget of each region against its share of the resident population (1 January 2026); logarithmic axes, the dashed line marks equal shares. ER: Emilia-Romagna; FVG: Friuli-Venezia Giulia; TAA: Trentino-Alto Adige.", 0.75)
         + "\n" + figure("staff_vs_budget", "As above, against the share of professors and researchers of the universities of the region (2024).", 0.75)))
+
+
+    # ------------------------------------------------------------------- 2.10 GSD
+    gsd_dir = out_dir / "analysis"
+    if (gsd_dir / "gsd_areas.csv").exists():
+        st = pd.read_csv(gsd_dir / "gsd_status.csv", index_col=0)
+        ga = pd.read_csv(gsd_dir / "gsd_areas.csv", index_col=0, dtype={"code": str})
+        gc = pd.read_csv(gsd_dir / "gsd_codes.csv", index_col=0)
+        gm = pd.read_csv(gsd_dir / "gsd_macro.csv", index_col=0, dtype={"code": str})
+        n_all, n_found = int(st["leaders"].sum()), int(st["found"].sum())
+        other = {c: int(st[c].sum()) if c in st else 0 for c in ("other_university", "not_found", "ambiguous", "not_looked_up")}
+        pi_f, ru_f = int(st.loc["PI", "found"]), int(st.loc["Partner-unit leaders", "found"])
+        top = ga.sort_values("leaders", ascending=False).head(3)
+        top_txt = join([tex(f"{c} {a}") + f" ({int(n)})" for c, a, n in zip(top.index, top["area"], top["leaders"])])
+        rows = [[f"{c} {tex(a.split(',')[0][:30])}", f"{int(v['staff'])}", f"{int(v['PI'])}", f"{int(v['Partner-unit leaders'])}",
+                 f"{int(gm.loc[c, 'PE'])}", f"{int(gm.loc[c, 'LS'])}", f"{int(gm.loc[c, 'SH'])}",
+                 f"{v['leaders_share_pct']:.1f}", f"{v['staff_share_pct']:.1f}", f"{v['leaders_per_1000_staff']:.1f}"]
+                for (c, v), a in zip(ga.iterrows(), ga["area"])]
+        rows_codes = [[tex(g), str(int(v["PI"])), str(int(v["Partner-unit leaders"])), str(int(v["leaders"]))]
+                      for g, v in gc.head(15).iterrows()]
+        parts.append(section(
+            "Disciplinary group of the unit leaders",
+            "To show the disciplinary group (GSD 2024) of the leaders of the funded units, by area of the National University Council (CUN), against the professors and researchers of the Italian universities.",
+            rf"The GSD was found at the university of the unit for {n_found} of the {n_all} leaders ({pi_f} PI, {ru_f} partner-unit leaders). The other leaders are: found only at another university {other['other_university']}, in no record {other['not_found']} (research bodies and other institutions that are not universities, and people not listed), several records at the university {other['ambiguous']}, not looked up {other['not_looked_up']}. The three areas with most leaders are {top_txt}. The first table gives the leaders by CUN area (the first two digits of the GSD) and by ERC macro-area, the share of leaders and of staff, and the leaders per 1000 professors and researchers; the second the most frequent GSDs.",
+            table(["CUN area", "Staff", "PI", "Partners", "PE", "LS", "SH", "Lead. (\\%)", "Staff (\\%)", "Per 1000"], rows, "lrrrrrrrrr", "\\footnotesize")
+            + "\n" + table(["GSD", "PI", "Partners", "Leaders"], rows_codes, "lrrr", "\\small")
+            + "\n" + figure("gsd_areas", "Share of the funded unit leaders found in the MUR directory, and share of the professors and researchers (2024), by CUN area.", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet
     summ = json.loads((out_dir / "analysis" / "summary.json").read_text())
@@ -301,7 +329,7 @@ Resident population by region (1 January 2026) and professors, researchers and r
 
     head = rf"""{PREAMBLE}\title{{PRIN 2026: funded projects}}
 \author{{}}
-\date{{Data of {datetime.date.today().isoformat()}; {len(d.sectors)} of {len(decrees.ALL_SECTORS)} sectors}}
+\date{{Data of {datetime.date.today().strftime("%d/%m/%Y")}; {len(d.sectors)} of {len(decrees.ALL_SECTORS)} sectors}}
 \begin{{document}}
 \maketitle
 """
