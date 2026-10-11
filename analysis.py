@@ -833,15 +833,18 @@ def career_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     found["short"] = found["career"].map({"Ordinario": "po", "Associato": "pa", "Ricercatore": "ru"}).fillna("rtd")
     lead = found.pivot_table(index="area", columns="short", values="name", aggfunc="count", fill_value=0)
     lead = lead.reindex(index=staff.index, columns=["po", "pa", "rtd", "ru"], fill_value=0)
+    money = found.pivot_table(index="area", columns="short", values="mur_contribution", aggfunc="sum", fill_value=0.0)
+    money = money.reindex(index=staff.index, columns=["po", "pa", "rtd", "ru"], fill_value=0.0)
     a = pd.concat([staff[["area"]], staff[["po", "pa", "rtd", "ru"]].add_prefix("staff_"),
-                   lead.add_prefix("leaders_")], axis=1)
-    a.loc["All"] = [""] + [int(a[c].sum()) for c in a.columns[1:]]
-    for g in ("staff", "leaders"):
+                   lead.add_prefix("leaders_"), money.add_prefix("money_")], axis=1)
+    a.loc["All"] = [""] + [a[c].sum() for c in a.columns[1:]]
+    for g in ("staff", "leaders", "money"):
         tot = a[[f"{g}_{k}" for k in ("po", "pa", "rtd", "ru")]].sum(axis=1)
         for k in ("po", "pa", "rtd", "ru"):
             a[f"{g}_{k}_pct"] = 100 * a[f"{g}_{k}"] / tot
     for k in ("po", "pa", "rtd"):
         a[f"leaders_per_1000_{k}"] = 1000 * a[f"leaders_{k}"] / a[f"staff_{k}"]
+        a[f"money_per_staff_{k}"] = a[f"money_{k}"] / a[f"staff_{k}"]
     a.index.name = "code"
     return dict(levels=t, areas=a)
 
