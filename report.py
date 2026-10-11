@@ -19,6 +19,7 @@ from scipy import stats
 
 import analysis as an
 import decrees
+import gsd
 from analysis import NATIONAL, tex
 
 log = logging.getLogger(__name__)
@@ -413,12 +414,18 @@ City, region and type of each institution come from a hand-checked table of {ins
         peers = inst[inst["kind"] == f["type"]]
         mine = units[units["cf"] == cf].sort_values("sector")
         rows = []
+        level = {}
+        if gsd.CACHE.exists():
+            c = gsd.load_cache()
+            c = c[c["status"] == "found"]
+            short = {"Ordinario": "PO", "Associato": "PA", "Ricercatore": "RU"}
+            level = {(n, i): short.get(r, "RTD") for n, i, r in zip(c["name"], c["institution"], c["role"])}
         for _, r in mine.iterrows():
             g = units[units["project_code"] == r["project_code"]]
             lead = g[g["role"] == "PI"].iloc[0]
             others = sorted(set(g["short_name"]) - {name} - ({lead["short_name"]} if r["role"] == "RU" else set()))
             title = r["title"] if len(r["title"]) <= 64 else r["title"][:61].rsplit(" ", 1)[0] + "..."
-            rows.append([r["sector"], r["role"], f"{r['mur_contribution'] / 1e3:.0f}", tex(title),
+            rows.append([r["sector"], r["role"], level.get((r["name"], r["institution"]), "n.a."), f"{r['mur_contribution'] / 1e3:.0f}", tex(title),
                          tex(lead["short_name"] if r["role"] == "RU" else "this institution"),
                          tex(", ".join(others))])
         facts = [["Funding", eur(f["mur_total"], 2) + f", {pct(f['share_of_budget_pct'], 2)} of the budget",
@@ -430,8 +437,9 @@ City, region and type of each institution come from a hand-checked table of {ins
                   pct(100 * (peers["mur_pi"] / peers["mur_total"]).median(), 0)]]
         body = (table([tex(name), "Value", f"Median, {tex(an.KIND_LABELS[f['type']].lower())}"],
                       [[tex(a), b, c] for a, b, c in facts], "llr")
-                + "\n" + table(["Sector", "Role", "k EUR", "Project", "Coordinator", "Other institutions"], rows, "llrp{4.6cm}p{2cm}p{3.6cm}", r"\footnotesize",
-                              total=["Total", "", f"{mine['mur_contribution'].sum() / 1e3:.0f}", "", "", ""])
+                + "\n" + table(["Sector", "Role", "Level", "k EUR", "Project", "Coordinator", "Other institutions"], rows, "lllrp{4.2cm}p{2cm}p{3.2cm}", r"\footnotesize",
+                              total=["Total", "", "", f"{mine['mur_contribution'].sum() / 1e3:.0f}", "", "", ""],
+                              note="Level of the leader: PO, PA, RTD, RU; n.a.: not a university leader or not found.")
                 + "\n" + figure("highlight_neighbours", rf"Share of the total budget of {tex(name)} and of the institutions ranked just above and below it.", 0.65)
                 + "\n" + figure("highlight_map", rf"Cities sharing funded projects with {tex(name)} (line width proportional to the number of projects).", 0.75))
         parts.append(section(
