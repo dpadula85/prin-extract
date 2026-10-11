@@ -250,15 +250,19 @@ City, region and type of each institution come from a hand-checked table of {ins
     rows = [[tex(r.split("/")[0]), f"{v['population_share_pct']:.1f}", f"{v['staff_share_pct']:.1f}",
              f"{v['budget_share_pct']:.1f}", f"{v['budget_over_population']:.2f}", f"{v['budget_over_staff']:.2f}"]
             for r, v in ctx.sort_values("budget_over_staff", ascending=False).iterrows()]
+    nat_pct = float(regions.loc[an.NATIONAL, "share_of_budget_pct"])
+    unassigned_pct = 100.0 - float(regions["share_of_budget_pct"].sum())
+    bodies = join(sorted(inst.loc[inst["kind"] == "national_research_body", "short_name"]))
+    rows.append([r"\textbf{National research bodies}$^\dagger$", "--", "--", rf"\textbf{{{nat_pct:.1f}}}", "--", "--"])
     parts.append(section(
         "Budget, population and university staff by region",
         "To compare the share of the total budget gathered by each region, as in the regional map, with its share of the resident population and of the professors and researchers of its universities.",
-        rf"Across the {len(drawn)} regions with funded units, the share of the budget has Pearson correlation {cors['population'][0]:.2f} and Spearman correlation {cors['population'][1]:.2f} with the share of the resident population, and {cors['staff'][0]:.2f} and {cors['staff'][1]:.2f} with the share of professors and researchers (the national research bodies are not regions and are left out; {join([tex(r.split('/')[0]) for r in ctx.index[ctx['budget_share_pct'] <= 0]])} has no funded unit and is left out). The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.",
+        rf"Across the {len(drawn)} regions with funded units, the share of the budget has Pearson correlation {cors['population'][0]:.2f} and Spearman correlation {cors['population'][1]:.2f} with the share of the resident population, and {cors['staff'][0]:.2f} and {cors['staff'][1]:.2f} with the share of professors and researchers (the national research bodies are not regions and are left out of the correlations; {join([tex(r.split('/')[0]) for r in ctx.index[ctx['budget_share_pct'] <= 0]])} has no funded unit and is left out). The national research bodies ({bodies}) belong to no region and received {nat_pct:.1f}\% of the budget; a further {unassigned_pct:.1f}\% of the budget was not assigned. The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff.",
         table(["Region", "Population (\\%)", "Staff (\\%)", "Budget (\\%)", "Budget/population", "Budget/staff"], rows, "lrrrrr", "\\small\\setlength{\\tabcolsep}{4pt}",
               total=["Total", f"{ctx['population_share_pct'].sum():.1f}", f"{ctx['staff_share_pct'].sum():.1f}",
-                     f"{ctx['budget_share_pct'].sum():.1f}", f"{ctx['budget_share_pct'].sum() / 100:.2f}",
-                     f"{ctx['budget_share_pct'].sum() / 100:.2f}"])
-        + "\n" + figure("population_vs_budget", "Share of the budget of each region against its share of the resident population (1 January 2026); logarithmic axes, the dashed line marks equal shares. ER: Emilia-Romagna; FVG: Friuli-Venezia Giulia; TAA: Trentino-Alto Adige.", 0.75)
+                     f"{ctx['budget_share_pct'].sum() + nat_pct:.1f}", "--", "--"])
+        + "\n" + rf"{{\footnotesize $^\dagger$ {bodies}: they belong to no region, so no population or staff is attributed to them.}}"
+        + "\n" + figure("population_vs_budget", f"Share of the budget of each region against its share of the resident population (1 January 2026); logarithmic axes, the dashed line marks equal shares; the national research bodies ({nat_pct:.1f}\\% of the budget) are not shown. ER: Emilia-Romagna; FVG: Friuli-Venezia Giulia; TAA: Trentino-Alto Adige.", 0.75)
         + "\n" + figure("staff_vs_budget", "As above, against the share of professors and researchers of the universities of the region (2024).", 0.75)))
 
 
