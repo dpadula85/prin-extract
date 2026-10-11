@@ -11,7 +11,7 @@ import json
 import logging
 import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -57,11 +57,22 @@ def join(items: List[str]) -> str:
 
 
 def table(header: List[str], rows: List[List[str]], colspec: str, size: str = "",
-          total: Optional[List[str]] = None, note: str = "") -> str:
+          total: Optional[List[str]] = None, note: str = "",
+          groups: Optional[List[Tuple[str, int]]] = None) -> str:
     """A booktabs table; `total`, if given, is a last row set off by a midrule; `note` is
-    set in a small row under the bottom rule, inside the table."""
-    lines = [r"\begin{table}[H]", r"\centering", size, rf"\begin{{tabular}}{{{colspec}}}", r"\toprule",
-             " & ".join(header) + r" \\", r"\midrule"]
+    set in a small row under the bottom rule, inside the table; `groups`, if given, is a
+    first header row of (label, number of columns) spans, an empty label leaving its columns
+    blank, each labelled span underlined by a cmidrule."""
+    lines = [r"\begin{table}[H]", r"\centering", size, rf"\begin{{tabular}}{{{colspec}}}", r"\toprule"]
+    if groups:
+        col, cells, rules = 1, [], []
+        for label, n in groups:
+            cells.append(rf"\multicolumn{{{n}}}{{c}}{{{label}}}" if label else rf"\multicolumn{{{n}}}{{c}}{{}}")
+            if label:
+                rules.append(rf"\cmidrule(lr){{{col}-{col + n - 1}}}")
+            col += n
+        lines += [" & ".join(cells) + r" \\", "".join(rules)]
+    lines += [" & ".join(header) + r" \\", r"\midrule"]
     lines += [" & ".join(r) + r" \\" for r in rows]
     if total is not None:
         lines += [r"\midrule", " & ".join(total) + r" \\"]
@@ -298,7 +309,7 @@ City, region and type of each institution come from a hand-checked table of {ins
         pi_f, ru_f = int(st.loc["PI", "found"]), int(st.loc["Partner-unit leaders", "found"])
         top = ga.sort_values("leaders", ascending=False).head(3)
         top_txt = join([tex(f"{c} {a}") + f" ({int(n)})" for c, a, n in zip(top.index, top["area"], top["leaders"])])
-        rows = [[f"{c} {tex(a.split(',')[0][:30])}", f"{int(v['staff'])}", f"{int(v['PI'])}", f"{int(v['Partner-unit leaders'])}",
+        rows = [[f"{c} {tex(an.CUN_AREAS.get(c, a))}", f"{int(v['staff'])}", f"{int(v['PI'])}", f"{int(v['Partner-unit leaders'])}",
                  f"{int(gm.loc[c, 'PE'])}", f"{int(gm.loc[c, 'LS'])}", f"{int(gm.loc[c, 'SH'])}",
                  f"{v['leaders_share_pct']:.1f}", f"{v['staff_share_pct']:.1f}", f"{v['budget_share_pct']:.1f}",
                  f"{v['leaders_per_1000_staff']:.1f}"]
@@ -339,13 +350,13 @@ City, region and type of each institution come from a hand-checked table of {ins
         def comp(c, v):
             return [str(int(v["n"]))] + [f"{v[f'staff_{k}_pct']:.1f}" for k in ("po", "pa", "rtd", "ru")] \
                 + [f"{v[f'leaders_{k}_pct']:.1f}" for k in ("po", "pa", "rtd", "ru")]
-        rows_comp = [[f"{c} {tex(v['area'].split(',')[0][:30])}"] + comp(c, v) for c, v in ca.iloc[:-1].iterrows()]
+        rows_comp = [[f"{c} {tex(an.CUN_AREAS.get(c, v['area']))}"] + comp(c, v) for c, v in ca.iloc[:-1].iterrows()]
         comp_total = ["All areas"] + comp("All", ca.loc["All"])
         rate = lambda v: [f"{v[f'leaders_per_1000_{k}']:.1f}" for k in ("po", "pa", "rtd")]
-        rows_rate = [[f"{c} {tex(v['area'].split(',')[0][:30])}"] + rate(v) for c, v in ca.iloc[:-1].iterrows()]
+        rows_rate = [[f"{c} {tex(an.CUN_AREAS.get(c, v['area']))}"] + rate(v) for c, v in ca.iloc[:-1].iterrows()]
         money = lambda v: [f"{v[f'money_{k}_pct']:.1f}" for k in ("po", "pa", "rtd", "ru")] \
             + [f"{v[f'money_per_staff_{k}'] / 1e3:.1f}" for k in ("po", "pa", "rtd")]
-        rows_money = [[f"{c} {tex(v['area'].split(',')[0][:30])}"] + money(v) for c, v in ca.iloc[:-1].iterrows()]
+        rows_money = [[f"{c} {tex(an.CUN_AREAS.get(c, v['area']))}"] + money(v) for c, v in ca.iloc[:-1].iterrows()]
         money_total = ["All areas"] + money(ca.loc["All"])
         rate_total = ["All areas"] + rate(ca.loc["All"])
         parts.append(section(
@@ -359,14 +370,16 @@ City, region and type of each institution come from a hand-checked table of {ins
                          f"{cl['mur_total'].sum() / 1e6:.2f}", f"{cl['budget_share_pct'].sum():.1f}",
                          f"{cl['mur_total'].sum() / n_lead / 1e3:.0f}"],
                   note="Leaders found at the university of their unit; mean: MUR contribution per unit.")
-            + "\n" + table(["CUN area", "Lead.", "PO", "PA", "RTD", "RU", "PO", "PA", "RTD", "RU"], rows_comp, "lrrrrrrrrr",
+            + "\n" + table(["CUN area", "Leaders", "PO", "PA", "RTD", "RU", "PO", "PA", "RTD", "RU"], rows_comp, "lrrrrrrrrr",
                   "\\scriptsize\\setlength{\\tabcolsep}{3pt}", total=comp_total,
-                  note="Columns 3--6: \\% of the area staff; 7--10: \\% of the leaders. RU: permanent researchers.")
+                  groups=[("", 2), ("Staff of the area (\\%)", 4), ("Leaders (\\%)", 4)],
+                  note="RTD: fixed-term researchers; RU: permanent researchers.")
             + "\n" + table(["CUN area", "PO", "PA", "RTD"], rows_rate, "lrrr", "\\small", total=rate_total,
-                  note="Leaders per 1000 staff of the same level and area (all staff, not only applicants).")
+                  groups=[("", 1), ("Leaders per 1000 staff", 3)],
+                  note="Staff of the same level and area (all staff, not only applicants).")
             + "\n" + table(["CUN area", "PO", "PA", "RTD", "RU", "PO", "PA", "RTD"], rows_money, "lrrrrrrr",
                   "\\scriptsize\\setlength{\\tabcolsep}{3pt}", total=money_total,
-                  note="Columns 2--5: \\% of the MUR money of the units; 6--8: k EUR per staff member of the level.")
+                  groups=[("", 1), ("MUR money of the units (\\%)", 4), ("k EUR per staff member", 3)])
             + "\n" + figure("career_levels", "Share of the funded PIs and of the partner-unit leaders found in the MUR directory, by career level.", 0.75)))
 
     # ------------------------------------------------------ GSDs per project
