@@ -124,8 +124,8 @@ Definitions: the *budget* is the sum, over the parsed sectors, of the funds the 
 
 | File | Content | When to edit |
 |---|---|---|
-| `institutions.csv` | tax code, short name, city, region, coordinates, type of each institution | when a new sector brings an institution not listed: `analysis.py` stops with its name |
-| `given_names.csv` | first given name, gender (F or M), and whether it was assigned by hand or by the Italian ending rule | `analysis.py` logs a warning with the names it does not find; a missing name falls back on the ending rule |
+| `institutions.csv` | tax code, short name, city, region, coordinates, type of each institution | `analysis.py` adds an institution not listed (type from keywords of the name, city, region and coordinates from an OpenStreetMap search, see `institutions.py`) and the pull request lists it to check |
+| `given_names.csv` | first given name, gender (F or M), and whether it was assigned by hand or by the Italian ending rule | `analysis.py` adds the names it does not find (gender by the ending rule; empty, for review, when the rule does not decide) and the pull request lists them |
 | `population_regions.csv` | resident population of each region on 1 January 2026 (ISTAT figures as listed in the [Wikipedia table of Italian regions by population](https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population), which cites [tuttitalia.it](https://www.tuttitalia.it)) | when a new ISTAT release is wanted |
 | `university_staff.csv` | professors (ordinary and associate), researchers (permanent and fixed-term) and research fellows of the universities of each region, 2025: sum over the universities of the `N_PERS` column of [`personale_xgenere.csv`](https://dati-ustat.mur.gov.it/dataset/28d258e4-85b2-43e8-b74f-ed2392ef16db/resource/eceaccb5-d130-4d60-a531-5a4f74b293a6/download/personale_xgenere.csv) ("Personale per genere"), from the dataset ["2025-2029 Personale universitario"](https://dati-ustat.mur.gov.it/dataset/2025-2029-personale-universitario) of the MUR statistical office (USTAT) | when a new year is released |
 | `staff_by_area.csv` | professors and researchers of the Italian universities by CUN scientific-disciplinary area, 2025: sum of `N_PERS_DR` over the universities, research fellows left out, of [`personale_docentedi-ruoloricercatorexareasd.csv`](https://dati-ustat.mur.gov.it/dataset/28d258e4-85b2-43e8-b74f-ed2392ef16db/resource/86ec9e91-27c3-400f-b1d2-389f7f4394aa/download/personale_docentedi-ruoloricercatorexareasd.csv) (same MUR dataset as above) | when a new year is released |
@@ -162,8 +162,8 @@ Checks: for each Tabella B PDF, the number of parsed units equals the number of 
 | Symptom | Cause and fix |
 |---|---|
 | `could not download` a PDF | the server returned HTML: save the file in the folder shown and re-run with `--no-download` |
-| `institutions missing from data/institutions.csv` | a new institution: add its row |
-| warning `given names not in data/given_names.csv` | add the names, or accept the ending rule |
+| `institution added to data/institutions.csv, to check` | a new institution was added by guess: check its type, city, region and coordinates in the pull request |
+| warning `given names to review in data/given_names.csv` | a name the ending rule cannot decide: enter F or M |
 | a parsed count differs from the PDF | the layout changed: the check in `prin_extract.py` output shows which file |
 | a sector is not in the table | its decree is not published yet, or the page has no Tabella B |
 

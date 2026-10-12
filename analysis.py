@@ -40,6 +40,7 @@ from scipy import stats
 
 import gender
 import gsd
+import institutions
 from style import new_axes, save_centered
 
 log = logging.getLogger(__name__)
@@ -95,10 +96,8 @@ def load(out_dir: Path) -> Data:
     """Units joined with the institution table, ranking with inferred gender, budgets."""
     units = pd.read_csv(out_dir / "all_rows.csv", dtype={"cf": str})
     inst = pd.read_csv(DATA / "institutions.csv", dtype={"cf": str})
-    unmapped = sorted(set(units["cf"]) - set(inst["cf"]))
-    if unmapped:
-        raise ValueError(f"institutions missing from data/institutions.csv: "
-                         f"{units[units['cf'].isin(unmapped)]['institution'].unique().tolist()}")
+    if institutions.record_missing(units, DATA / "institutions.csv"):
+        inst = pd.read_csv(DATA / "institutions.csv", dtype={"cf": str})
     units = units.merge(inst, on="cf", how="left")
     units["region"] = units["region"].fillna(NATIONAL)
     ranking = pd.read_csv(out_dir / "ranking.csv")
@@ -115,7 +114,10 @@ def load(out_dir: Path) -> Data:
         [g.split()[0] for g in ranking["pi_given"].dropna()]
         + [gender.first_given_from_surname_first(n) for n in units["name"]], table)
     if missing:
-        log.warning("given names not in data/given_names.csv: %s", ", ".join(missing))
+        log.warning("given names not in data/given_names.csv, added: %s", ", ".join(missing))
+        review = gender.record_missing(missing)
+        if review:
+            log.warning("given names to review in data/given_names.csv: %s", ", ".join(review))
     return Data(units, ranking, budgets, budget, sectors)
 
 

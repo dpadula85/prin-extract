@@ -22,7 +22,8 @@ TABLE = Path(__file__).with_name("data") / "given_names.csv"
 
 
 def load_table(path: Path = TABLE) -> dict:
-    t = pd.read_csv(path)
+    t = pd.read_csv(path, keep_default_na=False)
+    t = t[t["gender"] != ""]
     return dict(zip(t["given"], t["gender"]))
 
 
@@ -57,3 +58,17 @@ def unresolved(givens: Iterable[str], table: Optional[dict] = None) -> List[str]
     """Given names that are not in the reviewed table, for the maintainer to add."""
     table = load_table() if table is None else table
     return sorted({g for g in givens if g and g not in table})
+
+
+def record_missing(givens: Iterable[str], path: Path = TABLE) -> List[str]:
+    """Append the given names missing from the table to it: gender by the ending rule,
+    basis 'ending', or an empty gender and basis 'review' when the rule does not decide.
+    Returns the names left for review. The table stays sorted."""
+    new = unresolved(givens, load_table(path))
+    if not new:
+        return []
+    t = pd.read_csv(path, keep_default_na=False)
+    rows = [dict(given=g, gender=infer(g, {}) or "", basis="ending" if infer(g, {}) else "review") for g in new]
+    t = pd.concat([t, pd.DataFrame(rows)], ignore_index=True).drop_duplicates("given", keep="first")
+    t.sort_values("given").to_csv(path, index=False)
+    return [r["given"] for r in rows if r["basis"] == "review"]
