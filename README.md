@@ -37,7 +37,7 @@ When a sector is new, the workflow also runs `gsd.py` (the GSD lookup, not block
 Each sector has its own decree, which gives the funds available to the sector, split into the ring-fenced under-40 pool and the ordinary pool. A decree can be annulled and replaced (PE7: n. 32, replaced by n. 45); only the current one is listed. Sectors that are not parsed are not in any table. The table is rewritten by `prin_extract.py`.
 
 <!-- sectors:begin -->
-18 of 28 sectors parsed.
+19 of 28 sectors parsed.
 
 | Sector | Status | Decree | Budget (M EUR) | Funded (M EUR) | Projects |
 |---|---|---|---:|---:|---:|
@@ -57,7 +57,7 @@ Each sector has its own decree, which gives the funds available to the sector, s
 | LS3 | parsed | [n. 38 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-38-macrosettore-ls-settore-ls3-approvazione) | 5.66 | 4.67 | 4 |
 | LS4 | parsed | [n. 42 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-42-macrosettore-ls-settore-ls4-approvazione) | 12.94 | 12.09 | 12 |
 | LS5 | not yet published | | 9.77 | | |
-| LS6 | not yet published | | 7.81 | | |
+| LS6 | parsed | [n. 50 of 12/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-50-del-12-10-2026) | 7.81 | 5.96 | 5 |
 | LS7 | parsed | [n. 39 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-39-macrosettore-ls-settore-ls7-approvazione) | 17.88 | 17.88 | 17 |
 | LS8 | not yet published | | 8.39 | | |
 | LS9 | not yet published | | 15.11 | | |
@@ -69,24 +69,24 @@ Each sector has its own decree, which gives the funds available to the sector, s
 | SH6 | parsed | [n. 44 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-44-macrosettore-sh-settore-sh6-approvazione) | 9.37 | 9.25 | 9 |
 | SH7 | parsed | [n. 49 of 09/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-49-del-09-10-2026) | 7.70 | 7.00 | 6 |
 | SH8 | not yet published | | 8.96 | | |
-| **Total, parsed sectors** | | | **164.01** | **155.40** | **144** |
+| **Total, parsed sectors** | | | **171.81** | **161.35** | **149** |
 <!-- sectors:end -->
 
 ## Results
 
 <!-- results:begin -->
-Provisional: 18 of 28 sectors. Regenerate with `python3 analysis.py` and `python3 report.py`; the full report is [report/report.pdf](report/report.pdf).
+Provisional: 19 of 28 sectors. Regenerate with `python3 analysis.py` and `python3 report.py`; the full report is [report/report.pdf](report/report.pdf).
 
 | Quantity | Value |
 |---|---|
-| Budget of the parsed sectors | 164.01 M EUR |
-| Funded | 155.40 M EUR (94.8% of the budget) |
-| Projects, units | 144, 726 (144 PI, 582 RU) |
+| Budget of the parsed sectors | 171.81 M EUR |
+| Funded | 161.35 M EUR (93.9% of the budget) |
+| Projects, units | 149, 751 (149 PI, 602 RU) |
 | Institutions with a funded unit | 84 |
-| Share by institution type | Public univ. 76.9%, Private univ. 3.9%, Telematic univ. 1.3%, Advanced schools 2.7%, Research bodies 0.5%, National bodies 9.4%, AFAM 0.1% |
-| Share by macro-area | North 41.8% (of which 30% as PI), Centre 23.4% (of which 21% as PI), South and Islands 20.2% (of which 24% as PI); national research bodies 9.4% |
-| Median MUR contribution per unit | 258 k EUR (PI), 193 k EUR (RU) |
-| Projects of under-40 PIs | 37 projects, 40.11 M EUR (25.8% of the funded money); under-40 pools 24.32 M EUR |
+| Share by institution type | Public univ. 76.3%, Private univ. 4.1%, Telematic univ. 1.3%, Advanced schools 2.6%, Research bodies 0.5%, National bodies 9.1%, AFAM 0.1% |
+| Share by macro-area | North 42.5% (of which 30% as PI), Centre 22.8% (of which 21% as PI), South and Islands 19.5% (of which 23% as PI); national research bodies 9.1% |
+| Median MUR contribution per unit | 259 k EUR (PI), 194 k EUR (RU) |
+| Projects of under-40 PIs | 37 projects, 40.11 M EUR (24.9% of the funded money); under-40 pools 25.40 M EUR |
 | Women among unit leaders | 33% of PIs, 37% of partner-unit leaders |
 
 ![Share of the total budget by region (national research bodies not shown).](prin_out/figures/map_regions_share.png)
