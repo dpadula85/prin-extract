@@ -2,8 +2,10 @@ cf,short_name,city,region,lat,lon,kind
 80006930608,Accademia Belle Arti Frosinone,Frosinone,Lazio,41.640,13.340,afam
 80007010376,Bologna,Bologna,Emilia-Romagna,44.495,11.343,public_university
 80054330586,CNR,Roma,,,,national_research_body
+01984560662,GSSI,L'Aquila,Abruzzo,42.350,13.400,school
 97692990159,Humanitas University,Pieve Emanuele,Lombardia,45.352,9.204,private_university
 96049740184,IUSS Pavia,Pavia,Lombardia,45.185,9.158,school
+06838821004,INGV,Roma,,,,national_research_body
 97220210583,INAF,Roma,,,,national_research_body
 84001850589,INFN,Roma,,,,national_research_body
 00055590327,OGS,Trieste,Friuli-Venezia Giulia,45.650,13.777,research_body
@@ -15,6 +17,7 @@ cf,short_name,city,region,lat,lon,kind
 93051590722,Politecnico di Bari,Bari,Puglia,41.117,16.872,public_university
 80057930150,Politecnico di Milano,Milano,Lombardia,45.464,9.190,public_university
 00518460019,Politecnico di Torino,Torino,Piemonte,45.070,7.687,public_university
+92037570469,IMT Lucca,Lucca,Toscana,43.843,10.503,school
 80035060328,SISSA,Trieste,Friuli-Venezia Giulia,45.650,13.777,school
 80005050507,Normale,Pisa,Toscana,43.723,10.402,school
 95315120634,Scuola Superiore Meridionale,Napoli,Campania,40.852,14.268,school
@@ -27,6 +30,8 @@ cf,short_name,city,region,lat,lon,kind
 02133120150,Cattolica,Milano,Lombardia,45.464,9.190,private_university
 80009280274,IUAV,Venezia,Veneto,45.441,12.316,public_university
 00382520427,Politecnica delle Marche,Ancona,Marche,43.616,13.519,public_university
+90027520130,e-Campus,Novedrate,Lombardia,45.723,9.049,telematic
+05411471211,Pegaso,Napoli,Campania,40.852,14.268,telematic
 97471900155,San Raffaele Roma,Roma,Lazio,41.903,12.496,telematic
 93002750698,Chieti-Pescara,Chieti,Abruzzo,42.351,14.168,public_university
 97026980793,Magna Graecia,Catanzaro,Calabria,38.910,16.588,public_university

@@ -38,24 +38,33 @@ def guess_kind(name: str) -> str:
 
 
 def guess_short_name(name: str) -> str:
-    s = re.sub(r"^(Università|Univ\.)\s+(degli Studi|della|del|di|dell')?\s*(di|del|della|dell')?\s*", "", name.strip(), flags=re.I)
-    return s.strip(' "').title() if s.isupper() else s.strip(' "')
+    """The name without 'Università (Telematica) (degli Studi) (di)', quotes and the part after ' - '."""
+    s = name.split(" - ")[0].replace('"', "").strip()
+    s = re.sub(r"^(Università|Univ\.)\s+(Telematica\s+)?(degli Studi\s+)?(della|del|di|dell')?\s*", "", s, flags=re.I)
+    s = re.sub(r"^Scuola\s+", "", s, flags=re.I)
+    return s.title() if s.isupper() else s
 
 
 def geocode(name: str) -> dict:
-    """City, region, latitude and longitude of the first OpenStreetMap match, or empty."""
-    time.sleep(1.1)
-    try:
-        r = requests.get(NOMINATIM, timeout=30, headers={"User-Agent": "prin-extract (aggregate statistics)"},
-                         params=dict(q=name + ", Italia", format="json", addressdetails=1, limit=1, countrycodes="it"))
-        r.raise_for_status()
-        hit = r.json()[0]
-    except (requests.RequestException, IndexError, ValueError) as e:
-        log.warning("no location found for %s: %s", name, e)
-        return dict(city="", region="", lat="", lon="")
-    a = hit["address"]
-    city = next((a[k] for k in ("city", "town", "village", "municipality") if k in a), "")
-    return dict(city=city, region=a.get("state", ""), lat=round(float(hit["lat"]), 3), lon=round(float(hit["lon"]), 3))
+    """City, region, latitude, longitude and matched place of the first OpenStreetMap match among
+    the full name, the name before ' - ' and the short name; empty if none matches."""
+    tries = list(dict.fromkeys(q for q in (name, name.split(" - ")[0]) if q))
+    for q in tries:
+        time.sleep(1.1)
+        try:
+            r = requests.get(NOMINATIM, timeout=30, headers={"User-Agent": "prin-extract (aggregate statistics)"},
+                             params=dict(q=q.replace('"', "") + ", Italia", format="json", addressdetails=1, limit=1,
+                                         countrycodes="it"))
+            r.raise_for_status()
+            hit = r.json()[0]
+        except (requests.RequestException, IndexError, ValueError):
+            continue
+        a = hit["address"]
+        city = next((a[k] for k in ("city", "town", "village", "municipality") if k in a), "")
+        return dict(city=city, region=a.get("state", ""), lat=round(float(hit["lat"]), 3),
+                    lon=round(float(hit["lon"]), 3), matched=hit.get("display_name", ""))
+    log.warning("no location found for %s", name)
+    return dict(city="", region="", lat="", lon="", matched="")
 
 
 def record_missing(units: pd.DataFrame, path: Path = TABLE) -> List[str]:
@@ -68,8 +77,11 @@ def record_missing(units: pd.DataFrame, path: Path = TABLE) -> List[str]:
     rows = []
     for cf, name in zip(new["cf"], new["institution"]):
         kind = guess_kind(name)
-        loc = geocode(name) if kind != "national_research_body" else dict(city="", region="", lat="", lon="")
-        rows.append(dict(cf=cf, short_name=guess_short_name(name), kind=kind, **loc))
-        log.warning("institution added to data/institutions.csv, to check: %s -> %s", name, rows[-1])
+        short = guess_short_name(name)
+        loc = geocode(name)
+        matched = loc.pop("matched")
+        rows.append(dict(cf=cf, short_name=short, kind=kind, **loc))
+        log.warning("institution added to data/institutions.csv, to check: %s -> %s | OpenStreetMap match: %s",
+                    name, rows[-1], matched or "none")
     pd.concat([t, pd.DataFrame(rows)[COLUMNS]], ignore_index=True).to_csv(path, index=False)
     return list(new["institution"])
