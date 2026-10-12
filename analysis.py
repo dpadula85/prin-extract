@@ -231,7 +231,7 @@ REGION_CONTEXT = {"population": "population_regions.csv", "staff": "university_s
 
 def region_context_table(regions: pd.DataFrame) -> pd.DataFrame:
     """Per region, the share of the total budget (as in the regional map) beside the share of
-    the resident population (1 January 2026) and of the professors and researchers (2024) of
+    the resident population (1 January 2026) and of the professors and researchers (2025) of
     the Italian regions. The budget shares do not add up to 100: national research bodies
     and the budget not yet assigned are not regions. The ratio is the budget share divided by
     the other share."""
@@ -825,7 +825,7 @@ def career_tables(d: Data, cache: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     t["budget_share_pct"] = 100 * t["mur_total"] / d.budget
     t["mean_per_unit"] = t["mur_total"] / t["leaders"].where(t["leaders"] > 0)
     t.index.name = "level"
-    # the same leaders by CUN area and level, against the staff of the area (2024)
+    # the same leaders by CUN area and level, against the staff of the area (2025)
     staff = pd.read_csv(DATA / "staff_by_area_level.csv", index_col=0, dtype={"code": str})
     staff.index = staff.index.map(lambda c: f"{int(c):02d}")
     found["area"] = cache.set_index(["name", "institution"])["gsd"].reindex(
@@ -952,7 +952,7 @@ def fig_gsd_areas(d: Data, areas: pd.DataFrame, n_found: int, fig_dir: Path):
     fig.set_size_inches(14, 12)
     y = np.arange(len(t))
     ax.barh(y + 0.2, t["leaders_share_pct"], height=0.4, color=PI_COLOR, label=f"funded unit leaders ({n_found})")
-    ax.barh(y - 0.2, t["staff_share_pct"], height=0.4, color=GREY, label="professors and researchers (2024)")
+    ax.barh(y - 0.2, t["staff_share_pct"], height=0.4, color=GREY, label="professors and researchers (2025)")
     ax.set_yticks(y, [f"{c} {tex(CUN_AREAS.get(c, a))}" for c, a in zip(t.index, t["area"])])
     ax.yaxis.set_minor_locator(plt.NullLocator())
     ax.set_xlim(0, 1.1 * float(max(t["leaders_share_pct"].max(), t["staff_share_pct"].max())))

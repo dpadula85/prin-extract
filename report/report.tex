@@ -16,7 +16,7 @@
 \emergencystretch=3em
 \title{PRIN 2026: funded projects}
 \author{}
-\date{Data of 11/10/2026; 18 of 28 sectors}
+\date{Data of 12/10/2026; 18 of 28 sectors}
 \begin{document}
 \maketitle
 \section{Scope}
@@ -45,8 +45,8 @@ City, region and type of each institution come from a hand-checked table of 84 i
 \item Decrees, Tabella A (ranking) and Tabella B (funded projects): the MUR \href{https://prin.mur.gov.it/Pages/Index/301}{PRIN 2026 page} and the pages and files linked in the table of decrees below.
 \item Regional boundaries: ISTAT administrative boundaries, simplified, from the repository \href{https://github.com/openpolis/geojson-italy}{geojson-italy} of openpolis.
 \item Resident population by region, 1 January 2026 (ISTAT figures): the \href{https://en.wikipedia.org/wiki/List_of_Italian_regions_by_population}{table of Italian regions by population}, which cites \href{https://www.tuttitalia.it}{tuttitalia.it}.
-\item Professors, researchers and research fellows of the universities by region, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/46015a92-abe3-411c-af07-2532164cab59/download/personale_xgenere.csv}{personale\_xgenere.csv}, dataset \href{https://dati-ustat.mur.gov.it/dataset/personale-universitario}{2020--2024 Personale universitario} of the open data of the MUR statistical office (USTAT). The staff is all the university staff in post, not those who applied to the programme, for which no data are available.
-\item Professors and researchers by CUN scientific-disciplinary area, 2024: \href{https://dati-ustat.mur.gov.it/dataset/263a4704-a5cb-46c3-9062-4f977c9fd3e7/resource/a966dec6-b9a4-481c-92d2-485e799a9c1a/download/personale_docentedi-ruoloricercatorexareasd.csv}{personale\_docentedi-ruoloricercatorexareasd.csv}, same dataset; the same file by qualification (PO, PA, RTD, RU) gives \texttt{data/staff\_by\_area\_level.csv}.
+\item Professors, researchers and research fellows of the universities by region, 2025: \href{https://dati-ustat.mur.gov.it/dataset/28d258e4-85b2-43e8-b74f-ed2392ef16db/resource/eceaccb5-d130-4d60-a531-5a4f74b293a6/download/personale_xgenere.csv}{personale\_xgenere.csv}, dataset \href{https://dati-ustat.mur.gov.it/dataset/2025-2029-personale-universitario}{2025--2029 Personale universitario} of the open data of the MUR statistical office (USTAT). The staff is all the university staff in post, not those who applied to the programme, for which no data are available.
+\item Professors and researchers by CUN scientific-disciplinary area, 2025: \href{https://dati-ustat.mur.gov.it/dataset/28d258e4-85b2-43e8-b74f-ed2392ef16db/resource/86ec9e91-27c3-400f-b1d2-389f7f4394aa/download/personale_docentedi-ruoloricercatorexareasd.csv}{personale\_docentedi-ruoloricercatorexareasd.csv}, same dataset; the same file by qualification (PO, PA, RTD, RU) gives \texttt{data/staff\_by\_area\_level.csv}.
 \item Disciplinary group (GSD 2024) and career level of the unit leaders: looked up by name in the staff search of the MUR portal \href{https://cercauniversita.mur.gov.it}{Cerca Universit\`a} (see \texttt{gsd.py}); only aggregates are kept in the repository.
 \end{itemize}
 
@@ -193,7 +193,7 @@ Total & 144 & 100.0 & 74 & 38 & 32 & 100.0 & 1079 & 214 \\
 \subsubsection{Budget, population and university staff by region}
 \textbf{Purpose.} To compare the share of the total budget gathered by each region, as in the regional map, with its share of the resident population and of the professors and researchers of its universities.
 
-\textbf{Result.} Across the 19 regions with funded units, the share of the budget has Pearson correlation 0.91 and Spearman correlation 0.83 with the share of the resident population, and 0.96 and 0.88 with the share of professors and researchers (the national research bodies are not regions and are left out of the correlations; Valle d'Aosta has no funded unit and is left out). The national research bodies (CNR, INAF, INFN and INGV) belong to no region and received 9.4\% of the budget; a further 5.2\% of the budget was not assigned. The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff. The staff shares refer to all the professors and researchers of the Italian universities, not to those who applied to the programme, for which no data are available.
+\textbf{Result.} Across the 19 regions with funded units, the share of the budget has Pearson correlation 0.91 and Spearman correlation 0.83 with the share of the resident population, and 0.97 and 0.88 with the share of professors and researchers (the national research bodies are not regions and are left out of the correlations; Valle d'Aosta has no funded unit and is left out). The national research bodies (CNR, INAF, INFN and INGV) belong to no region and received 9.4\% of the budget; a further 5.2\% of the budget was not assigned. The table gives the shares and, in the last two columns, the share of the budget divided by the share of the population and of the staff. The staff shares refer to all the professors and researchers of the Italian universities, not to those who applied to the programme, for which no data are available.
 
 \begin{table}[H]
 \centering
@@ -202,25 +202,25 @@ Total & 144 & 100.0 & 74 & 38 & 32 & 100.0 & 1079 & 214 \\
 \toprule
 Region & Population (\%) & Staff (\%) & Budget (\%) & Budget/population & Budget/staff \\
 \midrule
-Trentino-Alto Adige & 1.9 & 1.8 & 2.7 & 1.46 & 1.53 \\
-Piemonte & 7.2 & 6.4 & 8.1 & 1.12 & 1.25 \\
-Umbria & 1.4 & 1.6 & 1.8 & 1.24 & 1.14 \\
-Lazio & 9.7 & 12.5 & 12.9 & 1.34 & 1.03 \\
-Toscana & 6.2 & 7.5 & 7.6 & 1.23 & 1.02 \\
-Molise & 0.5 & 0.5 & 0.5 & 0.99 & 1.01 \\
-Veneto & 8.2 & 6.8 & 6.2 & 0.75 & 0.90 \\
-Campania & 9.4 & 9.9 & 8.9 & 0.94 & 0.90 \\
-Lombardia & 17.1 & 16.6 & 14.4 & 0.84 & 0.87 \\
-Friuli-Venezia Giulia & 2.0 & 2.3 & 1.9 & 0.95 & 0.82 \\
-Emilia-Romagna & 7.6 & 9.5 & 7.2 & 0.95 & 0.76 \\
-Abruzzo & 2.1 & 2.7 & 1.9 & 0.87 & 0.69 \\
+Trentino-Alto Adige & 1.9 & 1.8 & 2.7 & 1.46 & 1.52 \\
+Piemonte & 7.2 & 6.4 & 8.1 & 1.12 & 1.26 \\
+Umbria & 1.4 & 1.5 & 1.8 & 1.24 & 1.15 \\
+Toscana & 6.2 & 7.3 & 7.6 & 1.23 & 1.04 \\
+Molise & 0.5 & 0.5 & 0.5 & 0.99 & 1.02 \\
+Lazio & 9.7 & 12.9 & 12.9 & 1.34 & 1.00 \\
+Campania & 9.4 & 10.0 & 8.9 & 0.94 & 0.89 \\
+Veneto & 8.2 & 6.9 & 6.2 & 0.75 & 0.89 \\
+Lombardia & 17.1 & 16.7 & 14.4 & 0.84 & 0.86 \\
+Friuli-Venezia Giulia & 2.0 & 2.3 & 1.9 & 0.95 & 0.84 \\
+Emilia-Romagna & 7.6 & 9.4 & 7.2 & 0.95 & 0.77 \\
+Abruzzo & 2.1 & 2.6 & 1.9 & 0.87 & 0.71 \\
+Liguria & 2.6 & 2.2 & 1.4 & 0.53 & 0.63 \\
 Sicilia & 8.1 & 6.9 & 4.3 & 0.53 & 0.62 \\
-Liguria & 2.6 & 2.2 & 1.4 & 0.53 & 0.62 \\
-Puglia & 6.6 & 4.8 & 2.7 & 0.42 & 0.57 \\
+Puglia & 6.6 & 4.7 & 2.7 & 0.42 & 0.58 \\
 Calabria & 3.1 & 2.2 & 1.0 & 0.33 & 0.46 \\
-Marche & 2.5 & 2.6 & 1.1 & 0.43 & 0.42 \\
-Basilicata & 0.9 & 0.5 & 0.2 & 0.20 & 0.36 \\
-Sardegna & 2.6 & 2.7 & 0.7 & 0.27 & 0.26 \\
+Marche & 2.5 & 2.5 & 1.1 & 0.43 & 0.44 \\
+Basilicata & 0.9 & 0.5 & 0.2 & 0.20 & 0.37 \\
+Sardegna & 2.6 & 2.6 & 0.7 & 0.27 & 0.27 \\
 Valle d'Aosta & 0.2 & 0.1 & 0.0 & 0.00 & 0.00 \\
 \textbf{National research bodies}$^\dagger$ & -- & -- & \textbf{9.4} & -- & -- \\
 \midrule
@@ -237,7 +237,7 @@ Total & 100.0 & 100.0 & 94.8 & -- & -- \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\textwidth]{../prin_out/figures/staff_vs_budget.pdf}
-\caption{As above, against the share of professors and researchers of the universities of the region (2024), over all the Italian university staff and not only the applicants.}
+\caption{As above, against the share of professors and researchers of the universities of the region (2025), over all the Italian university staff and not only the applicants.}
 \end{figure}
 
 \subsection{People}
@@ -283,22 +283,22 @@ Total & All & 726 & 36 & 33--40 \\
 \toprule
 CUN area & Staff & PI & Partners & PE & LS & SH & Lead. (\%) & Staff (\%) & Budget (\%) & Per 1000 \\
 \midrule
-01 Mathematics, computer science & 3695 & 7 & 37 & 42 & 0 & 2 & 6.7 & 5.7 & 5.4 & 11.9 \\
-02 Physics & 2840 & 14 & 54 & 68 & 0 & 0 & 10.4 & 4.4 & 8.1 & 23.9 \\
-03 Chemistry & 3323 & 8 & 48 & 49 & 7 & 0 & 8.5 & 5.1 & 6.6 & 16.9 \\
-04 Earth sciences & 1182 & 6 & 17 & 20 & 0 & 3 & 3.5 & 1.8 & 3.3 & 19.5 \\
-05 Biology & 5500 & 19 & 58 & 3 & 64 & 10 & 11.8 & 8.5 & 10.5 & 14.0 \\
-06 Medicine & 9851 & 21 & 92 & 9 & 102 & 2 & 17.3 & 15.2 & 13.8 & 11.5 \\
-07 Agriculture, veterinary & 3413 & 0 & 2 & 2 & 0 & 0 & 0.3 & 5.3 & 0.2 & 0.6 \\
-08 Civil eng., architecture & 4104 & 6 & 24 & 29 & 0 & 1 & 4.6 & 6.3 & 4.0 & 7.3 \\
-09 Industrial, information eng. & 7420 & 23 & 80 & 101 & 2 & 0 & 15.7 & 11.5 & 13.6 & 13.9 \\
-10 Antiquity, philology, arts & 5296 & 10 & 36 & 0 & 0 & 46 & 7.0 & 8.2 & 6.2 & 8.7 \\
-11 History, philosophy, psychology & 5116 & 14 & 43 & 1 & 1 & 55 & 8.7 & 7.9 & 7.7 & 11.1 \\
-12 Law & 5033 & 0 & 5 & 4 & 0 & 1 & 0.8 & 7.8 & 0.6 & 1.0 \\
-13 Economics, statistics & 5823 & 6 & 21 & 1 & 2 & 24 & 4.1 & 9.0 & 3.6 & 4.6 \\
-14 Political, social sciences & 2037 & 0 & 4 & 0 & 0 & 4 & 0.6 & 3.2 & 0.5 & 2.0 \\
+01 Mathematics, computer science & 3708 & 7 & 37 & 42 & 0 & 2 & 6.7 & 5.7 & 5.4 & 11.9 \\
+02 Physics & 2878 & 14 & 54 & 68 & 0 & 0 & 10.4 & 4.4 & 8.1 & 23.6 \\
+03 Chemistry & 3347 & 8 & 48 & 49 & 7 & 0 & 8.5 & 5.1 & 6.6 & 16.7 \\
+04 Earth sciences & 1193 & 6 & 17 & 20 & 0 & 3 & 3.5 & 1.8 & 3.3 & 19.3 \\
+05 Biology & 5505 & 19 & 58 & 3 & 64 & 10 & 11.8 & 8.4 & 10.5 & 14.0 \\
+06 Medicine & 9922 & 21 & 92 & 9 & 102 & 2 & 17.3 & 15.2 & 13.8 & 11.4 \\
+07 Agriculture, veterinary & 3413 & 0 & 2 & 2 & 0 & 0 & 0.3 & 5.2 & 0.2 & 0.6 \\
+08 Civil eng., architecture & 4133 & 6 & 24 & 29 & 0 & 1 & 4.6 & 6.3 & 4.0 & 7.3 \\
+09 Industrial, information eng. & 7609 & 23 & 80 & 101 & 2 & 0 & 15.7 & 11.6 & 13.6 & 13.5 \\
+10 Antiquity, philology, arts & 5353 & 10 & 36 & 0 & 0 & 46 & 7.0 & 8.2 & 6.2 & 8.6 \\
+11 History, philosophy, psychology & 5262 & 14 & 43 & 1 & 1 & 55 & 8.7 & 8.1 & 7.7 & 10.8 \\
+12 Law & 5047 & 0 & 5 & 4 & 0 & 1 & 0.8 & 7.7 & 0.6 & 1.0 \\
+13 Economics, statistics & 5903 & 6 & 21 & 1 & 2 & 24 & 4.1 & 9.0 & 3.6 & 4.6 \\
+14 Political, social sciences & 2083 & 0 & 4 & 0 & 0 & 4 & 0.6 & 3.2 & 0.5 & 1.9 \\
 \midrule
-Total & 64633 & 134 & 521 & 329 & 178 & 148 & 100.0 & 100.0 & 84.3 & 10.1 \\
+Total & 65356 & 134 & 521 & 329 & 178 & 148 & 100.0 & 100.0 & 84.3 & 10.0 \\
 \bottomrule
 \multicolumn{11}{l}{\footnotesize Staff: all professors and researchers of the Italian universities, not only applicants.} \\
 \end{tabular}
@@ -333,18 +333,18 @@ Total, all GSDs & 134 & 521 & 655 \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\textwidth]{../prin_out/figures/gsd_staff_vs_budget.pdf}
-\caption{Share of the budget received by the units whose leader's GSD was found, against the share of the professors and researchers (2024), by CUN area, numbered as in the table above; logarithmic axes, the dashed line marks equal shares. The staff is all the professors and researchers of the Italian universities, not only the applicants.}
+\caption{Share of the budget received by the units whose leader's GSD was found, against the share of the professors and researchers (2025), by CUN area, numbered as in the table above; logarithmic axes, the dashed line marks equal shares. The staff is all the professors and researchers of the Italian universities, not only the applicants.}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\textwidth]{../prin_out/figures/gsd_areas.pdf}
-\caption{Share of the funded unit leaders found in the MUR directory, and share of all the professors and researchers of the Italian universities (2024, not only the applicants), by CUN area.}
+\caption{Share of the funded unit leaders found in the MUR directory, and share of all the professors and researchers of the Italian universities (2025, not only the applicants), by CUN area.}
 \end{figure}
 
 \subsubsection{Career level of the unit leaders}
-\textbf{Purpose.} To show the career level (full professor PO, associate professor PA, fixed-term researcher RTD) of the leaders of the funded units, the MUR money of their units, and, by CUN area, the share of each level among the leaders, and of the MUR money of their units, against its share among all the professors and researchers of the Italian universities (2024). The levels are from the same MUR directory lookup as the disciplinary group; PRIN sectors have no staff data, so the staff comparison is by CUN area.
+\textbf{Purpose.} To show the career level (full professor PO, associate professor PA, fixed-term researcher RTD) of the leaders of the funded units, the MUR money of their units, and, by CUN area, the share of each level among the leaders, and of the MUR money of their units, against its share among all the professors and researchers of the Italian universities (2025). The levels are from the same MUR directory lookup as the disciplinary group; PRIN sectors have no staff data, so the staff comparison is by CUN area.
 
-\textbf{Result.} The level was found for 655 leaders. Full professors are 84 of the 134 PIs and 213 of the 521 partner-unit leaders; associate professors are 36 and 233; fixed-term researchers are 14 and 73. The units led by full professors received 39.5\% of the total budget, those led by associate professors 33.4\%, those led by fixed-term researchers 11.1\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are 27.4\% of the staff and 45.3\% of the leaders, PA 43.1\% and 41.1\%, RTD 22.9\% and 13.3\%; the leaders per 1000 staff are 16.8 for PO, 9.7 for PA and 5.9 for RTD. Of the MUR money of the units whose leader's level was found, PO received 46.9\%, PA 39.6\% and RTD 13.2\%. The tables give the same by CUN area.
+\textbf{Result.} The level was found for 655 leaders. Full professors are 84 of the 134 PIs and 213 of the 521 partner-unit leaders; associate professors are 36 and 233; fixed-term researchers are 14 and 73. The units led by full professors received 39.5\% of the total budget, those led by associate professors 33.4\%, those led by fixed-term researchers 11.1\%. The mean MUR contribution per unit is in the last column. Over all areas, PO are 27.7\% of the staff and 45.3\% of the leaders, PA 46.3\% and 41.1\%, RTD 20.4\% and 13.3\%; the leaders per 1000 staff are 16.4 for PO, 8.9 for PA and 6.5 for RTD. Of the MUR money of the units whose leader's level was found, PO received 46.9\%, PA 39.6\% and RTD 13.2\%. The tables give the same by CUN area.
 
 \begin{table}[H]
 \centering
@@ -374,22 +374,22 @@ Total & 134 & 521 & 655 & 329 & 178 & 148 & 100.0 & 138.29 & 84.3 & 211 \\
 \cmidrule(lr){3-6}\cmidrule(lr){7-10}
  &  & PO & PA & RTD & RU & PO & PA & RTD & RU \\
 \midrule
-01 Mathematics, computer science & 44 & 29.6 & 41.8 & 21.8 & 6.8 & 61.4 & 31.8 & 6.8 & 0.0 \\
-02 Physics & 68 & 25.6 & 45.7 & 25.2 & 3.5 & 41.2 & 45.6 & 13.2 & 0.0 \\
-03 Chemistry & 56 & 23.1 & 47.8 & 22.1 & 6.9 & 44.6 & 48.2 & 7.1 & 0.0 \\
-04 Earth sciences & 23 & 23.3 & 50.1 & 20.7 & 5.9 & 43.5 & 43.5 & 8.7 & 4.3 \\
-05 Biology & 77 & 21.5 & 45.5 & 24.3 & 8.7 & 42.9 & 42.9 & 14.3 & 0.0 \\
-06 Medicine & 113 & 23.8 & 43.2 & 24.0 & 9.0 & 56.6 & 29.2 & 14.2 & 0.0 \\
-07 Agriculture, veterinary & 2 & 25.7 & 45.8 & 21.4 & 7.1 & 0.0 & 0.0 & 50.0 & 50.0 \\
-08 Civil eng., architecture & 30 & 26.7 & 44.7 & 24.6 & 4.0 & 56.7 & 40.0 & 3.3 & 0.0 \\
-09 Industrial, information eng. & 103 & 29.7 & 36.8 & 30.2 & 3.4 & 46.6 & 40.8 & 12.6 & 0.0 \\
-10 Antiquity, philology, arts & 46 & 25.4 & 48.0 & 20.9 & 5.7 & 30.4 & 47.8 & 21.7 & 0.0 \\
-11 History, philosophy, psychology & 57 & 26.7 & 45.9 & 22.6 & 4.8 & 29.8 & 49.1 & 21.1 & 0.0 \\
-12 Law & 5 & 37.1 & 37.2 & 15.2 & 10.6 & 80.0 & 20.0 & 0.0 & 0.0 \\
-13 Economics, statistics & 27 & 34.8 & 38.2 & 20.4 & 6.5 & 33.3 & 48.1 & 18.5 & 0.0 \\
-14 Political, social sciences & 4 & 25.7 & 47.0 & 20.6 & 6.8 & 25.0 & 75.0 & 0.0 & 0.0 \\
+01 Mathematics, computer science & 44 & 29.8 & 45.3 & 18.6 & 6.3 & 61.4 & 31.8 & 6.8 & 0.0 \\
+02 Physics & 68 & 25.9 & 48.7 & 22.4 & 3.0 & 41.2 & 45.6 & 13.2 & 0.0 \\
+03 Chemistry & 56 & 23.4 & 50.8 & 20.1 & 5.7 & 44.6 & 48.2 & 7.1 & 0.0 \\
+04 Earth sciences & 23 & 23.7 & 52.5 & 18.5 & 5.3 & 43.5 & 43.5 & 8.7 & 4.3 \\
+05 Biology & 77 & 21.7 & 49.9 & 21.0 & 7.4 & 42.9 & 42.9 & 14.3 & 0.0 \\
+06 Medicine & 113 & 23.8 & 47.1 & 21.9 & 7.2 & 56.6 & 29.2 & 14.2 & 0.0 \\
+07 Agriculture, veterinary & 2 & 26.3 & 48.3 & 19.4 & 6.0 & 0.0 & 0.0 & 50.0 & 50.0 \\
+08 Civil eng., architecture & 30 & 26.7 & 48.1 & 21.9 & 3.3 & 56.7 & 40.0 & 3.3 & 0.0 \\
+09 Industrial, information eng. & 103 & 29.8 & 39.4 & 28.1 & 2.7 & 46.6 & 40.8 & 12.6 & 0.0 \\
+10 Antiquity, philology, arts & 46 & 25.5 & 52.2 & 17.2 & 5.1 & 30.4 & 47.8 & 21.7 & 0.0 \\
+11 History, philosophy, psychology & 57 & 27.1 & 48.9 & 20.1 & 3.9 & 29.8 & 49.1 & 21.1 & 0.0 \\
+12 Law & 5 & 37.6 & 39.5 & 13.2 & 9.7 & 80.0 & 20.0 & 0.0 & 0.0 \\
+13 Economics, statistics & 27 & 35.6 & 41.3 & 17.5 & 5.6 & 33.3 & 48.1 & 18.5 & 0.0 \\
+14 Political, social sciences & 4 & 26.0 & 49.9 & 18.4 & 5.7 & 25.0 & 75.0 & 0.0 & 0.0 \\
 \midrule
-All areas & 655 & 27.4 & 43.1 & 22.9 & 6.6 & 45.3 & 41.1 & 13.3 & 0.3 \\
+All areas & 655 & 27.7 & 46.3 & 20.4 & 5.6 & 45.3 & 41.1 & 13.3 & 0.3 \\
 \bottomrule
 \multicolumn{10}{l}{\footnotesize RTD: fixed-term researchers; RU: permanent researchers.} \\
 \end{tabular}
@@ -403,22 +403,22 @@ All areas & 655 & 27.4 & 43.1 & 22.9 & 6.6 & 45.3 & 41.1 & 13.3 & 0.3 \\
 \cmidrule(lr){2-4}
  & PO & PA & RTD \\
 \midrule
-01 Mathematics, computer science & 24.7 & 9.1 & 3.7 \\
-02 Physics & 38.6 & 23.9 & 12.6 \\
-03 Chemistry & 32.5 & 17.0 & 5.4 \\
-04 Earth sciences & 36.4 & 16.9 & 8.2 \\
-05 Biology & 27.9 & 13.2 & 8.2 \\
-06 Medicine & 27.3 & 7.8 & 6.8 \\
-07 Agriculture, veterinary & 0.0 & 0.0 & 1.4 \\
-08 Civil eng., architecture & 15.5 & 6.5 & 1.0 \\
-09 Industrial, information eng. & 21.8 & 15.4 & 5.8 \\
-10 Antiquity, philology, arts & 10.4 & 8.7 & 9.0 \\
-11 History, philosophy, psychology & 12.4 & 11.9 & 10.4 \\
+01 Mathematics, computer science & 24.4 & 8.3 & 4.3 \\
+02 Physics & 37.6 & 22.1 & 14.0 \\
+03 Chemistry & 31.9 & 15.9 & 5.9 \\
+04 Earth sciences & 35.3 & 16.0 & 9.0 \\
+05 Biology & 27.6 & 12.0 & 9.5 \\
+06 Medicine & 27.1 & 7.1 & 7.4 \\
+07 Agriculture, veterinary & 0.0 & 0.0 & 1.5 \\
+08 Civil eng., architecture & 15.4 & 6.0 & 1.1 \\
+09 Industrial, information eng. & 21.2 & 14.0 & 6.1 \\
+10 Antiquity, philology, arts & 10.2 & 7.9 & 10.9 \\
+11 History, philosophy, psychology & 11.9 & 10.9 & 11.3 \\
 12 Law & 2.1 & 0.5 & 0.0 \\
-13 Economics, statistics & 4.4 & 5.8 & 4.2 \\
-14 Political, social sciences & 1.9 & 3.1 & 0.0 \\
+13 Economics, statistics & 4.3 & 5.3 & 4.8 \\
+14 Political, social sciences & 1.8 & 2.9 & 0.0 \\
 \midrule
-All areas & 16.8 & 9.7 & 5.9 \\
+All areas & 16.4 & 8.9 & 6.5 \\
 \bottomrule
 \multicolumn{4}{l}{\footnotesize Staff of the same level and area (all staff, not only applicants).} \\
 \end{tabular}
