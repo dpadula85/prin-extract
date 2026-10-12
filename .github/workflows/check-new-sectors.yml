@@ -125,6 +125,11 @@ jobs:
           print("If a step failed, open its log: a parsed count that differs from the PDF means the layout changed.")
           PY
 
+      - name: Delete the branch of an earlier pull request
+        if: steps.changes.outputs.changed == 'true'
+        continue-on-error: true
+        run: git push origin --delete data/update
+
       - name: Open the pull request
         id: cpr
         if: steps.changes.outputs.changed == 'true'
