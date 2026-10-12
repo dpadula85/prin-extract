@@ -567,8 +567,12 @@ def main(argv=None) -> int:
     update_readme_results(root / "README.md", out)
     if not a.no_compile:
         for _ in range(2):
-            subprocess.run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "report.tex"],
-                           cwd=rdir, check=True, stdout=subprocess.DEVNULL)
+            run = subprocess.run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "report.tex"],
+                                 cwd=rdir, stdout=subprocess.DEVNULL)
+            if run.returncode:
+                lines = (rdir / "report.log").read_text(errors="replace").splitlines()
+                at = next((k for k, l in enumerate(lines) if l.startswith("!")), len(lines) - 20)
+                raise RuntimeError("pdflatex failed:\n" + "\n".join(lines[at:at + 12]))
     print(f"Wrote {rdir / 'report.tex'}" + ("" if a.no_compile else " and report.pdf"))
     return 0
 
