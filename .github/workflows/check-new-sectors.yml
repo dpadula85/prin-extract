@@ -74,12 +74,6 @@ jobs:
         timeout-minutes: 120
         run: python3 gsd.py
 
-      - name: Tests
-        id: tests
-        if: steps.changes.outputs.changed == 'true'
-        continue-on-error: true
-        run: python3 -m pytest tests -q
-
       - name: Analysis and report
         id: analysis
         if: steps.changes.outputs.changed == 'true'
@@ -88,6 +82,12 @@ jobs:
           set -o pipefail
           python3 analysis.py 2>&1 | tee analysis.log
           python3 report.py
+
+      - name: Tests
+        id: tests
+        if: steps.changes.outputs.changed == 'true'
+        continue-on-error: true
+        run: python3 -m pytest tests -q
 
       - name: Write the pull request text
         if: steps.changes.outputs.changed == 'true'
@@ -128,7 +128,13 @@ jobs:
       - name: Delete the branch of an earlier pull request
         if: steps.changes.outputs.changed == 'true'
         continue-on-error: true
-        run: git push origin --delete data/update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for pr in $(gh pr list --head data/update --state open --json number -q '.[].number'); do
+            gh pr close "$pr" --comment "Replaced by a newer pull request."
+          done
+          git push origin --delete data/update
 
       - name: Open the pull request
         id: cpr
