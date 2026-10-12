@@ -1,84 +1,85 @@
 cf,short_name,city,region,lat,lon,kind
 80006930608,Accademia Belle Arti Frosinone,Frosinone,Lazio,41.640,13.340,afam
-80007010376,Bologna,Bologna,Emilia-Romagna,44.495,11.343,public_university
-80054330586,CNR,Roma,,,,national_research_body
-01984560662,GSSI,L'Aquila,Abruzzo,42.350,13.400,school
-97692990159,Humanitas University,Pieve Emanuele,Lombardia,45.352,9.204,private_university
-96049740184,IUSS Pavia,Pavia,Lombardia,45.185,9.158,school
-06838821004,INGV,Roma,,,,national_research_body
-97220210583,INAF,Roma,,,,national_research_body
-84001850589,INFN,Roma,,,,national_research_body
-00055590327,OGS,Trieste,Friuli-Venezia Giulia,45.650,13.777,research_body
-09261710017,INRiM,Torino,Piemonte,45.070,7.687,research_body
-11933781004,Link Campus University,Roma,Lazio,41.903,12.496,private_university
-93135780729,LUM,Casamassima,Puglia,40.961,16.914,private_university
-94060760215,Bolzano,Bolzano,Trentino-Alto Adige/Südtirol,46.498,11.355,public_university
-80071270153,IULM,Milano,Lombardia,45.464,9.190,private_university
-93051590722,Politecnico di Bari,Bari,Puglia,41.117,16.872,public_university
-80057930150,Politecnico di Milano,Milano,Lombardia,45.464,9.190,public_university
-00518460019,Politecnico di Torino,Torino,Piemonte,45.070,7.687,public_university
-92037570469,IMT Lucca,Lucca,Toscana,43.843,10.503,school
-80035060328,SISSA,Trieste,Friuli-Venezia Giulia,45.650,13.777,school
-80005050507,Normale,Pisa,Toscana,43.723,10.402,school
-95315120634,Scuola Superiore Meridionale,Napoli,Campania,40.852,14.268,school
-93008800505,Sant'Anna,Pisa,Toscana,43.723,10.402,school
-09073721004,Unicusano,Roma,Lazio,41.903,12.496,telematic
-97187560152,Vita-Salute San Raffaele,Milano,Lombardia,45.464,9.190,private_university
-97962900581,UniCamillus,Roma,Lazio,41.903,12.496,private_university
-97087620585,Campus Bio-Medico,Roma,Lazio,41.903,12.496,private_university
-80007720271,Ca' Foscari,Venezia,Veneto,45.441,12.316,public_university
-02133120150,Cattolica,Milano,Lombardia,45.464,9.190,private_university
-80009280274,IUAV,Venezia,Veneto,45.441,12.316,public_university
-00382520427,Politecnica delle Marche,Ancona,Marche,43.616,13.519,public_university
-90027520130,e-Campus,Novedrate,Lombardia,45.723,9.049,telematic
-05411471211,Pegaso,Napoli,Campania,40.852,14.268,telematic
-97471900155,San Raffaele Roma,Roma,Lazio,41.903,12.496,telematic
-93002750698,Chieti-Pescara,Chieti,Abruzzo,42.351,14.168,public_university
-97026980793,Magna Graecia,Catanzaro,Calabria,38.910,16.588,public_university
-95039180120,Insubria,Varese,Lombardia,45.821,8.825,public_university
-04400441004,Roma Tre,Roma,Lazio,41.903,12.496,public_university
-92008370709,Molise,Campobasso,Molise,41.560,14.663,public_university
-94021400026,Piemonte Orientale,Vercelli,Piemonte,45.324,8.418,public_university
-01114010620,Sannio,Benevento,Campania,41.130,14.783,public_university
-01021630668,L'Aquila,L'Aquila,Abruzzo,42.350,13.400,public_university
-96003410766,Basilicata,Potenza,Basilicata,40.640,15.806,public_university
-02044190615,Vanvitelli,Caserta,Campania,41.073,14.333,public_university
-80029030568,Tuscia,Viterbo,Lazio,42.421,12.108,public_university
 80002170720,Bari Aldo Moro,Bari,Puglia,41.117,16.872,public_university
+96003410766,Basilicata,Potenza,Basilicata,40.640,15.806,public_university
+80007010376,Bologna,Bologna,Emilia-Romagna,44.495,11.343,public_university
+94060760215,Bolzano,Bolzano,Trentino-Alto Adige/Südtirol,46.498,11.355,public_university
 98007650173,Brescia,Brescia,Lombardia,45.542,10.212,public_university
+80054330586,CNR,Roma,,,,national_research_body
+80007720271,Ca' Foscari,Venezia,Veneto,45.441,12.316,public_university
 80019600925,Cagliari,Cagliari,Sardegna,39.224,9.122,public_university
+80003950781,Calabria,Rende,Calabria,39.360,16.225,public_university
 81001910439,Camerino,Camerino,Marche,43.136,13.068,public_university
+97087620585,Campus Bio-Medico,Roma,Lazio,41.903,12.496,private_university
 81006500607,Cassino,Cassino,Lazio,41.490,13.830,public_university
 02772010878,Catania,Catania,Sicilia,37.508,15.083,public_university
+02133120150,Cattolica,Milano,Lombardia,45.464,9.190,private_university
+93002750698,Chieti-Pescara,Chieti,Abruzzo,42.351,14.168,public_university
+00876220633,Federico II,Napoli,Campania,40.852,14.268,public_university
 80007370382,Ferrara,Ferrara,Emilia-Romagna,44.838,11.620,public_university
 01279680480,Firenze,Firenze,Toscana,43.770,11.256,public_university
 94045260711,Foggia,Foggia,Puglia,41.462,15.545,public_university
+01984560662,GSSI,L'Aquila,Abruzzo,42.350,13.400,school
 00754150100,Genova,Genova,Liguria,44.406,8.946,public_university
+97692990159,Humanitas University,Pieve Emanuele,Lombardia,45.352,9.204,private_university
+92037570469,IMT Lucca,Lucca,Toscana,43.843,10.503,school
+97220210583,INAF,Roma,,,,national_research_body
+84001850589,INFN,Roma,,,,national_research_body
+06838821004,INGV,Roma,,,,national_research_body
+09261710017,INRiM,Torino,Piemonte,45.070,7.687,research_body
+80009280274,IUAV,Venezia,Veneto,45.441,12.316,public_university
+80071270153,IULM,Milano,Lombardia,45.464,9.190,private_university
+96049740184,IUSS Pavia,Pavia,Lombardia,45.185,9.158,school
+95039180120,Insubria,Varese,Lombardia,45.821,8.825,public_university
+01021630668,L'Aquila,L'Aquila,Abruzzo,42.350,13.400,public_university
+00297640633,L'Orientale,Napoli,Campania,40.852,14.268,public_university
+93135780729,LUM,Casamassima,Puglia,40.961,16.914,private_university
+11933781004,Link Campus University,Roma,Lazio,41.903,12.496,private_university
 00177050432,Macerata,Macerata,Marche,43.299,13.453,public_university
+97026980793,Magna Graecia,Catanzaro,Calabria,38.910,16.588,public_university
 80004070837,Messina,Messina,Sicilia,38.194,15.554,public_university
 80012650158,Milano Statale,Milano,Lombardia,45.464,9.190,public_university
 12621570154,Milano-Bicocca,Milano,Lombardia,45.464,9.190,public_university
 00427620364,Modena e Reggio Emilia,Modena,Emilia-Romagna,44.647,10.925,public_university
-00297640633,L'Orientale,Napoli,Campania,40.852,14.268,public_university
-80018240632,Parthenope,Napoli,Campania,40.852,14.268,public_university
-00876220633,Federico II,Napoli,Campania,40.852,14.268,public_university
+92008370709,Molise,Campobasso,Molise,41.560,14.663,public_university
+80005050507,Normale,Pisa,Toscana,43.723,10.402,school
+00055590327,OGS,Trieste,Friuli-Venezia Giulia,45.650,13.777,research_body
 80006480281,Padova,Padova,Veneto,45.406,11.877,public_university
 80023730825,Palermo,Palermo,Sicilia,38.116,13.362,public_university
 00308780345,Parma,Parma,Emilia-Romagna,44.802,10.328,public_university
+80018240632,Parthenope,Napoli,Campania,40.852,14.268,public_university
+80007270186,Pavia,Pavia,Lombardia,45.187,9.157,public_university
+05411471211,Pegaso,Napoli,Campania,40.852,14.268,telematic
 00448820548,Perugia,Perugia,Umbria,43.111,12.391,public_university
-80209930587,Sapienza,Roma,Lazio,41.903,12.496,public_university
-80213750583,Tor Vergata,Roma,Lazio,41.903,12.496,public_university
+94021400026,Piemonte Orientale,Vercelli,Piemonte,45.324,8.418,public_university
+80003670504,Pisa,Pisa,Toscana,43.723,10.402,public_university
+00382520427,Politecnica delle Marche,Ancona,Marche,43.616,13.519,public_university
+93051590722,Politecnico di Bari,Bari,Puglia,41.117,16.872,public_university
+80057930150,Politecnico di Milano,Milano,Lombardia,45.464,9.190,public_university
+00518460019,Politecnico di Torino,Torino,Piemonte,45.070,7.687,public_university
+04400441004,Roma Tre,Roma,Lazio,41.903,12.496,public_university
+80035060328,SISSA,Trieste,Friuli-Venezia Giulia,45.650,13.777,school
+80008870752,Salento,Lecce,Puglia,40.352,18.175,public_university
 80018670655,Salerno,Salerno,Campania,40.682,14.768,public_university
+97471900155,San Raffaele Roma,Roma,Lazio,41.903,12.496,telematic
+01114010620,Sannio,Benevento,Campania,41.130,14.783,public_university
+93008800505,Sant'Anna,Pisa,Toscana,43.723,10.402,school
+80209930587,Sapienza,Roma,Lazio,41.903,12.496,public_university
 00196350904,Sassari,Sassari,Sardegna,40.726,8.556,public_university
+95315120634,Scuola Superiore Meridionale,Napoli,Campania,40.852,14.268,school
 80002070524,Siena,Siena,Toscana,43.319,11.331,public_university
+80002630541,Stranieri di Perugia,Perugia,Umbria,43.111,12.391,public_university
 92012890676,Teramo,Teramo,Abruzzo,42.659,13.704,public_university
+80213750583,Tor Vergata,Roma,Lazio,41.903,12.496,public_university
 80088230018,Torino,Torino,Piemonte,45.070,7.687,public_university
 00340520220,Trento,Trento,Trentino-Alto Adige/Südtirol,46.075,11.122,public_university
 80013890324,Trieste,Trieste,Friuli-Venezia Giulia,45.650,13.777,public_university
+80029030568,Tuscia,Viterbo,Lazio,42.421,12.108,public_university
 80014550307,Udine,Udine,Friuli-Venezia Giulia,46.071,13.235,public_university
+97962900581,UniCamillus,Roma,Lazio,41.903,12.496,private_university
+09073721004,Unicusano,Roma,Lazio,41.903,12.496,telematic
 82002850418,Urbino,Urbino,Marche,43.726,12.637,public_university
+02044190615,Vanvitelli,Caserta,Campania,41.073,14.333,public_university
 93009870234,Verona,Verona,Veneto,45.438,10.992,public_university
-80008870752,Salento,Lecce,Puglia,40.352,18.175,public_university
-80003950781,Calabria,Rende,Calabria,39.360,16.225,public_university
-80003670504,Pisa,Pisa,Toscana,43.723,10.402,public_university
-80002630541,Stranieri di Perugia,Perugia,Umbria,43.111,12.391,public_university
+97187560152,Vita-Salute San Raffaele,Milano,Lombardia,45.464,9.190,private_university
+90027520130,e-Campus,Novedrate,Lombardia,45.723,9.049,telematic
