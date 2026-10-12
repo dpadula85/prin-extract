@@ -98,6 +98,7 @@ jobs:
           import decrees
           old = json.load(open("/tmp/decrees_old.json")) or None
           new = json.load(open("prin_out/decrees.json"))
+          print("@${{ github.repository_owner }} new PRIN 2026 sectors are ready to review.\n")
           print("Sectors published since the last update:\n")
           print(decrees.describe_changes(old, new))
           import subprocess
@@ -133,6 +134,7 @@ jobs:
           title: "New PRIN 2026 sectors"
           commit-message: "Update the data with the newly published PRIN 2026 sectors"
           body-path: pr_body.md
+          assignees: ${{ github.repository_owner }}
           add-paths: |
             prin_pdfs
             prin_out
