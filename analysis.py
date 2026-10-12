@@ -96,8 +96,10 @@ def load(out_dir: Path) -> Data:
     """Units joined with the institution table, ranking with inferred gender, budgets."""
     units = pd.read_csv(out_dir / "all_rows.csv", dtype={"cf": str})
     inst = pd.read_csv(DATA / "institutions.csv", dtype={"cf": str})
-    if institutions.record_missing(units, DATA / "institutions.csv"):
-        inst = pd.read_csv(DATA / "institutions.csv", dtype={"cf": str})
+    unmapped = sorted(set(units["cf"]) - set(inst["cf"]))
+    if unmapped:
+        raise ValueError(f"institutions missing from data/institutions.csv (complete_tables adds them): "
+                         f"{units[units['cf'].isin(unmapped)]['institution'].unique().tolist()}")
     units = units.merge(inst, on="cf", how="left")
     units["region"] = units["region"].fillna(NATIONAL)
     ranking = pd.read_csv(out_dir / "ranking.csv")
@@ -110,15 +112,23 @@ def load(out_dir: Path) -> Data:
                          for g in ranking["pi_given"]]
     units["gender"] = [gender.infer(gender.first_given_from_surname_first(n), table)
                        for n in units["name"]]
-    missing = gender.unresolved(
-        [g.split()[0] for g in ranking["pi_given"].dropna()]
-        + [gender.first_given_from_surname_first(n) for n in units["name"]], table)
+    return Data(units, ranking, budgets, budget, sectors)
+
+
+def complete_tables(out_dir: Path):
+    """Add the institutions and the given names of the parsed units that are missing from the
+    hand-checked tables in data/ (see institutions.py and gender.py); the log lists them."""
+    units = pd.read_csv(out_dir / "all_rows.csv", dtype={"cf": str})
+    institutions.record_missing(units, DATA / "institutions.csv")
+    ranking = pd.read_csv(out_dir / "ranking.csv")
+    givens = ([g.split()[0] for g in ranking["pi_given"].dropna()]
+              + [gender.first_given_from_surname_first(n) for n in units["name"]])
+    missing = gender.unresolved(givens)
     if missing:
         log.warning("given names not in data/given_names.csv, added: %s", ", ".join(missing))
         review = gender.record_missing(missing)
         if review:
             log.warning("given names to review in data/given_names.csv: %s", ", ".join(review))
-    return Data(units, ranking, budgets, budget, sectors)
 
 
 # ---------------------------------------------------------------- tables
@@ -1108,6 +1118,7 @@ def main(argv=None) -> int:
     ap.add_argument("--no-latex", action="store_true", help="render text with mathtext, not LaTeX")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    complete_tables(Path(a.out))
     s = run(Path(a.out), use_latex=not a.no_latex, highlight=a.highlight)
     print(f"{s['n_projects']} projects, {s['funded'] / 1e6:.1f} of {s['budget'] / 1e6:.1f} M EUR "
           f"in {s['n_sectors']} sectors; Gini {s['gini']:.2f}")

@@ -71,5 +71,5 @@ def record_missing(units: pd.DataFrame, path: Path = TABLE) -> List[str]:
         loc = geocode(name) if kind != "national_research_body" else dict(city="", region="", lat="", lon="")
         rows.append(dict(cf=cf, short_name=guess_short_name(name), kind=kind, **loc))
         log.warning("institution added to data/institutions.csv, to check: %s -> %s", name, rows[-1])
-    pd.concat([t, pd.DataFrame(rows)[COLUMNS]], ignore_index=True).sort_values("short_name").to_csv(path, index=False)
+    pd.concat([t, pd.DataFrame(rows)[COLUMNS]], ignore_index=True).to_csv(path, index=False)
     return list(new["institution"])
