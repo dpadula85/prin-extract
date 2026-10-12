@@ -85,7 +85,8 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         continue-on-error: true
         run: |
-          python3 analysis.py
+          set -o pipefail
+          python3 analysis.py 2>&1 | tee analysis.log
           python3 report.py
 
       - name: Write the pull request text
@@ -99,6 +100,10 @@ jobs:
           print("Sectors published since the last update:\n")
           print(decrees.describe_changes(old, new))
           print("\nTests: ${{ steps.tests.outcome }}. GSD lookup: ${{ steps.gsd.outcome }}. Analysis and report: ${{ steps.analysis.outcome }}.")
+          names = [l for l in open("analysis.log") if "given names not in" in l]
+          if names:
+              print("\n**Given names to review** (add them to data/given_names.csv on this branch, else the ending rule applies): "
+                    + names[0].split("given_names.csv:")[-1].strip())
           print("If a step failed, open its log: a new institution must be added to data/institutions.csv, "
                 "and a parsed count that differs from the PDF means the layout changed.")
           PY
