@@ -65,7 +65,6 @@ cf,short_name,city,region,lat,lon,kind
 80006480281,Padova,Padova,Veneto,45.406,11.877,public_university
 80023730825,Palermo,Palermo,Sicilia,38.116,13.362,public_university
 00308780345,Parma,Parma,Emilia-Romagna,44.802,10.328,public_university
-80007270186,Pavia,Pavia,Lombardia,45.185,9.158,public_university
 00448820548,Perugia,Perugia,Umbria,43.111,12.391,public_university
 80209930587,Sapienza,Roma,Lazio,41.903,12.496,public_university
 80213750583,Tor Vergata,Roma,Lazio,41.903,12.496,public_university
