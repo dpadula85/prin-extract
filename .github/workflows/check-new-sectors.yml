@@ -93,12 +93,29 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         run: |
           python3 - <<'PY' > pr_body.md
+          import io
           import json
           import decrees
           old = json.load(open("/tmp/decrees_old.json")) or None
           new = json.load(open("prin_out/decrees.json"))
           print("Sectors published since the last update:\n")
           print(decrees.describe_changes(old, new))
+          import subprocess
+          import pandas as pd
+          try:
+              before = pd.read_csv(io.StringIO(subprocess.check_output(["git", "show", "HEAD:prin_out/all_rows.csv"], text=True)))
+          except subprocess.CalledProcessError:
+              before = pd.DataFrame(columns=["sector"])
+          rows = pd.read_csv("prin_out/all_rows.csv")
+          added = [s for s in decrees.ALL_SECTORS if s in set(rows["sector"]) and s not in set(before["sector"])]
+          print("\nSectors newly parsed:\n")
+          for s in added or ["none"]:
+              r = rows[rows["sector"] == s]
+              print(f"- {s}: {r['project_code'].nunique()} projects, {len(r)} units, {r['mur_contribution'].sum() / 1e6:.2f} M EUR MUR contribution" if s != "none" else "- none")
+          waiting = [s for s in new["decrees"] if s not in set(rows["sector"])]
+          if waiting:
+              print("\nPublished but not parsed: " + ", ".join(sorted(waiting)))
+          print(f"\nParsed in total: {rows['sector'].nunique()} of {len(decrees.ALL_SECTORS)} sectors.")
           print("\nTests: ${{ steps.tests.outcome }}. GSD lookup: ${{ steps.gsd.outcome }}. Analysis and report: ${{ steps.analysis.outcome }}.")
           names = [l for l in open("analysis.log") if "given names" in l or "institution added" in l]
           if names:
