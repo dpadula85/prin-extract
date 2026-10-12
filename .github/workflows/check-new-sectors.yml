@@ -1,6 +1,6 @@
 name: Check for new PRIN sectors
 
-# Every 6 hours: download what the MUR has published, and if a sector is new (or its
+# Every 4 hours: download what the MUR has published, and if a sector is new (or its
 # decree changed) regenerate all data, figures and the report and open a pull request
 # with the result. Nothing is committed to the default branch. Once all the sectors are
 # parsed the workflow disables itself. The GSD of the unit leaders is looked up by name in the
@@ -10,7 +10,7 @@ name: Check for new PRIN sectors
 
 on:
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 */4 * * *"
   workflow_dispatch:
 
 permissions:
