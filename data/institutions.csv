@@ -78,3 +78,8 @@ cf,short_name,city,region,lat,lon,kind
 80003670504,Pisa,Pisa,Toscana,43.723,10.402,public_university
 80002630541,Stranieri di Perugia,Perugia,Umbria,43.111,12.391,public_university
 80007270186,Pavia,Pavia,Lombardia,45.187,9.157,public_university
+01984560662,Gran Sasso Science Institute - Scuola di dottorato internazionale,,,,,school
+06838821004,Istituto Nazionale Geofisica e Vulcanologia,Roma,Lazio,41.828,12.515,research_body
+90027520130,"Telematica ""E-CAMPUS",,,,,telematic
+05411471211,Telematica PEGASO,Siracusa,Sicilia,37.068,15.289,telematic
+92037570469,Scuola IMT Alti Studi - LUCCA,Lucca,Toscana,43.846,10.511,school
