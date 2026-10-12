@@ -182,3 +182,9 @@ def test_gsd_name_and_university_matching():
     assert same('Università degli Studi della Campania "Luigi Vanvitelli"', 'CAMPANIA - "L. VANVITELLI"')
     assert same("Università degli Studi dell'AQUILA", "L'AQUILA")
     assert not same("Università degli Studi di MILANO", "MILANO-BICOCCA")
+
+
+def test_under40_name_only_green_is_detected():
+    """LS6 and SH5 print only the PI's name in green, not the project code."""
+    cells = [("2026PXXXXX", False), ("A title", False), ("Maria ROSSI", True), ("85,00", False)]
+    assert tabella_a.parse_cells(cells, "LS6")[0]["under40"]

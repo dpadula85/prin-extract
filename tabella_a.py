@@ -72,7 +72,7 @@ def _is_green(rgb) -> bool:
 
 def read_cells(path: Path) -> List[Tuple[str, bool]]:
     """Text cells of the PDF in content-stream order, each with whether it is printed in
-    green (the PDF marks the code and name of under-40 PIs that way)."""
+    green (the PDF marks the code and/or the name of under-40 PIs that way)."""
     from pypdf import PdfReader
     cells: List[Tuple[str, bool]] = []
     fill = (0.0, 0.0, 0.0)
@@ -109,6 +109,7 @@ def parse_cells(cells: List[Tuple[str, bool]], sector: str) -> List[dict]:
         elif NUMBER.fullmatch(c) or MASKED_DATE.fullmatch(c):
             cur["numbers"].append(c)
         else:
+            cur["under40"] = cur["under40"] or green  # LS6 prints only the name in green
             cur["body"].append(c)
     out = []
     for r in rows:

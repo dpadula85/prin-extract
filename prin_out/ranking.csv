@@ -34,7 +34,7 @@ LS6,1,2026PECS9A,"The self-reactive root: how BCR autoreactivity shapes lymphoma
 LS6,2,2026PHLB4C,Uncovering novel innate immune circuits governing neutrophil-γδ T cell crosstalk in homeostasis and cancer immunity,Sébastien,JAILLON,89.5,,,,,,,False,True
 LS6,3,2026PTZLZH,INTEGRATIVE DISSECTION AND GENE CORRECTION OF IMMUNE DYSFUNCTION IN X-LINKED AGAMMAGLOBULINEMIA (XLA): FROM CLINICAL PHENOTYPE TO IMMUNE CIRCUIT AND GENE CORRECTION,Raffaele,BADOLATO,86.25,,,,,,,False,True
 LS6,4,2026PL7E99,Re-TickS - Re-thinking Tick Surveillance in a changing environment: novel approaches to characterize vectors and pathogens through an eco-evolutionary lens,Davide,SASSERA,85.0,34.0,17.5,0.92,6,7,,False,True
-LS6,5,2026PA8574,Surveillance Analysis from WAstewater To Estimate Antibiotic Resistance in Universitary hospital settings in Italy (SAFeWATER),Marta,COLANERI,85.0,34.0,17.0,0.57,2,5,,False,True
+LS6,5,2026PA8574,Surveillance Analysis from WAstewater To Estimate Antibiotic Resistance in Universitary hospital settings in Italy (SAFeWATER),Marta,COLANERI,85.0,34.0,17.0,0.57,2,5,,True,True
 LS7,1,2026PWA7H5,Epi-COMBO —Epigenetic COnvergent Multi-tumor Blockade of Oncogenic non-coding networks: Modulating the 8q24 MYC–PVT1 axis through miR-423-5p and other epigenetic targeting.,Michele,CARAGLIA,100.0,40.0,20.0,0.95,9,10,,False,True
 LS7,2,2026PT4KJY,"Integrated multi-omics, pharmacokinetics and patient-derived organoids to predict response to JAK inhibitors in adult and pediatric ulcerative colitis",Gabriele,STOCCO,100.0,40.0,20.0,0.86,3,4,1976,False,True
 LS7,3,2026PJYZXJ,"Adolescent Stress and Psychopathological Trajectories: Vulnerability, Neurobiological Mechanisms, and Gene–Environment Interactions Toward Targeted Interventions",Marco Andrea,RIVA,100.0,40.0,20.0,0.86,8,6,1959,False,True
@@ -203,7 +203,7 @@ SH4,14,2026PX3JRA,"Tuning to the world: how adaptation to natural stimulus stati
 SH4,15,2026PAJRNY,"RESPECT Recognition, Epistemic Symmetry and Participation in Expert-by-experience Care Transformations",Elena,FACCIO,85.25,,,,,,,False,False
 SH4,16,2026P5FH9L,DIGI-HEALTH: Digital Work and Healthy Recovery: A Multilevel Framework for Psychophysiological Sustainability,Guido,ALESSANDRI,85.0,,,,,,,False,False
 SH5,1,2026PZXJPY,"DAPHNE – Digital Archive of Petrarchan Heritage and Networked Evidence: A National FAIR Census, Description, and Visual Repository of Petrarchan Manuscripts in Italy (XIV-XVI centuries).",Natascia,TONELLI,100.0,,,,,,,False,True
-SH5,2,2026PN4LPF,What’s the Matter? Matter as an Epistemic and Ontological Principle in Premodern Thought (4th–16th Centuries),Mario,LOCONSOLE,99.75,,,,,,,False,True
+SH5,2,2026PN4LPF,What’s the Matter? Matter as an Epistemic and Ontological Principle in Premodern Thought (4th–16th Centuries),Mario,LOCONSOLE,99.75,,,,,,,True,True
 SH5,3,2026P8783L,REcovering AnCient Texts and developing new interpretative paradigms through Greek papyrological collections (REAcT),Giovan Battista,D'ALESSIO,99.0,40.0,,,,,,False,True
 SH5,4,2026PTH2J2,Sharpening concepts: the architecture of mathematical definitions,Andrea,SERENI,99.0,39.5,,,,,,False,True
 SH5,5,2026PP99C8,ArchAut An Archaeology of Italian Autofiction (1922-1975) through Authors’ Archives,Lorenzo,MARCHESE,96.5,,,,,,,True,True
