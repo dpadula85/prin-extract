@@ -5,7 +5,7 @@ Tick a box with `[x]` and move the line to Done when finished.
 ## Open
 
 - [ ] **1. Correctness check.** Audit the parsing and the budget arithmetic sector by sector.
-  - [ ] Find out why some sectors have missing budget (available minus funded).
+  - [x] Find out why some sectors have missing budget (available minus funded). Not a parsing error: funded sums match the rows exactly, and the money is split in two pools (under-40, ordinary) that cannot be combined. Every leftover is below the smallest possible project (1.0 M EUR, the minimum funded contribution in the data) in its pool, or the pool has no eligible project left (SH4: 1.50 M EUR, no unfunded under-40 project; LS6: only 5 projects ranked, all funded). Still to do: add this note to the report next to the available-vs-funded figure.
   - [ ] Check the remaining sectors for parsing errors like the LS6 under-40 one.
 - [ ] **2. More fact sheets**, like the Siena one.
   - [ ] Tied to the author's past: Basilicata, Pisa, Scuola Normale Superiore.
