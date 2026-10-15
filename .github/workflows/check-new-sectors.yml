@@ -155,6 +155,8 @@ jobs:
             report/report.pdf
             report/factsheets.tex
             report/factsheets.pdf
+            report/focus.tex
+            report/focus.pdf
             README.md
 
       - name: Check whether all the sectors are parsed

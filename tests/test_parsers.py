@@ -188,3 +188,22 @@ def test_under40_name_only_green_is_detected():
     """LS6 and SH5 print only the PI's name in green, not the project code."""
     cells = [("2026PXXXXX", False), ("A title", False), ("Maria ROSSI", True), ("85,00", False)]
     assert tabella_a.parse_cells(cells, "LS6")[0]["under40"]
+
+
+def test_focus_tables_split_units_by_gsd():
+    import analysis as an
+    import focus
+    units = pd.DataFrame(dict(
+        sector=["PE5", "PE5", "PE5"], project_code=["A", "A", "B"], role=["PI", "RU", "PI"],
+        name=["P One", "R Two", "P Three"], institution=["X", "Y", "X"], cf=["1", "2", "1"],
+        mur_contribution=[100.0, 50.0, 200.0], gender=["F", "M", "M"], short_name=["X", "Y", "X"]))
+    ranking = pd.DataFrame(dict(project_code=["A", "B"], under40=[True, False]))
+    d = an.Data(units=units, ranking=ranking, budgets=None, budget=1000.0, sectors=["PE5"])
+    cache = pd.DataFrame(dict(name=["P One", "R Two", "P Three"], institution=["X", "Y", "X"], status="found",
+                              gsd=["03/CHEM-05", "03/CHEM-03", "03/CHEM-05"], ssd=["CHEM-05/A", "CHEM-03/A", "CHEM-05/A"],
+                              role=["Associato", "Ordinario", "Ricercatore"]))
+    t = focus.tables(d, cache, "03/CHEM")
+    p = t["profile"]
+    assert p.loc["03/CHEM-05", "units"] == 2 and p.loc["03/CHEM-05", "pi_under40"] == 1
+    assert p.loc["03/CHEM-03", "ru_money"] == 50.0 and p.loc["All", "mur_total"] == 350.0
+    assert t["partners"].loc["03/CHEM-05", "03"] == 1

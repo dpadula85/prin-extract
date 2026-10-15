@@ -1150,6 +1150,8 @@ def main(argv=None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     complete_tables(Path(a.out))
     s = run(Path(a.out), use_latex=not a.no_latex, highlight=a.highlight)
+    import focus  # imports this module, so not at the top
+    focus.run(Path(a.out))
     print(f"{s['n_projects']} projects, {s['funded'] / 1e6:.1f} of {s['budget'] / 1e6:.1f} M EUR "
           f"in {s['n_sectors']} sectors; Gini {s['gini']:.2f}")
     return 0

@@ -19,6 +19,7 @@ from scipy import stats
 
 import analysis as an
 import decrees
+import focus
 import gsd
 from analysis import NATIONAL, tex
 
@@ -550,6 +551,91 @@ def build_factsheets(out_dir: Path) -> Optional[str]:
     return head + "\n\\clearpage\n".join(parts) + "\n\\end{document}\n"
 
 
+def build_focus(out_dir: Path) -> Optional[str]:
+    """LaTeX of the subsector-by-subsector analysis of every prefix of data/focus.txt (focus.py);
+    None if there is nothing to show. Only aggregates: no leader and no project is named."""
+    prefixes = focus.focus_prefixes()
+    if not prefixes or not gsd.CACHE.exists():
+        return None
+    d = an.load(out_dir)
+    cache = gsd.load_cache()
+    parts = []
+    for prefix in prefixes:
+        t = focus.tables(d, cache, prefix)
+        if t["units"].empty:
+            continue
+        cov = focus.coverage(d, cache, prefix)
+        prof, s = t["profile"], focus.slug(prefix)
+        all_ = prof.loc["All"]
+        codes = [c for c in prof.index if c != "All"]
+        n_all = lambda c: str(int(prof.loc[c, "units"]))
+        money_rows, mix_rows = [], []
+        for c in prof.index:
+            r = prof.loc[c]
+            name = tex(c.split("/")[-1]) if c != "All" else "All"
+            money_rows.append([name, str(int(r["units"])), str(int(r["pi_units"])), str(int(r["projects"])), str(int(r["institutions"])),
+                               str(int(r["erc_sectors"])), f"{r['mur_total'] / 1e3:.0f}", f"{r['budget_share_pct']:.2f}",
+                               f"{r['mean_k_eur_per_unit']:.0f}"])
+            mix_rows.append([name, f"{r['women_pct']:.0f}", str(int(r["pi_under40"]))] + [str(int(r[k])) for k in ("po", "pa", "rtd", "ru")])
+        overview = (table(["GSD", "Units", "PI", "Projects", "Institutions", "ERC sectors", "k EUR", r"Share \%", "k EUR/unit"],
+                          money_rows, "lrrrrrrrr", r"\footnotesize")
+                    + "\n" + table(["GSD", r"Women \%", "PI under 40", "PO", "PA", "RTD", "RU"], mix_rows, "lrrrrrr", r"\footnotesize")
+                    + "\n{\\footnotesize Units: funded units whose leader's GSD is the row's; PI: of these, coordinators; Institutions and ERC sectors: "
+                    "distinct ones with such a unit; Share: of the total budget; Women: among these leaders; PI under 40: units led by a PI under 40; "
+                    "PO, PA, RTD, RU: full professors, associate professors, fixed-term and permanent researchers.}\n")
+        ssd = t["ssd"]
+        ssd_rows = [[tex(i), str(int(r["units"])), str(int(r["pi_units"])), f"{r['mur_total'] / 1e3:.0f}", f"{r['budget_share_pct']:.2f}"]
+                    for i, r in ssd.iterrows()]
+        ssd_tab = table(["Sub-sector (SSD)", "Units", "PI", "k EUR", "Share \\%"], ssd_rows, "lrrrr", r"\footnotesize")
+        scope = (rf"{int(all_['units'])} funded units have a leader whose GSD starts with {tex(prefix)} ({int(all_['pi_units'])} coordinators, "
+                 rf"{int(all_['ru_units'])} partners) in {int(all_['projects'])} projects and {int(all_['erc_sectors'])} ERC sectors; they received "
+                 rf"{eur(all_['mur_total'], 2)} ({pct(all_['budget_share_pct'], 2)} of the budget). The GSD is known for {cov['found']} of the "
+                 rf"{cov['leaders']} unit leaders of these {cov['sectors']} sectors (leaders of research bodies and of institutions that are not "
+                 rf"universities are not in the directory). The staff of the directory is known by CUN area, not by GSD, so nothing is divided by the staff of a GSD.")
+        parts.append(section(
+            f"Subsectors {tex(prefix)}", "To describe, for each GSD of the group, the units funded, their money, their ERC sectors, institutions, "
+            "career levels, gender and partners, using the GSD of the unit leaders.", scope,
+            overview + "\n" + ssd_tab + "\n"
+            + figure(f"focus_{s}_money", "Money of the units by GSD of the leader, in percent of the total budget; in brackets the number of units.", 0.75)
+            + "\n" + figure(f"focus_{s}_sectors", "Number of funded units by GSD of the leader and ERC sector.", 0.8)
+            + "\n" + figure(f"focus_{s}_partners", "Units of the projects that have a unit of the GSD, by CUN area of their leader (units of the GSD itself excluded; leaders whose GSD was not found are not counted). Areas: " + ", ".join(f"{a} {tex(an.CUN_AREAS.get(a, a))}" for a in focus.partner_areas(t)), 0.85),
+            level="section"))
+        for c in codes:
+            r, units = prof.loc[c], t["units"][t["units"]["gsd"] == c]
+            secs = units.groupby("sector").agg(units=("name", "size"), pi=("role", lambda x: int((x == "PI").sum())),
+                                               money=("mur_contribution", "sum"))
+            sec_tab = table(["ERC sector", "Units", "PI", "k EUR"], [[tex(i), str(int(x["units"])), str(int(x["pi"])), f"{x['money'] / 1e3:.0f}"]
+                                                                       for i, x in secs.iterrows()],
+                            "lrrr", r"\footnotesize", total=["Total", str(int(r["units"])), str(int(r["pi_units"])), f"{r['mur_total'] / 1e3:.0f}"],
+                            long=True)
+            ins = t["institutions"][t["institutions"]["gsd"] == c]
+            ins_tab = table(["Institution", "Units", "k EUR"], [[tex(x["short_name"]), str(int(x["units"])), f"{x['mur_total'] / 1e3:.0f}"]
+                                                                  for _, x in ins.iterrows()], "lrr", r"\footnotesize", long=True)
+            pr = t["partners"].loc[c]
+            areas = [(a, int(pr[a])) for a in pr.index if a.isdigit() and pr[a] > 0]
+            areas.sort(key=lambda x: -x[1])
+            mix = ", ".join(f"{tex(an.CUN_AREAS.get(a, a))} {n}" for a, n in areas)
+            ssds = ssd[ssd.index.str.startswith(c.split("/")[-1])]
+            result = (rf"{int(r['units'])} units ({int(r['pi_units'])} coordinators) in {int(r['projects'])} projects, at {int(r['institutions'])} institutions, "
+                      rf"in {int(r['erc_sectors'])} ERC sectors, {eur(r['mur_total'], 2)} ({pct(r['budget_share_pct'], 2)} of the budget, "
+                      rf"{r['mean_k_eur_per_unit']:.0f} k EUR per unit); women among the leaders {int(r['women'])} of {int(r['units'])}; "
+                      rf"career levels PO {int(r['po'])}, PA {int(r['pa'])}, RTD {int(r['rtd'])}, RU {int(r['ru'])}; PIs under 40: {int(r['pi_under40'])}. "
+                      rf"The projects have {int(pr['other_units'])} other units, of which {int(pr['other_found'])} have a leader with a known GSD"
+                      + (rf": {mix}." if mix else ".")
+                      + (rf" Sub-sectors: {join([f'{tex(i)} {int(x['units'])}' for i, x in ssds.iterrows()])}." if len(ssds) > 1 else ""))
+            parts.append("\\clearpage\n" + section(f"GSD {tex(c)}", "To list the units of one GSD by ERC sector and by institution.", result,
+                                                    sec_tab + "\n" + ins_tab, level="subsection"))
+    if not parts:
+        return None
+    head = rf"""{PREAMBLE}\title{{PRIN 2026: funded units by GSD of the leader}}
+\author{{}}
+\date{{Data of {datetime.date.today().strftime("%d/%m/%Y")}; {len(d.sectors)} of {len(decrees.ALL_SECTORS)} sectors}}
+\begin{{document}}
+\maketitle
+"""
+    return head + "\n".join(parts) + "\n\\end{document}\n"
+
+
 def compile_tex(rdir: Path, name: str):
     """Run pdflatex twice on report/<name>.tex; on failure raise with the first error lines."""
     for _ in range(2):
@@ -630,10 +716,15 @@ def main(argv=None) -> int:
     sheets = build_factsheets(out)
     if sheets:
         (rdir / "factsheets.tex").write_text(sheets, encoding="utf-8")
+    focus_tex = build_focus(out)
+    if focus_tex:
+        (rdir / "focus.tex").write_text(focus_tex, encoding="utf-8")
     if not a.no_compile:
         compile_tex(rdir, "report")
         if sheets:
             compile_tex(rdir, "factsheets")
+        if focus_tex:
+            compile_tex(rdir, "focus")
     print(f"Wrote {rdir / 'report.tex'}" + ("" if a.no_compile else " and report.pdf")
           + (f"; {rdir / 'factsheets.tex'}" + ("" if a.no_compile else " and factsheets.pdf") if sheets else ""))
     return 0

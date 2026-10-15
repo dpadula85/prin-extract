@@ -11,8 +11,10 @@ Tick a box with `[x]` and move the line to Done when finished.
   - [x] Tied to the author's past: Basilicata, Pisa, Scuola Normale Superiore.
   - [x] Tied to the author's funded project: Padova, Brescia, Bolzano, Basilicata, Torino. Built as `report/factsheets.pdf` from `data/factsheets.txt`; the workflow rebuilds it.
 - [ ] **3. Deeper analysis by GSD within chemistry**, especially PE5 and PE4 (PE4 not yet published).
-  - [ ] Write it generally, so it extends to any sector.
-  - [ ] Produce results only for the chemistry sectors.
+  - [x] Write it generally, so it extends to any sector: `focus.py`, driven by the code prefixes of `data/focus.txt`.
+  - [x] Produce results only for the chemistry sectors: `report/focus.pdf`, one page per GSD CHEM-01 to CHEM-07 (the GSD is that of the unit leaders only; no per-GSD staff data exist).
+  - [ ] PE4: nothing to do until it is published (the workflow rebuilds `focus.pdf`).
+  - [ ] Decide whether per-GSD analyses of the team (not only the leaders) are wanted: needs the GSD of every team member, which the tables do not give.
 - [ ] **4. A posteriori "dream team" analysis.** Which team composition (institutions, career levels, gender, GSD mix, under-40 PI) goes with being funded?
   - [ ] Chemistry first.
   - [ ] Written so it extends to any sector.
