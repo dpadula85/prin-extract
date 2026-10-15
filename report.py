@@ -101,6 +101,56 @@ def section(title: str, purpose: str, result: str, body: str, level: str = "subs
                       rf"\textbf{{Result.}} {result}", "", body, ""])
 
 
+def fact_sheet(d, inst: pd.DataFrame, name: str, stems: Tuple[str, str] = ("highlight_neighbours", "highlight_map"),
+               level: str = "subsection") -> str:
+    """The fact sheet of the institution with this short name: its figures against the median of
+    its type, the list of its funded units, and the two figures named by `stems`."""
+    units = d.units
+    cf = inst.index[inst["short_name"] == name][0]
+    r0 = inst.loc[cf]
+    f = dict(share_of_budget_pct=float(r0["share_of_budget_pct"]), rank=int(r0["rank"]),
+             rank_in_type=int(r0["rank_in_type"]), type=r0["kind"],
+             n_institutions_of_type=int((inst["kind"] == r0["kind"]).sum()),
+             projects=int(r0["projects"]), pi_units=int(r0["pi_units"]), ru_units=int(r0["ru_units"]),
+             n_sectors=int(r0["n_sectors"]), mur_total=float(r0["mur_total"]))
+    peers = inst[inst["kind"] == f["type"]]
+    mine = units[units["cf"] == cf].sort_values("sector")
+    rows = []
+    leader_level = {}
+    if gsd.CACHE.exists():
+        c = gsd.load_cache()
+        c = c[c["status"] == "found"]
+        short = {"Ordinario": "PO", "Associato": "PA", "Ricercatore": "RU"}
+        leader_level = {(n, i): short.get(r, "RTD") for n, i, r in zip(c["name"], c["institution"], c["role"])}
+    for _, r in mine.iterrows():
+        g = units[units["project_code"] == r["project_code"]]
+        lead = g[g["role"] == "PI"].iloc[0]
+        others = sorted(set(g["short_name"]) - {name} - ({lead["short_name"]} if r["role"] == "RU" else set()))
+        title = r["title"] if len(r["title"]) <= 64 else r["title"][:61].rsplit(" ", 1)[0] + "..."
+        rows.append([r["sector"], r["role"], leader_level.get((r["name"], r["institution"]), "n.a."), f"{r['mur_contribution'] / 1e3:.0f}", tex(title),
+                     tex(lead["short_name"] if r["role"] == "RU" else "this institution"),
+                     tex(", ".join(others))])
+    facts = [["Funding", eur(f["mur_total"], 2) + f", {pct(f['share_of_budget_pct'], 2)} of the budget",
+              pct(peers["share_of_budget_pct"].median(), 2)],
+             ["Rank", f"{f['rank']} of {len(inst)}; {f['rank_in_type']} of {f['n_institutions_of_type']} in its type", ""],
+             ["Funded projects", str(f["projects"]), f"{peers['projects'].median():.0f}"],
+             ["Sectors with a funded unit", f"{f['n_sectors']} of {len(d.sectors)}", f"{peers['n_sectors'].median():.0f}"],
+             ["Money received as PI", pct(100 * peers.loc[cf, "mur_pi"] / f["mur_total"], 0),
+              pct(100 * (peers["mur_pi"] / peers["mur_total"]).median(), 0)]]
+    body = (table([tex(name), "Value", f"Median, {tex(an.KIND_LABELS[f['type']].lower())}"],
+                  [[tex(a), b, c] for a, b, c in facts], "llr")
+            + "\n" + table(["Sector", "Role", "Level", "k EUR", "Project", "Coordinator", "Other institutions"], rows, "lllrp{4.2cm}p{2cm}p{3.2cm}", r"\footnotesize",
+                          total=["Total", "", "", f"{mine['mur_contribution'].sum() / 1e3:.0f}", "", "", ""],
+                          note="Level of the leader: PO, PA, RTD, RU; n.a.: not a university leader or not found.")
+            + "\n" + figure(stems[0], rf"Share of the total budget of {tex(name)} and of the institutions ranked just above and below it.", 0.65)
+            + "\n" + figure(stems[1], rf"Cities sharing funded projects with {tex(name)} (line width proportional to the number of projects).", 0.75))
+    return section(
+        f"Institution fact sheet: {tex(name)}",
+        "To collect the figures of one institution and compare them with the other institutions of the same type.",
+        rf"{tex(name)} received {eur(f['mur_total'], 2)} ({pct(f['share_of_budget_pct'], 2)} of the budget) in {f['projects']} projects, {f['pi_units']} as coordinator and {f['ru_units']} as partner, in {f['n_sectors']} sectors; it ranks {f['rank']} of {len(inst)} institutions and {f['rank_in_type']} of {f['n_institutions_of_type']} within its type.",
+        body, level=level)
+
+
 def build(out_dir: Path, highlight: Optional[str]) -> str:
     d = an.load(out_dir)
     manifest = decrees.load_manifest(out_dir / "decrees.json")
@@ -415,46 +465,10 @@ City, region and type of each institution come from a hand-checked table of {ins
             + "\n" + figure("distinct_gsd", "Share of the projects by number of distinct GSDs among the leaders of their units, against the same leaders shuffled between the projects of their sector, each project keeping its number of units (mean of 2000 shuffles).", 0.75)))
 
     # ------------------------------------------------------------ 2.9 fact sheet
-    summ = json.loads((out_dir / "analysis" / "summary.json").read_text())
-    if highlight and summ.get("highlight"):
-        name, f = next(iter(summ["highlight"].items()))
-        cf = inst.index[inst["short_name"] == name][0]
-        peers = inst[inst["kind"] == f["type"]]
-        mine = units[units["cf"] == cf].sort_values("sector")
-        rows = []
-        level = {}
-        if gsd.CACHE.exists():
-            c = gsd.load_cache()
-            c = c[c["status"] == "found"]
-            short = {"Ordinario": "PO", "Associato": "PA", "Ricercatore": "RU"}
-            level = {(n, i): short.get(r, "RTD") for n, i, r in zip(c["name"], c["institution"], c["role"])}
-        for _, r in mine.iterrows():
-            g = units[units["project_code"] == r["project_code"]]
-            lead = g[g["role"] == "PI"].iloc[0]
-            others = sorted(set(g["short_name"]) - {name} - ({lead["short_name"]} if r["role"] == "RU" else set()))
-            title = r["title"] if len(r["title"]) <= 64 else r["title"][:61].rsplit(" ", 1)[0] + "..."
-            rows.append([r["sector"], r["role"], level.get((r["name"], r["institution"]), "n.a."), f"{r['mur_contribution'] / 1e3:.0f}", tex(title),
-                         tex(lead["short_name"] if r["role"] == "RU" else "this institution"),
-                         tex(", ".join(others))])
-        facts = [["Funding", eur(f["mur_total"], 2) + f", {pct(f['share_of_budget_pct'], 2)} of the budget",
-                  pct(peers["share_of_budget_pct"].median(), 2)],
-                 ["Rank", f"{f['rank']} of {len(inst)}; {f['rank_in_type']} of {f['n_institutions_of_type']} in its type", ""],
-                 ["Funded projects", str(f["projects"]), f"{peers['projects'].median():.0f}"],
-                 ["Sectors with a funded unit", f"{f['n_sectors']} of {len(d.sectors)}", f"{peers['n_sectors'].median():.0f}"],
-                 ["Money received as PI", pct(100 * peers.loc[cf, "mur_pi"] / f["mur_total"], 0),
-                  pct(100 * (peers["mur_pi"] / peers["mur_total"]).median(), 0)]]
-        body = (table([tex(name), "Value", f"Median, {tex(an.KIND_LABELS[f['type']].lower())}"],
-                      [[tex(a), b, c] for a, b, c in facts], "llr")
-                + "\n" + table(["Sector", "Role", "Level", "k EUR", "Project", "Coordinator", "Other institutions"], rows, "lllrp{4.2cm}p{2cm}p{3.2cm}", r"\footnotesize",
-                              total=["Total", "", "", f"{mine['mur_contribution'].sum() / 1e3:.0f}", "", "", ""],
-                              note="Level of the leader: PO, PA, RTD, RU; n.a.: not a university leader or not found.")
-                + "\n" + figure("highlight_neighbours", rf"Share of the total budget of {tex(name)} and of the institutions ranked just above and below it.", 0.65)
-                + "\n" + figure("highlight_map", rf"Cities sharing funded projects with {tex(name)} (line width proportional to the number of projects).", 0.75))
-        parts.append(section(
-            f"Institution fact sheet: {tex(name)}",
-            "To collect the figures of one institution and compare them with the other institutions of the same type.",
-            rf"{tex(name)} received {eur(f['mur_total'], 2)} ({pct(f['share_of_budget_pct'], 2)} of the budget) in {f['projects']} projects, {f['pi_units']} as coordinator and {f['ru_units']} as partner, in {f['n_sectors']} sectors; it ranks {f['rank']} of {len(inst)} institutions and {f['rank_in_type']} of {f['n_institutions_of_type']} within its type.",
-            body, level="subsection"))
+    if highlight:
+        near = inst[inst["city"] == highlight]
+        if len(near):
+            parts.append(fact_sheet(d, inst, near["short_name"].iloc[0]))
 
     # ------------------------------------------------------------- appendices
     parts.append(r"\appendix")
@@ -501,6 +515,38 @@ City, region and type of each institution come from a hand-checked table of {ins
 \maketitle
 """
     return head + "\n".join(parts) + "\n\\end{document}\n"
+
+
+def build_factsheets(out_dir: Path) -> Optional[str]:
+    """LaTeX of the fact sheets of data/factsheets.txt, one per page; None if there are none."""
+    d = an.load(out_dir)
+    inst = an.institution_table(d)
+    parts = []
+    for name in an.factsheet_names():
+        if name not in set(inst["short_name"]):
+            log.warning("fact sheet: no institution with funded units is called %r", name)
+            continue
+        parts.append(fact_sheet(d, inst, name, an.factsheet_stems(name), level="section"))
+    if not parts:
+        return None
+    head = rf"""{PREAMBLE}\title{{PRIN 2026: institution fact sheets}}
+\author{{}}
+\date{{Data of {datetime.date.today().strftime("%d/%m/%Y")}; {len(d.sectors)} of {len(decrees.ALL_SECTORS)} sectors}}
+\begin{{document}}
+\maketitle
+"""
+    return head + "\n\\clearpage\n".join(parts) + "\n\\end{document}\n"
+
+
+def compile_tex(rdir: Path, name: str):
+    """Run pdflatex twice on report/<name>.tex; on failure raise with the first error lines."""
+    for _ in range(2):
+        run = subprocess.run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", f"{name}.tex"],
+                             cwd=rdir, stdout=subprocess.DEVNULL)
+        if run.returncode:
+            lines = (rdir / f"{name}.log").read_text(errors="replace").splitlines()
+            at = next((k for k, l in enumerate(lines) if l.startswith("!")), len(lines) - 20)
+            raise RuntimeError("pdflatex failed:\n" + "\n".join(lines[at:at + 12]))
 
 
 RESULTS_BEGIN, RESULTS_END = "<!-- results:begin -->", "<!-- results:end -->"
@@ -569,15 +615,15 @@ def main(argv=None) -> int:
     rdir.mkdir(exist_ok=True)
     (rdir / "report.tex").write_text(build(out, a.highlight or None), encoding="utf-8")
     update_readme_results(root / "README.md", out)
+    sheets = build_factsheets(out)
+    if sheets:
+        (rdir / "factsheets.tex").write_text(sheets, encoding="utf-8")
     if not a.no_compile:
-        for _ in range(2):
-            run = subprocess.run(["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "report.tex"],
-                                 cwd=rdir, stdout=subprocess.DEVNULL)
-            if run.returncode:
-                lines = (rdir / "report.log").read_text(errors="replace").splitlines()
-                at = next((k for k, l in enumerate(lines) if l.startswith("!")), len(lines) - 20)
-                raise RuntimeError("pdflatex failed:\n" + "\n".join(lines[at:at + 12]))
-    print(f"Wrote {rdir / 'report.tex'}" + ("" if a.no_compile else " and report.pdf"))
+        compile_tex(rdir, "report")
+        if sheets:
+            compile_tex(rdir, "factsheets")
+    print(f"Wrote {rdir / 'report.tex'}" + ("" if a.no_compile else " and report.pdf")
+          + (f"; {rdir / 'factsheets.tex'}" + ("" if a.no_compile else " and factsheets.pdf") if sheets else ""))
     return 0
 
 

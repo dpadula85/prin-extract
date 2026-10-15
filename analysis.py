@@ -28,7 +28,7 @@ from collections import Counter
 from dataclasses import dataclass
 from itertools import combinations
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,6 +46,7 @@ from style import new_axes, save_centered
 log = logging.getLogger(__name__)
 
 DATA = Path(__file__).with_name("data")
+FACTSHEETS = DATA / "factsheets.txt"
 NATIONAL = "National research bodies"
 KIND_LABELS = {"public_university": "Public univ.", "private_university": "Private univ.",
                "telematic": "Telematic univ.", "school": "Advanced schools",
@@ -622,27 +623,48 @@ def fig_breadth(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: Optional[
     _save(fig, ax, fig_dir, "institution_breadth")
 
 
-def fig_neighbours(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str, window: int = 5):
-    """The highlighted institution and the ones ranked just above and below it by funding."""
-    pos = int(np.flatnonzero((inst["city"] == highlight).to_numpy())[0])
+def factsheet_names() -> List[str]:
+    """Short names (institutions.csv) of the institutions with a fact sheet, one per line of
+    data/factsheets.txt; blank lines and lines starting with # are ignored."""
+    if not FACTSHEETS.exists():
+        return []
+    lines = [l.strip() for l in FACTSHEETS.read_text(encoding="utf-8").splitlines()]
+    return [l for l in lines if l and not l.startswith("#")]
+
+
+def factsheet_stems(name: str) -> Tuple[str, str]:
+    """File stems (without extension) of the two figures of the fact sheet of `name`."""
+    slug = "".join(c if c.isalnum() else "_" for c in name.lower().replace("'", ""))
+    return f"fact_{slug}_neighbours", f"fact_{slug}_map"
+
+
+def fig_neighbours(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str, window: int = 5,
+                   cf: Optional[str] = None, stem: str = "highlight_neighbours"):
+    """The highlighted institution (the first of the highlighted city, or the one with tax code
+    `cf`) and the ones ranked just above and below it by funding."""
+    mine = (inst.index == cf) if cf else (inst["city"] == highlight).to_numpy()
+    pos = int(np.flatnonzero(mine)[0])
     sel = inst.iloc[max(pos - window, 0):pos + window + 1][::-1]
     fig, ax = _axes(small=True)
     y = np.arange(len(sel))
-    colors_ = [RU_COLOR if c == highlight else PI_COLOR for c in sel["city"]]
+    hot = (sel.index == cf) if cf else (sel["city"] == highlight).to_numpy()
+    colors_ = [RU_COLOR if h else PI_COLOR for h in hot]
     ax.barh(y, sel["share_of_budget_pct"], color=colors_)
     ax.set_yticks(y, [tex(f"{r} {n}") for r, n in zip(sel["rank"], sel["short_name"])])
     ax.yaxis.set_minor_locator(plt.NullLocator())
     ax.set_xlabel(r"Share of total budget / \%")
-    _save(fig, ax, fig_dir, "highlight_neighbours")
+    _save(fig, ax, fig_dir, stem)
 
 
-def fig_ego_map(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str):
-    """Map of the cities sharing projects with the highlighted one (width ~ number of projects)."""
+def fig_ego_map(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str,
+                cf: Optional[str] = None, stem: str = "highlight_map", label: Optional[str] = None):
+    """Map of the cities sharing projects with the highlighted one (width ~ number of projects);
+    with `cf`, only the projects of that institution count, not of the whole city."""
     city = _city_table(d, inst)
     pos = {c: (r["lon"], r["lat"]) for c, r in city.iterrows()}
     pos[NATIONAL] = (11.2, 38.9)
     place = d.units.assign(node=np.where(d.units["region"] == NATIONAL, NATIONAL, d.units["city"]))
-    mine = set(place.loc[place["city"] == highlight, "project_code"])
+    mine = set(place.loc[(place["cf"] == cf) if cf else (place["city"] == highlight), "project_code"])
     shared: Counter = Counter()
     for _, g in place[place["project_code"].isin(mine)].groupby("project_code"):
         for n in set(g["node"]) - {highlight}:
@@ -661,8 +683,8 @@ def fig_ego_map(d: Data, inst: pd.DataFrame, fig_dir: Path, highlight: str):
     _place_labels(fig, ax, xy, np.full(len(names), np.sqrt(300 / np.pi)), list(range(len(names))),
                   [tex("National bodies" if n == NATIONAL else n) for n in names], fontsize=16,
                   colors=[RU_COLOR if k == 0 else None for k in range(len(names))], backing=True)
-    ax.set_title(tex(f"{highlight}: cities sharing projects, {_stamp(d)}"), fontsize=22)
-    _save(fig, ax, fig_dir, "highlight_map")
+    ax.set_title(tex(f"{label or highlight}: cities sharing projects, {_stamp(d)}"), fontsize=22)
+    _save(fig, ax, fig_dir, stem)
 
 
 def _ccw(a, b, c) -> bool:
@@ -1092,6 +1114,14 @@ def run(out_dir: Path, use_latex: bool = True, highlight: Optional[str] = None) 
     if highlight:
         fig_neighbours(d, inst, fig_dir, highlight)
         fig_ego_map(d, inst, fig_dir, highlight)
+    for name in factsheet_names():
+        hit = inst.index[inst["short_name"] == name]
+        if not len(hit):
+            log.warning("fact sheet: no institution with funded units is called %r", name)
+            continue
+        s_nb, s_map = factsheet_stems(name)
+        fig_neighbours(d, inst, fig_dir, inst.loc[hit[0], "city"], cf=hit[0], stem=s_nb)
+        fig_ego_map(d, inst, fig_dir, inst.loc[hit[0], "city"], cf=hit[0], stem=s_map, label=name)
     summary = dict(n_sectors=len(d.sectors), sectors=d.sectors, budget=d.budget,
                    funded=float(d.units["mur_contribution"].sum()),
                    n_projects=int(d.units["project_code"].nunique()),

@@ -153,6 +153,8 @@ jobs:
             data/institutions.csv
             report/report.tex
             report/report.pdf
+            report/factsheets.tex
+            report/factsheets.pdf
             README.md
 
       - name: Check whether all the sectors are parsed

@@ -1,0 +1,8 @@
+# Short names of the institutions with a fact sheet (report/factsheets.pdf).
+Basilicata
+Pisa
+Normale
+Padova
+Brescia
+Bolzano
+Torino
