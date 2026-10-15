@@ -60,11 +60,23 @@ def join(items: List[str]) -> str:
 
 def table(header: List[str], rows: List[List[str]], colspec: str, size: str = "",
           total: Optional[List[str]] = None, note: str = "",
-          groups: Optional[List[Tuple[str, int]]] = None) -> str:
+          groups: Optional[List[Tuple[str, int]]] = None, long: bool = False) -> str:
     """A booktabs table; `total`, if given, is a last row set off by a midrule; `note` is
     set in a small row under the bottom rule, inside the table; `groups`, if given, is a
     first header row of (label, number of columns) spans, an empty label leaving its columns
-    blank, each labelled span underlined by a cmidrule."""
+    blank, each labelled span underlined by a cmidrule; `long` makes a longtable that breaks
+    over pages and repeats its header (no groups)."""
+    if long:
+        lines = ["{" + size, rf"\begin{{longtable}}{{{colspec}}}", r"\toprule", " & ".join(header) + r" \\", r"\midrule",
+                 r"\endhead"]
+        lines += [" & ".join(r) + r" \\" for r in rows]
+        if total is not None:
+            lines += [r"\midrule", " & ".join(total) + r" \\"]
+        lines += [r"\bottomrule"]
+        if note:
+            lines += [rf"\multicolumn{{{len(header)}}}{{l}}{{\footnotesize {note}}} \\"]
+        lines += [r"\end{longtable}", "}"]
+        return "\n".join(x for x in lines if x)
     lines = [r"\begin{table}[H]", r"\centering", size, rf"\begin{{tabular}}{{{colspec}}}", r"\toprule"]
     top = None
     if groups:
@@ -141,7 +153,7 @@ def fact_sheet(d, inst: pd.DataFrame, name: str, stems: Tuple[str, str] = ("high
                   [[tex(a), b, c] for a, b, c in facts], "llr")
             + "\n" + table(["Sector", "Role", "Level", "k EUR", "Project", "Coordinator", "Other institutions"], rows, "lllrp{4.2cm}p{2cm}p{3.2cm}", r"\footnotesize",
                           total=["Total", "", "", f"{mine['mur_contribution'].sum() / 1e3:.0f}", "", "", ""],
-                          note="Level of the leader: PO, PA, RTD, RU; n.a.: not a university leader or not found.")
+                          note="Level of the leader: PO, PA, RTD, RU; n.a.: not a university leader or not found.", long=True)
             + "\n" + figure(stems[0], rf"Share of the total budget of {tex(name)} and of the institutions ranked just above and below it.", 0.65)
             + "\n" + figure(stems[1], rf"Cities sharing funded projects with {tex(name)} (line width proportional to the number of projects).", 0.75))
     return section(
