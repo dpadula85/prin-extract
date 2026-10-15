@@ -155,10 +155,14 @@ City, region and type of each institution come from a hand-checked table of {ins
     lo, hi = sec["used_pct"].idxmin(), sec["used_pct"].idxmax()
     below = u40[u40["funded_below_ordinary_cut"] > 0]
     over_pool = int((u40["money_under40_projects"] > u40["pool"]).sum())
+    left = sec["budget"] - sec["funded"]
+    smallest = d.units.groupby("project_code")["mur_contribution"].sum().min()
+    all_funded = sec.index[sec["n_funded"] == sec["n_ranked"]]
     parts.append(section(
         "Budget and funded money per sector",
         "To compare, sector by sector, the money funded with the budget the decrees make available, and to separate the money that went to projects whose PI is under 40.",
         rf"The budget is {eur(B, 2)} and {eur(funded, 2)} ({pct(100 * funded / B)}) was funded. Per sector, the funded money is between {pct(sec.loc[lo, 'used_pct'])} of the budget of {lo} and {pct(sec.loc[hi, 'used_pct'])} of the budget of {hi}. "
+        rf"The unfunded part of the budget is {eur(left.sum(), 2)}; in {int((left < smallest).sum())} sectors it is smaller than {eur(smallest, 1)}, the smallest contribution received by a funded project, and in {join(list(all_funded))} all the ranked projects are funded. "
         rf"{int(u40['funded_under40'].sum())} of the {n_proj} funded projects have an under-40 PI; they received {eur(u40['money_under40_projects'].sum(), 2)} ({pct(100 * u40['money_under40_projects'].sum() / funded)} of the funded money). The under-40 pools of the {len(d.sectors)} sectors add up to {eur(u40['pool'].sum(), 2)}; in {over_pool} sectors the money of the under-40 PIs' projects is larger than the sector's pool. "
         rf"{int(u40['funded_below_ordinary_cut'].sum())} funded under-40 projects rank below the best unfunded project of an over-40 PI ({join(list(below.index))}).",
         figure("sector_budgets", rf"Per sector, in percent of the total budget: budget available (outline) and funded money, split into projects of under-40 PIs (green) and the others (blue). {len(d.sectors)} of 28 sectors.", 0.85)))
