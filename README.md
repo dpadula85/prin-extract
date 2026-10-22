@@ -37,7 +37,7 @@ When a sector is new, the workflow also runs `gsd.py` (the GSD lookup, not block
 Each sector has its own decree, which gives the funds available to the sector, split into the ring-fenced under-40 pool and the ordinary pool. A decree can be annulled and replaced (PE7: n. 32, replaced by n. 45); only the current one is listed. Sectors that are not parsed are not in any table. The table is rewritten by `prin_extract.py`.
 
 <!-- sectors:begin -->
-20 of 28 sectors parsed.
+21 of 28 sectors parsed.
 
 | Sector | Status | Decree | Budget (M EUR) | Funded (M EUR) | Projects |
 |---|---|---|---:|---:|---:|
@@ -63,13 +63,13 @@ Each sector has its own decree, which gives the funds available to the sector, s
 | LS9 | not yet published | | 15.11 | | |
 | SH1 | not yet published | | 10.58 | | |
 | SH2 | not yet published | | 11.87 | | |
-| SH3 | not yet published | | 9.36 | | |
+| SH3 | parsed | [n. 56 of 22/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-56-del-22-10-2026) | 9.36 | 8.02 | 7 |
 | SH4 | parsed | [n. 40 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-40-macrosettore-sh-settore-sh4-approvazione) | 9.62 | 8.12 | 8 |
 | SH5 | parsed | [n. 41 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-41-macrosettore-sh-settore-sh5-approvazione) | 10.50 | 10.22 | 9 |
 | SH6 | parsed | [n. 44 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-44-macrosettore-sh-settore-sh6-approvazione) | 9.37 | 9.25 | 9 |
 | SH7 | parsed | [n. 49 of 09/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-49-del-09-10-2026) | 7.70 | 7.00 | 6 |
 | SH8 | not yet published | | 8.96 | | |
-| **Total, parsed sectors** | | | **181.59** | **170.75** | **157** |
+| **Total, parsed sectors** | | | **190.95** | **178.77** | **164** |
 <!-- sectors:end -->
 
 ## Results

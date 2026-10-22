@@ -1,5 +1,5 @@
 {
- "n_sectors": 20,
+ "n_sectors": 21,
  "sectors": [
   "LS2",
   "LS3",
@@ -17,31 +17,32 @@
   "PE9",
   "PE10",
   "PE11",
+  "SH3",
   "SH4",
   "SH5",
   "SH6",
   "SH7"
  ],
- "budget": 181585762.42,
- "funded": 170746302.0,
- "n_projects": 157,
- "n_units": 789,
- "n_ranked": 254,
- "gini": 0.5579035293991144,
- "n_institutions": 85,
- "top10_share": 0.43417800052852684,
+ "budget": 190946709.95999998,
+ "funded": 178770246.0,
+ "n_projects": 164,
+ "n_units": 824,
+ "n_ranked": 263,
+ "gini": 0.5637161281108922,
+ "n_institutions": 87,
+ "top10_share": 0.4316052515808475,
  "highlight": {
   "Siena": {
-   "share_of_budget_pct": 1.089049589375841,
-   "rank": 27,
-   "rank_in_type": 25,
+   "share_of_budget_pct": 1.2702989229341106,
+   "rank": 25,
+   "rank_in_type": 23,
    "type": "public_university",
-   "n_institutions_of_type": 59,
-   "projects": 8,
+   "n_institutions_of_type": 60,
+   "projects": 10,
    "pi_units": 5,
-   "ru_units": 3,
-   "n_sectors": 7,
-   "mur_total": 1977559.0
+   "ru_units": 5,
+   "n_sectors": 8,
+   "mur_total": 2425594.0
   }
  }
 }
