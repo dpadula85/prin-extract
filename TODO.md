@@ -25,6 +25,8 @@ Tick a box with `[x]` and move the line to Done when finished.
 - [ ] PR email never arrived (every run was triggered by the owner; probably needs "Include your own updates" in GitHub notification settings).
 - [ ] Institutions like INGV (national research bodies) cannot be guessed by `complete_tables()`: classify by hand.
 
+- [ ] GSD lookup of the 64 LS5 leaders: the MUR portal answered 403 (CloudFront block) on 2026-10-22, from GitHub and from here. Retry `python3 gsd.py` later; if the block lasts, find another way. The `GSD_CACHE` secret is older than the local cache (726 against 752 rows): refresh it after the lookup.
+
 ## Done
 
 - [x] Under-40 detection when only the PI name is green (LS6, SH5).
