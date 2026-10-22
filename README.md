@@ -28,7 +28,7 @@ Optional: a LaTeX installation (figures use LaTeX text; `analysis.py --no-latex`
 
 ## Automatic updates
 
-[.github/workflows/check-new-sectors.yml](.github/workflows/check-new-sectors.yml) runs every 4 hours (and on demand from the Actions tab) until all 28 sectors are parsed. It runs `prin_extract.py`; if a sector is new or a decree changed, it installs LaTeX, regenerates all tables, figures and the report with `analysis.py` and `report.py`, runs the tests, and opens a pull request with the new PDFs, tables, figures, report and README, listing the new sectors and whether the tests and the analysis passed. Nothing is committed to the default branch. When all 28 sectors are in `prin_out/all_rows.csv` the workflow opens an issue that mentions the repository owner (GitHub sends the email) and disables itself. `analysis.py` also appends the shares of institutions and regions to `prin_out/history.csv` whenever the set of parsed sectors changes, so the numbers can be followed as sectors are published.
+[.github/workflows/check-new-sectors.yml](.github/workflows/check-new-sectors.yml) runs every 4 hours (and on demand from the Actions tab) until all 28 sectors are parsed. It runs `prin_extract.py --csv --uni SIENA` (so `prin_out/SIENA.csv` and the Excel file are refreshed); if a sector is new, a decree changed, or the report on the default branch covers fewer sectors than are parsed, it installs LaTeX, regenerates all tables, figures and the report with `analysis.py` and `report.py`, runs the tests, and opens a pull request with the new PDFs, tables, figures, report and README, listing the new sectors and whether the tests and the analysis passed. A run whose analysis, report or tests failed ends red (the pull request is still opened); an unknown given name or institution never stops the report, it is added to `data/` and listed in the pull request to check. Nothing is committed to the default branch. When all 28 sectors are in `prin_out/all_rows.csv` the workflow opens an issue that mentions the repository owner (GitHub sends the email) and disables itself. `analysis.py` also appends the shares of institutions and regions to `prin_out/history.csv` whenever the set of parsed sectors changes, so the numbers can be followed as sectors are published.
 
 When a sector is new, the workflow also runs `gsd.py` (the GSD lookup, not blocking: the pull request is opened even if it fails). The answers are kept in the GitHub Actions cache between runs, so each run asks the MUR portal only about the leaders of the new sector; the first run asks about all of them (about 35 minutes), and so does the first run after GitHub drops an unused cache (after 7 days).
 
@@ -75,19 +75,19 @@ Each sector has its own decree, which gives the funds available to the sector, s
 ## Results
 
 <!-- results:begin -->
-Provisional: 20 of 28 sectors. Regenerate with `python3 analysis.py` and `python3 report.py`; the full report is [report/report.pdf](report/report.pdf).
+Provisional: 21 of 28 sectors. Regenerate with `python3 analysis.py` and `python3 report.py`; the full report is [report/report.pdf](report/report.pdf).
 
 | Quantity | Value |
 |---|---|
-| Budget of the parsed sectors | 181.59 M EUR |
-| Funded | 170.75 M EUR (94.0% of the budget) |
-| Projects, units | 157, 789 (157 PI, 632 RU) |
-| Institutions with a funded unit | 85 |
-| Share by institution type | Public univ. 76.3%, Private univ. 4.1%, Telematic univ. 1.2%, Advanced schools 2.6%, Research bodies 0.5%, National bodies 9.3%, AFAM 0.1% |
-| Share by macro-area | North 41.9% (of which 30% as PI), Centre 23.5% (of which 21% as PI), South and Islands 19.4% (of which 24% as PI); national research bodies 9.3% |
-| Median MUR contribution per unit | 258 k EUR (PI), 195 k EUR (RU) |
-| Projects of under-40 PIs | 40 projects, 43.58 M EUR (25.5% of the funded money); under-40 pools 26.88 M EUR |
-| Women among unit leaders | 34% of PIs, 37% of partner-unit leaders |
+| Budget of the parsed sectors | 190.95 M EUR |
+| Funded | 178.77 M EUR (93.6% of the budget) |
+| Projects, units | 164, 824 (164 PI, 660 RU) |
+| Institutions with a funded unit | 87 |
+| Share by institution type | Public univ. 76.4%, Private univ. 4.1%, Telematic univ. 1.2%, Advanced schools 2.4%, Research bodies 0.4%, National bodies 9.0%, AFAM 0.1% |
+| Share by macro-area | North 42.0% (of which 30% as PI), Centre 23.6% (of which 21% as PI), South and Islands 19.0% (of which 23% as PI); national research bodies 9.0% |
+| Median MUR contribution per unit | 259 k EUR (PI), 195 k EUR (RU) |
+| Projects of under-40 PIs | 43 projects, 47.15 M EUR (26.4% of the funded money); under-40 pools 28.43 M EUR |
+| Women among unit leaders | 35% of PIs, 37% of partner-unit leaders |
 
 ![Share of the total budget by region (national research bodies not shown).](prin_out/figures/map_regions_share.png)
 *Share of the total budget by region (national research bodies not shown).*

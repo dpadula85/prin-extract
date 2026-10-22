@@ -1,8 +1,10 @@
 name: Check for new PRIN sectors
 
 # Every 4 hours: download what the MUR has published, and if a sector is new (or its
-# decree changed) regenerate all data, figures and the report and open a pull request
-# with the result. Nothing is committed to the default branch. Once all the sectors are
+# decree changed, or the report on the default branch does not cover every parsed sector)
+# regenerate all data, figures and the report and open a pull request with the result.
+# Nothing is committed to the default branch. A run ends red if the analysis, the report
+# or the tests failed (the pull request is opened anyway, with the outcomes). Once all the sectors are
 # parsed the workflow disables itself. The GSD of the unit leaders is looked up by name in the
 # MUR staff directory (gsd.py); the answers are kept in the Actions cache between runs, so a
 # run asks only about leaders it has not seen. The first run starts from the repository secret
@@ -34,13 +36,23 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Download and parse the published PDFs
-        run: python3 prin_extract.py --csv
+        run: python3 prin_extract.py --csv --uni SIENA
 
       - name: Detect new publications
         id: changes
         run: |
           n=$(git status --porcelain -- prin_out/decrees.json prin_pdfs | wc -l)
-          echo "changed=$([ "$n" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          # a merged pull request whose report failed leaves the report behind the data
+          stale=$(python3 - <<'PY'
+          import re
+          import pandas as pd
+          n = pd.read_csv("prin_out/all_rows.csv")["sector"].nunique()
+          m = re.search(r"covers (\d+) of the", re.sub(r"\s+", " ", open("report/report.tex").read()))
+          print("true" if not m or int(m.group(1)) != n else "false")
+          PY
+          )
+          echo "report out of date: $stale"
+          echo "changed=$([ "$n" -gt 0 ] || [ "$stale" = true ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
           git show HEAD:prin_out/decrees.json > /tmp/decrees_old.json 2>/dev/null || echo '{}' > /tmp/decrees_old.json
 
       - name: Install LaTeX
@@ -122,6 +134,8 @@ jobs:
           if names:
               print("\n**Added to the hand-checked tables, to review on this branch** (given names by the ending rule, an empty "
                     "gender needs F or M; institutions by keywords and an OpenStreetMap search):\n```\n" + "".join(names) + "```")
+          if "${{ steps.analysis.outcome }}" != "success" or "${{ steps.tests.outcome }}" != "success":
+              print("\n**A step failed: the tables, figures or report in this pull request may be incomplete.**")
           print("If a step failed, open its log: a parsed count that differs from the PDF means the layout changed.")
           PY
 
@@ -158,6 +172,12 @@ jobs:
             report/focus.tex
             report/focus.pdf
             README.md
+
+      - name: Fail the run if the analysis, the report or the tests failed
+        if: steps.changes.outputs.changed == 'true' && (steps.analysis.outcome != 'success' || steps.tests.outcome != 'success')
+        run: |
+          echo "analysis and report: ${{ steps.analysis.outcome }}, tests: ${{ steps.tests.outcome }}; see the logs above"
+          exit 1
 
       - name: Check whether all the sectors are parsed
         id: complete

@@ -74,9 +74,15 @@ def test_regional_shares_conserve_the_funded_money():
 
 
 def test_gender_table_covers_every_given_name_seen():
+    """Every given name is in data/given_names.csv. A name whose gender the ending rule does not
+    decide stays empty (basis 'review') and is left out of the shares; the pull request lists it."""
     d = analysis.load(OUT)
-    assert d.ranking["gender"].notna().all()
-    assert d.units["gender"].notna().all()
+    table = pd.read_csv(ROOT / "data" / "given_names.csv", keep_default_na=False)
+    givens = ([g.split()[0] for g in d.ranking["pi_given"].dropna()]
+              + [gender.first_given_from_surname_first(n) for n in d.units["name"]])
+    assert not gender.unresolved(givens, dict.fromkeys(table["given"], "")), "run analysis.py to add them"
+    for df in (d.ranking, d.units):
+        assert df["gender"].notna().mean() > 0.99
 
 
 @pytest.mark.parametrize("name,expected", [("Veronica", "F"), ("Luca", "M"), ("Andrea", "M"),

@@ -78,7 +78,8 @@ def _axes(small: bool = False, tick: Optional[int] = None):
 
 
 def tex(s: str) -> str:
-    """Escape the characters LaTeX treats specially in a label."""
+    """Escape the characters LaTeX treats specially in a label (a missing value is an empty label)."""
+    s = s if isinstance(s, str) else ""
     for a, b in (("&", r"\&"), ("%", r"\%"), ("_", r"\_"), ("#", r"\#")):
         s = s.replace(a, b)
     return s
@@ -103,6 +104,7 @@ def load(out_dir: Path) -> Data:
                          f"{units[units['cf'].isin(unmapped)]['institution'].unique().tolist()}")
     units = units.merge(inst, on="cf", how="left")
     units["region"] = units["region"].fillna(NATIONAL)
+    units["city"] = units["city"].fillna("")  # a failed OpenStreetMap search leaves it empty
     ranking = pd.read_csv(out_dir / "ranking.csv")
     manifest = json.loads((out_dir / "decrees.json").read_text())
     budgets = pd.DataFrame(manifest["budgets"]).T.rename_axis("sector").reset_index()

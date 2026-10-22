@@ -84,5 +84,5 @@ cf,short_name,city,region,lat,lon,kind
 80002630541,Stranieri di Perugia,Perugia,Umbria,43.111,12.391,public_university
 80007270186,Pavia,Pavia,Lombardia,45.187,9.157,public_university
 80229010584,ROMA Foro Italico,Roma,Lazio,41.933,12.459,public_university
-09106101000,Universitas MERCATORUM,,,,,telematic
-08134851008,Roma UnitelmaSapienza,,,,,public_university
+09106101000,Universitas MERCATORUM,Roma,Lazio,41.903,12.496,telematic
+08134851008,Roma UnitelmaSapienza,Roma,Lazio,41.903,12.496,public_university
