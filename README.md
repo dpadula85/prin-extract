@@ -87,7 +87,7 @@ Provisional: 20 of 28 sectors. Regenerate with `python3 analysis.py` and `python
 | Share by macro-area | North 41.9% (of which 30% as PI), Centre 23.5% (of which 21% as PI), South and Islands 19.4% (of which 24% as PI); national research bodies 9.3% |
 | Median MUR contribution per unit | 258 k EUR (PI), 195 k EUR (RU) |
 | Projects of under-40 PIs | 40 projects, 43.58 M EUR (25.5% of the funded money); under-40 pools 26.88 M EUR |
-| Women among unit leaders | 35% of PIs, 37% of partner-unit leaders |
+| Women among unit leaders | 34% of PIs, 37% of partner-unit leaders |
 
 ![Share of the total budget by region (national research bodies not shown).](prin_out/figures/map_regions_share.png)
 *Share of the total budget by region (national research bodies not shown).*
