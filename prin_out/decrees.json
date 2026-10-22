@@ -172,6 +172,16 @@
    "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS4_Tabella_A_Graduatoria%20finale.pdf",
    "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS4_Tabella_B_Progetti%20finanziati.pdf"
   },
+  "LS5": {
+   "annulled_by": null,
+   "date": "22/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/Decreto%20Direttoriale%20n.%2055%20del%2022-10-2026.pdf",
+   "decree_number": 55,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-55-del-22-10-2026",
+   "sector": "LS5",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS5_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS5_Tabella_B_Progetti%20finanziati.pdf"
+  },
   "LS6": {
    "annulled_by": null,
    "date": "12/10/2026",
