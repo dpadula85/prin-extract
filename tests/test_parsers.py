@@ -190,6 +190,26 @@ def test_under40_name_only_green_is_detected():
     assert tabella_a.parse_cells(cells, "LS6")[0]["under40"]
 
 
+def test_tabella_a_glued_cells_are_split():
+    """LS5 prints rank and code, name and scores, or only the scores, in one text cell."""
+    cells = [
+        ("1 2026P3FMLS Disentangling non-nEuronal ceLls", False), ("DELETE-PAIN", False),
+        ("Romina NASSINI 85,50 36,00", False),
+        ("2 2026PHMNCT", False), ("A title", False), ("Michela FAGIOLINI 85,00 34,50 16,00 0,80 3 2", False),
+        ("3", False), ("2026PPHL87", True), ("Another title", False), ("Cristina SPALLETTI", True),
+        ("84,25 34,50", False),
+    ]
+    rows = tabella_a.parse_cells(cells, "LS5")
+    assert [r["project_code"] for r in rows] == ["2026P3FMLS", "2026PHMNCT", "2026PPHL87"]
+    assert [r["pi_surname"] for r in rows] == ["NASSINI", "FAGIOLINI", "SPALLETTI"]
+    assert [r["score"] for r in rows] == [85.5, 85.0, 84.25]
+    assert rows[0]["title"] == "Disentangling non-nEuronal ceLls DELETE-PAIN"
+    assert (rows[1]["equity"], rows[1]["men"], rows[1]["women"]) == (0.8, 3, 2)
+    assert [r["under40"] for r in rows] == [False, False, True]
+    with pytest.raises(ValueError, match="expected 1"):
+        tabella_a.parse_cells([("2 2026P3FMLS", False)], "LS5")
+
+
 def test_focus_tables_split_units_by_gsd():
     import analysis as an
     import focus

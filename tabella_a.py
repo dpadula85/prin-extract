@@ -93,10 +93,43 @@ def read_cells(path: Path) -> List[Tuple[str, bool]]:
     return cells
 
 
+RANK_CODE = re.compile(r"(\d+) (2026[A-Z0-9]{6})(?: (.+))?")
+TOKEN = r"(?:\d+(?:,\d\d)?|[\dX]{2}/[\dX]{2}/\d{4})"
+NUMBERS = re.compile(rf"{TOKEN}(?: {TOKEN})*")
+NAME_AND_NUMBERS = re.compile(rf"(.+?) (\d+,\d\d(?: {TOKEN})*)")
+
+
+def _split_glued(cells: List[Tuple[str, bool]]) -> List[Tuple[str, bool]]:
+    """Some PDFs print several columns in one text cell: "7 2026P8ZKS9 Title", "Name 85,50 36,00"
+    or only "85,25 34,50". Split them into the cells of the layout described above; the rank
+    printed before a code is checked against the position of the row (a row cannot be skipped)."""
+    out: List[Tuple[str, bool]] = []
+    n_codes = 0
+    for c, green in cells:
+        m = RANK_CODE.fullmatch(c)
+        if m:
+            n_codes += 1
+            if int(m.group(1)) != n_codes:
+                raise ValueError(f"rank {m.group(1)} printed before {m.group(2)}, expected {n_codes}")
+            out.append((m.group(2), green))
+            if m.group(3):
+                out.append((m.group(3), green))
+            continue
+        n_codes += bool(CODE.fullmatch(c))
+        m = NAME_AND_NUMBERS.fullmatch(c)
+        if m and not CODE.fullmatch(c):
+            out += [(m.group(1), green)] + [(t, green) for t in m.group(2).split()]
+        elif NUMBERS.fullmatch(c):
+            out += [(t, green) for t in c.split()]
+        else:
+            out.append((c, green))
+    return out
+
+
 def parse_cells(cells: List[Tuple[str, bool]], sector: str) -> List[dict]:
     rows: List[dict] = []
     cur = None
-    for c, green in cells:
+    for c, green in _split_glued(cells):
         if c.startswith(FOOTNOTE):
             cur = None
         elif CODE.fullmatch(c):
