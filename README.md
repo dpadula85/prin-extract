@@ -83,8 +83,8 @@ Provisional: 23 of 28 sectors. Regenerate with `python3 analysis.py` and `python
 | Funded | 195.96 M EUR (94.1% of the budget) |
 | Projects, units | 180, 900 (180 PI, 720 RU) |
 | Institutions with a funded unit | 91 |
-| Share by institution type | Public univ. 77.3%, Private univ. 4.1%, Telematic univ. 1.2%, Advanced schools 2.3%, Research bodies 0.4%, National bodies 8.7%, AFAM 0.1% |
-| Share by macro-area | North 42.1% (of which 31% as PI), Centre 24.0% (of which 20% as PI), South and Islands 19.1% (of which 25% as PI); national research bodies 8.8% |
+| Share by institution type | Public univ. 77.3%, Private univ. 4.0%, Telematic univ. 1.2%, Advanced schools 2.3%, Research bodies 0.4%, National bodies 8.7%, AFAM 0.1% |
+| Share by macro-area | North 42.1% (of which 31% as PI), Centre 24.1% (of which 20% as PI), South and Islands 19.1% (of which 25% as PI); national research bodies 8.7% |
 | Median MUR contribution per unit | 260 k EUR (PI), 195 k EUR (RU) |
 | Projects of under-40 PIs | 48 projects, 52.82 M EUR (27.0% of the funded money); under-40 pools 30.98 M EUR |
 | Women among unit leaders | 35% of PIs, 37% of partner-unit leaders |

@@ -109,6 +109,8 @@ def load(out_dir: Path) -> Data:
     manifest = json.loads((out_dir / "decrees.json").read_text())
     budgets = pd.DataFrame(manifest["budgets"]).T.rename_axis("sector").reset_index()
     sectors = sorted(units["sector"].unique(), key=lambda x: (x[:2], int(x[2:])))
+    # Tabella A of a sector can be out before its Tabella B: rank only the parsed sectors
+    ranking = ranking[ranking["sector"].isin(sectors)].reset_index(drop=True)
     budget = float(budgets.loc[budgets["sector"].isin(sectors), "total"].sum())
     table = gender.load_table()
     ranking["gender"] = [gender.infer(g.split()[0], table) if isinstance(g, str) and g else None

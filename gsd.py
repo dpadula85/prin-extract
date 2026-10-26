@@ -53,6 +53,10 @@ def search_names(name: str) -> tuple:
     return surname, given.split()[0] if given else ""
 
 
+class PortalUnavailable(RuntimeError):
+    """The portal refused or did not answer a request."""
+
+
 class Portal:
     """The search form of the portal, with the session token it asks for."""
 
@@ -156,7 +160,13 @@ def lookup_all(units: pd.DataFrame, limit: Optional[int] = None, path: Path = CA
     portal, new = Portal(), []
     path.parent.mkdir(exist_ok=True)
     for k, (_, row) in enumerate(todo.iterrows(), 1):
-        rec = dict(name=row["name"], institution=row["institution"], **resolve(portal, row["name"], row["institution"], extra.get(row["cf"], "")))
+        try:
+            rec = dict(name=row["name"], institution=row["institution"], **resolve(portal, row["name"], row["institution"], extra.get(row["cf"], "")))
+        except requests.RequestException as err:
+            # the portal refuses (403 from CloudFront) or is down: keep the answers so far
+            if new:
+                pd.concat([cache, pd.DataFrame(new)], ignore_index=True)[COLUMNS].to_csv(path, index=False)
+            raise PortalUnavailable("%s; %d of %d leaders looked up" % (err, len(new), len(todo))) from err
         new.append(rec)
         if k % 25 == 0 or k == len(todo):
             out = pd.concat([cache, pd.DataFrame(new)], ignore_index=True)[COLUMNS]
@@ -173,7 +183,12 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     units = pd.read_csv(args.out / "all_rows.csv", dtype={"cf": str})
-    table = lookup_all(units, args.limit)
+    try:
+        table = lookup_all(units, args.limit)
+    except PortalUnavailable as err:
+        log.error("the portal does not answer: %s. Leaders not in the cache have no GSD in the report; "
+                  "run gsd.py again when it answers.", err)
+        return 1
     print(table["status"].value_counts().to_string())
     return 0
 

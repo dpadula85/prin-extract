@@ -84,9 +84,9 @@
 80009280274,IUAV,Venezia,Veneto,public_university,1,0,1,204999.0,0.0,204999.0,0.09841763862428345,1,83,57
 08134851008,Roma UnitelmaSapienza,Roma,Lazio,public_university,1,1,0,200317.0,200317.0,0.0,0.09616986481056292,1,84,58
 80229010584,ROMA Foro Italico,Roma,Lazio,public_university,1,0,1,199998.0,0.0,199998.0,0.09601671661607833,1,85,59
-97394340588,Internazionale UNINETTUNO,,National research bodies,telematic,1,0,1,183984.0,0.0,183984.0,0.08832858123527514,1,86,5
+97394340588,Internazionale UNINETTUNO,Roma,Lazio,telematic,1,0,1,183984.0,0.0,183984.0,0.08832858123527514,1,86,5
 09106101000,Universitas MERCATORUM,Roma,Lazio,telematic,1,0,1,165231.0,0.0,165231.0,0.0793254837707939,1,87,6
 80006930608,Accademia Belle Arti Frosinone,Frosinone,Lazio,afam,1,0,1,161707.0,0.0,161707.0,0.07763365230570395,1,88,1
 00177050432,Macerata,Macerata,Marche,public_university,1,0,1,140885.0,0.0,140885.0,0.06763725197480072,1,89,60
-80012990273,Conservatorio Di Musica Di Venezia,,National research bodies,private_university,1,0,1,125839.0,0.0,125839.0,0.0604138421496749,1,90,10
+80012990273,Conservatorio Di Musica Di Venezia,Venezia,Veneto,afam,1,0,1,125839.0,0.0,125839.0,0.0604138421496749,1,90,2
 92012890676,Teramo,Teramo,Abruzzo,public_university,1,0,1,125524.0,0.0,125524.0,0.06026261430872617,1,91,61

@@ -57,9 +57,12 @@ jobs:
 
       - name: Install LaTeX
         if: steps.changes.outputs.changed == 'true'
+        timeout-minutes: 20
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-science texlive-fonts-recommended cm-super dvipng
+          # a stalled Ubuntu mirror once held this step for 54 minutes: short timeouts, then retries
+          apt="sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
+          $apt update
+          $apt install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-science texlive-fonts-recommended cm-super dvipng
 
       - name: Restore the GSD lookups of earlier runs
         if: steps.changes.outputs.changed == 'true'

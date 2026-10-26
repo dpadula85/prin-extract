@@ -87,6 +87,6 @@ cf,short_name,city,region,lat,lon,kind
 09106101000,Universitas MERCATORUM,Roma,Lazio,41.903,12.496,telematic
 08134851008,Roma UnitelmaSapienza,Roma,Lazio,41.903,12.496,public_university
 04894530635,Stazione Zoologica Anton Dohrn di Napoli,Napoli,Campania,40.833,14.235,private_university
-97394340588,Internazionale UNINETTUNO,,,,,telematic
+97394340588,Internazionale UNINETTUNO,Roma,Lazio,41.903,12.496,telematic
 80007610522,per Stranieri di SIENA,Siena,Toscana,43.331,11.321,public_university
-80012990273,Conservatorio Di Musica Di Venezia,,,,,private_university
+80012990273,Conservatorio Di Musica Di Venezia,Venezia,Veneto,45.441,12.316,afam
