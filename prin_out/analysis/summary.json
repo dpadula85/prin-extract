@@ -1,5 +1,5 @@
 {
- "n_sectors": 23,
+ "n_sectors": 24,
  "sectors": [
   "LS2",
   "LS3",
@@ -11,6 +11,7 @@
   "PE1",
   "PE2",
   "PE3",
+  "PE4",
   "PE5",
   "PE6",
   "PE7",
@@ -25,19 +26,19 @@
   "SH7",
   "SH8"
  ],
- "budget": 208294979.29999998,
- "funded": 195962123.0,
- "n_projects": 180,
- "n_units": 900,
- "n_ranked": 285,
- "gini": 0.5809961002144648,
+ "budget": 215448256.15000004,
+ "funded": 202768724.0,
+ "n_projects": 186,
+ "n_units": 931,
+ "n_ranked": 294,
+ "gini": 0.5867214438134677,
  "n_institutions": 91,
- "top10_share": 0.43979577114501867,
+ "top10_share": 0.4462791411559112,
  "highlight": {
   "Siena": {
-   "share_of_budget_pct": 1.2480363226882638,
-   "rank": 24,
-   "rank_in_type": 23,
+   "share_of_budget_pct": 1.2065992301140283,
+   "rank": 25,
+   "rank_in_type": 24,
    "type": "public_university",
    "n_institutions_of_type": 61,
    "projects": 11,
@@ -47,7 +48,7 @@
    "mur_total": 2599597.0
   },
   "per Stranieri di SIENA": {
-   "share_of_budget_pct": 0.09845124481116095,
+   "share_of_budget_pct": 0.09518248310036273,
    "rank": 82,
    "rank_in_type": 56,
    "type": "public_university",

@@ -141,12 +141,12 @@ PE3,5,2026PL4ZKA,Rare-earth intercalated Dirac monolayers for electrically tunab
 PE3,6,2026PCH84S,Data-Driven Design and On-Surface Synthesis of Tunable 1D-to-2D Covalent Molecular Quantum Networks - DYNAMO,Simona,ACHILLI,88.5,36.0,,,,,,True,False
 PE3,7,2026PYBZPP,Energy-efficient Conductive Bridge RAM for Flexible Electronics enabled by Amorphous Telluride Electrolytes (ECO-FLEX),Riccardo,MAZZARELLO,88.5,35.0,,,,,,False,False
 PE3,8,2026P9AEJJ,SILENTIO - SILicon Emitter based Next-generation Technology for Integrated Optics,Jacopo,FORNERIS,88.25,,,,,,,False,False
-PE4,1,2026P4LETM,Surfactants for Sustainability Science - S4S,Gerardo,PALAZZO,98.0,,,,,,,False,False
-PE4,2,2026PCHY2K,Catalytic Heterogeneous interfaces under Applied bias: uncovering dynamic active-site emergence through operando experiments and atomistic simulations (CHAnge),Giancarlo,CICERO,96.75,,,,,,,False,False
-PE4,3,2026PKTNR3,PROcesses for green dimethyl Ether from sUstainable Sources (PROMETHEUS),Laura,PRATI,95.0,,,,,,,False,False
-PE4,4,2026P793JM,POC-PD: Graphene-Based Multisensor Bioelectronic Platforms for Data-Driven Analysis of Parkinson's Disease Salivary Biomarker Signatures,Emanuele,TREOSSI,90.25,,,,,,,False,False
-PE4,5,2026PWNFWF,X-CHIRAL - X-ray Circular dicHroIsm for point and inheRent chirAlity in Liquid and gas phases,Emanuele,COCCIA,90.0,,,,,,,False,False
-PE4,6,2026PFPN4B,DREAM-AIR - Defining risk in the exposome era: AI–driven analytical chemistry for airborne micro-and nanoplastics,Jacopo,LA NASA,89.25,,,,,,,True,False
+PE4,1,2026P4LETM,Surfactants for Sustainability Science - S4S,Gerardo,PALAZZO,98.0,,,,,,,False,True
+PE4,2,2026PCHY2K,Catalytic Heterogeneous interfaces under Applied bias: uncovering dynamic active-site emergence through operando experiments and atomistic simulations (CHAnge),Giancarlo,CICERO,96.75,,,,,,,False,True
+PE4,3,2026PKTNR3,PROcesses for green dimethyl Ether from sUstainable Sources (PROMETHEUS),Laura,PRATI,95.0,,,,,,,False,True
+PE4,4,2026P793JM,POC-PD: Graphene-Based Multisensor Bioelectronic Platforms for Data-Driven Analysis of Parkinson's Disease Salivary Biomarker Signatures,Emanuele,TREOSSI,90.25,,,,,,,False,True
+PE4,5,2026PWNFWF,X-CHIRAL - X-ray Circular dicHroIsm for point and inheRent chirAlity in Liquid and gas phases,Emanuele,COCCIA,90.0,,,,,,,False,True
+PE4,6,2026PFPN4B,DREAM-AIR - Defining risk in the exposome era: AI–driven analytical chemistry for airborne micro-and nanoplastics,Jacopo,LA NASA,89.25,,,,,,,True,True
 PE4,7,2026PL3ZS2,MAGNETic assisted oxygen evolution reaction with high entropy Oxides - MAGNETO,Maria Chiara,SPADARO,88.0,,,,,,,True,False
 PE4,8,2026P72BRH,Bio-Nanoplatforms for Antimicrobial applications via Membrane Interaction Design (BioMIND),Costanza,MONTIS,86.0,,,,,,,True,False
 PE4,9,2026PWF9F7,Integrated PhotoelectrocAtalytic hybrId paiRs: from CO2/NOx-to C–N bonds (PAIR-CN),Cristiana,DI VALENTIN,85.25,,,,,,,False,False

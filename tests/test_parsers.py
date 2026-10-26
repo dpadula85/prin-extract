@@ -73,6 +73,14 @@ def test_regional_shares_conserve_the_funded_money():
     assert inst["mur_total"].sum() == pytest.approx(d.units["mur_contribution"].sum())
 
 
+def test_every_published_sector_is_parsed():
+    """A decree whose Tabella B is not parsed (a renamed file, a changed layout) fails here
+    instead of leaving the sector out of the report unnoticed."""
+    manifest = json.loads((OUT / "decrees.json").read_text())
+    parsed = set(pd.read_csv(OUT / "all_rows.csv")["sector"])
+    assert set(manifest["decrees"]) <= parsed, sorted(set(manifest["decrees"]) - parsed)
+
+
 def test_gender_table_covers_every_given_name_seen():
     """Every given name is in data/given_names.csv. A name whose gender the ending rule does not
     decide stays empty (basis 'review') and is left out of the shares; the pull request lists it."""

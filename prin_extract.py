@@ -75,7 +75,8 @@ def find_pdf_urls():
         for a in sp.find_all("a", href=True):
             u = urljoin(p, a["href"])
             name = unquote(u).lower()
-            if name.endswith(".pdf") and "tabella" in name and "finanziati" in name:
+            # the PE4 file is named "Tabella_B_Graduatoria finale" but holds the funded projects
+            if name.endswith(".pdf") and re.search(r"tabella[ _-]*b", name):
                 pdfs.add(u)
     return sorted(pdfs), s
 
