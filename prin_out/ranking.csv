@@ -77,6 +77,18 @@ LS7,25,2026PJJBA4,Multi-scale Determinants of Intra-Urban Temperature Variabilit
 LS7,26,2026PJHZR5,Engineering Mitochondrial Transfer for Neurorepair A Platform Technology for Organelle-Based Neurorepair in Ischemic and Neurodegenerative Brain Injury,Silvia,CARLONI,86.25,,,,,,,False,False
 LS7,27,2026P3TPWX,Decoding IMmunometabolic circuits in PediAtriC nervous system Tumors - IMPACT,Veronica,FERRUCCI,85.5,35.0,,,,,,True,True
 LS7,28,2026PTLP9H,Venetoclax-compatible next-generation multifunctional CAR T cells for acute myeloid leukemia targeting,Fabrizio,PANE,85.5,34.0,,,,,,False,False
+LS8,1,2026P34ET4,SEA_Light. Seagrasses Adaptation to Light: from Evolutionary strategies to Agricultural innovation,Gabriele,PROCACCINI,98.0,,,,,,,False,True
+LS8,2,2026P97NRT,"NOVel Artificial MARine Ecosystems: linking behaviour, physiology, ecology and smart engineering for biodiversity-sensitive design of artificial marine habitats (NOVA-MARE)",Laura,AIROLDI,92.25,,,,,,,False,True
+LS8,3,2026PL8HEY,RESPOND - Integrated ecological and evolutionary responses to extreme climatic events,Diego,RUBOLINI,91.0,,,,,,,False,True
+LS8,4,2026PSNY8E,Understanding the Functioning of Ecosystems emergiNg after glacier retreat - FENIce,Gentile Francesco,FICETOLA,90.25,,,,,,,False,True
+LS8,5,2026PPNPWR,"CHEMO-EMO - Chemical Signals of Emotion: Bridging Humans, Dogs, and Plants",Biagio,D'ANIELLO,90.0,,,,,,,False,True
+LS8,6,2026PCX4AX,Deciphering lipid-mediated host signal perception and chemotropic navigation mechanisms in a destructive soil-borne plant-pathogen (OLEOSIGNAL),David,TURRA',89.75,,,,,,,False,True
+LS8,7,2026PZCH7W,"ECHOES (Ecological Connectivity and Hierarchical Organisation across spatiotEmporal Scales) - Scale-bridging ecology of mammal network functions across space, time and complexity",Carlo,RONDININI,88.75,,,,,,,False,True
+LS8,8,2026PXF3MF,How Genomes Encode Form: A Causal Framework for Morphological Evolution,Riccardo,PAPA,88.25,,,,,,,False,False
+LS8,9,2026PEWTZT,TRANSMIT: Towards a mechanistic and predictive framework of microbiome transmission,Maria Elena,MARTINO,88.0,,,,,,,True,True
+LS8,10,2026PHA83C,MISTRAL Multi-omic Immune Structure TRaced through Ancestry and Local history,Alessandro,RAVEANE,87.25,,,,,,,True,False
+LS8,11,2026P8EA8R,AI-FIRMUS: Ancestral Insight on Fermentations to Improve and Renovate Modern processes through the Understanding of microbial Synergies.,Duccio,CAVALIERI,86.0,,,,,,,False,False
+LS8,12,2026P8XE8F,"Predicting the resilience of coastal aquifer ecosystems from biodiversity, function and environmental change",Alejandro,MARTINEZ,85.5,,,,,,,False,False
 PE10,1,2026PLXLAZ,PETRICORE - Quantifying soil moisture effects on rainfall across scales and regimes,Claudia,PASQUERO,94.0,38.0,,,,,,False,True
 PE10,2,2026P8B3F3,A Multidisciplinary AppROach to unravel the seismic cycle in geothermal systems (AMARO),Giulio,DI TORO,94.0,37.0,,,,,,False,True
 PE10,3,2026PB3CXT,Eocene Thermal optimum with EC-Earth4: proxy Reconstruction and Numerical AnaLysis (ETERNAL),Jost-Diedrich,GRAF VON HARDENBERG,91.0,,,,,,,False,True
@@ -129,6 +141,15 @@ PE3,5,2026PL4ZKA,Rare-earth intercalated Dirac monolayers for electrically tunab
 PE3,6,2026PCH84S,Data-Driven Design and On-Surface Synthesis of Tunable 1D-to-2D Covalent Molecular Quantum Networks - DYNAMO,Simona,ACHILLI,88.5,36.0,,,,,,True,False
 PE3,7,2026PYBZPP,Energy-efficient Conductive Bridge RAM for Flexible Electronics enabled by Amorphous Telluride Electrolytes (ECO-FLEX),Riccardo,MAZZARELLO,88.5,35.0,,,,,,False,False
 PE3,8,2026P9AEJJ,SILENTIO - SILicon Emitter based Next-generation Technology for Integrated Optics,Jacopo,FORNERIS,88.25,,,,,,,False,False
+PE4,1,2026P4LETM,Surfactants for Sustainability Science - S4S,Gerardo,PALAZZO,98.0,,,,,,,False,False
+PE4,2,2026PCHY2K,Catalytic Heterogeneous interfaces under Applied bias: uncovering dynamic active-site emergence through operando experiments and atomistic simulations (CHAnge),Giancarlo,CICERO,96.75,,,,,,,False,False
+PE4,3,2026PKTNR3,PROcesses for green dimethyl Ether from sUstainable Sources (PROMETHEUS),Laura,PRATI,95.0,,,,,,,False,False
+PE4,4,2026P793JM,POC-PD: Graphene-Based Multisensor Bioelectronic Platforms for Data-Driven Analysis of Parkinson's Disease Salivary Biomarker Signatures,Emanuele,TREOSSI,90.25,,,,,,,False,False
+PE4,5,2026PWNFWF,X-CHIRAL - X-ray Circular dicHroIsm for point and inheRent chirAlity in Liquid and gas phases,Emanuele,COCCIA,90.0,,,,,,,False,False
+PE4,6,2026PFPN4B,DREAM-AIR - Defining risk in the exposome era: AI–driven analytical chemistry for airborne micro-and nanoplastics,Jacopo,LA NASA,89.25,,,,,,,True,False
+PE4,7,2026PL3ZS2,MAGNETic assisted oxygen evolution reaction with high entropy Oxides - MAGNETO,Maria Chiara,SPADARO,88.0,,,,,,,True,False
+PE4,8,2026P72BRH,Bio-Nanoplatforms for Antimicrobial applications via Membrane Interaction Design (BioMIND),Costanza,MONTIS,86.0,,,,,,,True,False
+PE4,9,2026PWF9F7,Integrated PhotoelectrocAtalytic hybrId paiRs: from CO2/NOx-to C–N bonds (PAIR-CN),Cristiana,DI VALENTIN,85.25,,,,,,,False,False
 PE5,1,2026P92F5R,Deciphering the Fusobacterial Glycocode: How Surface Glycans Drive Host Interaction and Immune Modulation FUSOGLYCOATLAS,Alba,SILIPO,98.5,,,,,,,False,True
 PE5,2,2026PH9NYR,SYnthetic molecular Machines and Pumps operaATIng in complex Environments (Sympatie),Alberto,CREDI,96.5,,,,,,,False,True
 PE5,3,2026P39CXW,NiXome — A structural-bioinorganic atlas of human metalloproteome vulnerability to environmental nickel,Stefano Luciano,CIURLI,95.75,,,,,,,False,True
@@ -262,3 +283,13 @@ SH7,4,2026PFPY3A,Families with a Migrant Background and Socio-Demographic Inequa
 SH7,5,2026PKE93N,"Circular Economy Data, Models and Indicators for Transition Analytics (CIRCE-DATA)",Massimiliano,MAZZANTI,87.5,,,,,,,False,True
 SH7,6,2026PNA9YP,INFLOW: infertility in the low fertility era,Marco,COZZANI,87.0,,,,,,,True,True
 SH7,7,2026PWCNYF,"DATALOC — Data Centres, Cloud Services and Local Development: Environmental, Economic and Social Impacts in Europe and Italy",Maria,SAVONA,85.25,,,,,,,False,False
+SH8,1,2026PW2MYN,"C.A.R.M.A. – Crisis and Radical Medical Anthropology Rethinking the Capital’s Madness in the Age of Extraction and Global War. Socio-Anthropological, Philosophical and Historical perspectives on Trauma, Disaster, Local Knowledge and Care",Simona,TALIANI,97.75,,,,,,,False,True
+SH8,2,2026PSMA5R,"The Intangible Knowledge of the Actor in Italy: History, Theories and Techniques",Guido,DI PALMA,92.25,,,,,,,False,True
+SH8,3,2026PWEMFE,M.E.A.N.S. -Places for the Mind. An Ecological Approach to Neuroinclusive Learning Spaces,Anna,ANZANI,90.0,,,,,,,False,True
+SH8,4,2026PNSPWF,FRATRES: Mendicant Orders' Networks in Late Medieval Southern Italian Cities. Reframing Architectural Heritage,Arianna,CARANNANTE,89.0,,,,,,,True,True
+SH8,5,2026PPY3Z7,"PASSIM Places And SoundS of Italian Musical life: Mapping, experiencing and reconstructing sonic cities",Emilio,SALA,87.25,,,,,,,False,True
+SH8,6,2026P4X7SL,"Metamorphic Matter. Reassessing Stucco and Plastic Materials in Late Medieval and Early Modern Italy: Technical Practices, Artistic Agency, Narrative Strategies",Serena,QUAGLIAROLI,86.75,,,,,,,True,True
+SH8,7,2026PN3ELF,"R4USEFilm. Retrieving, Revealing, Revisiting and Remixing Italian Industrial Film Heritage",Simone,DOTTO,86.0,35.0,,,,,,True,True
+SH8,8,2026P9SHKY,DIVAS – Digital Verdi Archive of Sant’Agata,Ruben,VERNAZZA,86.0,34.5,,,,,,True,True
+SH8,9,2026PTYMJ3,Subversive Religions in Antiquity: from Kosmos to Chaos and Back,Corinne,BONNET,85.5,,,,,,,False,False
+SH8,10,2026PH53RZ,"AFRICA. AFrican musical objects: Reception, Imaginary, Collections and Audio-visual heritage (XVIII-XX centuries)",Paola,DESSI',85.0,,,,,,,False,False
