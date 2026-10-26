@@ -202,6 +202,16 @@
    "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS7_Tabella_A_Graduatoria%20finale.pdf",
    "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS7_Tabella_B_Progetti%20finanziati.pdf"
   },
+  "LS8": {
+   "annulled_by": null,
+   "date": "26/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/Decreto%20Direttoriale%20n.%2058%20del%2026-10-2026.pdf",
+   "decree_number": 58,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-58-del-26-10-2026",
+   "sector": "LS8",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS8_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS8_Tabella_B_Progetti%20finanziati.pdf"
+  },
   "PE1": {
    "annulled_by": null,
    "date": "05/10/2026",
@@ -251,6 +261,16 @@
    "sector": "PE3",
    "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE3_Tabella_A_Graduatoria_finale%5B1%5D.pdf",
    "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE3_Tabella_B_Progetti_finanziati%5B1%5D.pdf"
+  },
+  "PE4": {
+   "annulled_by": null,
+   "date": "26/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/Decreto%20Direttoriale%20n.%2059%20del%2026-10-2026.pdf",
+   "decree_number": 59,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-59-del-26-10-2026",
+   "sector": "PE4",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE4_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE4_Tabella_B_Graduatoria%20finale.pdf"
   },
   "PE5": {
    "annulled_by": null,
@@ -351,6 +371,16 @@
    "sector": "SH7",
    "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/SH7_Tabella_A_Graduatoria%20finale.pdf",
    "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/SH7_Tabella_B_Progetti%20finanziati.pdf"
+  },
+  "SH8": {
+   "annulled_by": null,
+   "date": "26/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/Decreto%20Direttoriale%20n.%2057%20del%2026-10-2026.pdf",
+   "decree_number": 57,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-57-del-26-10-2026",
+   "sector": "SH8",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/SH8_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/SH8_Tabella_B_Progetti%20finanziati.pdf"
   }
  }
 }
