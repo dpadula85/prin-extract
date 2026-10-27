@@ -37,7 +37,7 @@ When a sector is new, the workflow also runs `gsd.py` (the GSD lookup, not block
 Each sector has its own decree, which gives the funds available to the sector, split into the ring-fenced under-40 pool and the ordinary pool. A decree can be annulled and replaced (PE7: n. 32, replaced by n. 45); only the current one is listed. Sectors that are not parsed are not in any table. The table is rewritten by `prin_extract.py`.
 
 <!-- sectors:begin -->
-24 of 28 sectors parsed.
+25 of 28 sectors parsed.
 
 | Sector | Status | Decree | Budget (M EUR) | Funded (M EUR) | Projects |
 |---|---|---|---:|---:|---:|
@@ -60,7 +60,7 @@ Each sector has its own decree, which gives the funds available to the sector, s
 | LS6 | parsed | [n. 50 of 12/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-50-del-12-10-2026) | 7.81 | 5.96 | 5 |
 | LS7 | parsed | [n. 39 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-39-macrosettore-ls-settore-ls7-approvazione) | 17.88 | 17.88 | 17 |
 | LS8 | parsed | [n. 58 of 26/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-58-del-26-10-2026) | 8.39 | 8.32 | 8 |
-| LS9 | not yet published | | 15.11 | | |
+| LS9 | parsed | [n. 60 of 27/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-60-del-27-10-2026) | 15.11 | 14.83 | 14 |
 | SH1 | not yet published | | 10.58 | | |
 | SH2 | not yet published | | 11.87 | | |
 | SH3 | parsed | [n. 56 of 22/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-56-del-22-10-2026) | 9.36 | 8.02 | 7 |
@@ -69,25 +69,25 @@ Each sector has its own decree, which gives the funds available to the sector, s
 | SH6 | parsed | [n. 44 of 06/10/2026](https://www.mur.gov.it/it/atti-e-normativa/bando-prin-2026-ddg-6-ottobre-2026-n-44-macrosettore-sh-settore-sh6-approvazione) | 9.37 | 9.25 | 9 |
 | SH7 | parsed | [n. 49 of 09/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-49-del-09-10-2026) | 7.70 | 7.00 | 6 |
 | SH8 | parsed | [n. 57 of 26/10/2026](https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-57-del-26-10-2026) | 8.96 | 8.87 | 8 |
-| **Total, parsed sectors** | | | **215.45** | **202.77** | **186** |
+| **Total, parsed sectors** | | | **230.56** | **217.60** | **200** |
 <!-- sectors:end -->
 
 ## Results
 
 <!-- results:begin -->
-Provisional: 24 of 28 sectors. Regenerate with `python3 analysis.py` and `python3 report.py`; the full report is [report/report.pdf](report/report.pdf).
+Provisional: 25 of 28 sectors. Regenerate with `python3 analysis.py` and `python3 report.py`; the full report is [report/report.pdf](report/report.pdf).
 
 | Quantity | Value |
 |---|---|
-| Budget of the parsed sectors | 215.45 M EUR |
-| Funded | 202.77 M EUR (94.1% of the budget) |
-| Projects, units | 186, 931 (186 PI, 745 RU) |
+| Budget of the parsed sectors | 230.56 M EUR |
+| Funded | 217.60 M EUR (94.4% of the budget) |
+| Projects, units | 200, 996 (200 PI, 796 RU) |
 | Institutions with a funded unit | 91 |
-| Share by institution type | Public univ. 77.2%, Private univ. 3.9%, Telematic univ. 1.2%, Advanced schools 2.2%, Research bodies 0.4%, National bodies 9.1%, AFAM 0.1% |
-| Share by macro-area | North 42.3% (of which 30% as PI), Centre 23.7% (of which 20% as PI), South and Islands 19.0% (of which 25% as PI); national research bodies 9.1% |
+| Share by institution type | Public univ. 77.8%, Private univ. 3.6%, Telematic univ. 1.1%, Advanced schools 2.1%, Research bodies 0.4%, National bodies 9.3%, AFAM 0.1% |
+| Share by macro-area | North 42.3% (of which 31% as PI), Centre 23.3% (of which 20% as PI), South and Islands 19.5% (of which 24% as PI); national research bodies 9.3% |
 | Median MUR contribution per unit | 260 k EUR (PI), 195 k EUR (RU) |
-| Projects of under-40 PIs | 49 projects, 53.99 M EUR (26.6% of the funded money); under-40 pools 32.15 M EUR |
-| Women among unit leaders | 34% of PIs, 37% of partner-unit leaders |
+| Projects of under-40 PIs | 53 projects, 58.23 M EUR (26.8% of the funded money); under-40 pools 34.55 M EUR |
+| Women among unit leaders | 35% of PIs, 39% of partner-unit leaders |
 
 ![Share of the total budget by region (national research bodies not shown).](prin_out/figures/map_regions_share.png)
 *Share of the total budget by region (national research bodies not shown).*

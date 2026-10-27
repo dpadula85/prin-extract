@@ -212,6 +212,16 @@
    "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS8_Tabella_A_Graduatoria%20finale.pdf",
    "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS8_Tabella_B_Progetti%20finanziati.pdf"
   },
+  "LS9": {
+   "annulled_by": null,
+   "date": "27/10/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-10/Decreto%20Direttoriale%20n.%2060%20del%2027-10-2026.pdf",
+   "decree_number": 60,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-60-del-27-10-2026",
+   "sector": "LS9",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/LS9_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/LS9_Tabella_B_Progetti%20finanziati.pdf"
+  },
   "PE1": {
    "annulled_by": null,
    "date": "05/10/2026",
