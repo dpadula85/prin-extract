@@ -100,32 +100,38 @@ def save_centered(fig, ax, out_path, pad_inches=0.15):
     `fig.subplots_adjust` margins from the LARGER requirement of each
     opposing pair (left vs. right, bottom vs. top) plus `pad_inches` --
     so the side that needs less content space gets extra background
-    whitespace instead, keeping the graph itself centered. The measurement is
-    repeated until the margins stop changing: a margin changes the size of the
-    axes, which can change the tick spacing and so the width of the tick labels
-    (a y label was cut off at the page edge when the first pass measured
-    one-decimal tick labels and the final layout had two decimals).
+    whitespace instead, keeping the graph itself centered. The layout is then
+    checked once more and any overflow added to the margins: a margin changes the
+    size of the axes, which can change the tick spacing and so the width of the
+    tick labels (a y label was cut off at the page edge when the first pass
+    measured one-decimal tick labels and the final layout had two decimals).
     """
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    tight_bbox = fig.get_tightbbox(renderer)
     width_in, height_in = fig.get_size_inches()
-    margin_x = margin_y = None
-    for _ in range(6):                                  # the margins change the axes size, hence possibly the ticks and their labels
-        fig.canvas.draw()
-        renderer = fig.canvas.get_renderer()
-        tight_bbox = fig.get_tightbbox(renderer)
-        pos = ax.get_position()
-        axes_left_in, axes_right_in = pos.x0 * width_in, pos.x1 * width_in
-        axes_bottom_in, axes_top_in = pos.y0 * height_in, pos.y1 * height_in
+    pos = ax.get_position()
+    axes_left_in, axes_right_in = pos.x0 * width_in, pos.x1 * width_in
+    axes_bottom_in, axes_top_in = pos.y0 * height_in, pos.y1 * height_in
 
-        needed_left = axes_left_in - tight_bbox.x0
-        needed_right = tight_bbox.x1 - axes_right_in
-        needed_bottom = axes_bottom_in - tight_bbox.y0
-        needed_top = tight_bbox.y1 - axes_top_in
+    needed_left = axes_left_in - tight_bbox.x0
+    needed_right = tight_bbox.x1 - axes_right_in
+    needed_bottom = axes_bottom_in - tight_bbox.y0
+    needed_top = tight_bbox.y1 - axes_top_in
 
-        new_x = max(needed_left, needed_right, 0.0) + pad_inches
-        new_y = max(needed_bottom, needed_top, 0.0) + pad_inches
-        if margin_x is not None and abs(new_x - margin_x) < 1e-3 and abs(new_y - margin_y) < 1e-3:
-            break
-        margin_x, margin_y = new_x, new_y
+    margin_x = max(needed_left, needed_right, 0.0) + pad_inches
+    margin_y = max(needed_bottom, needed_top, 0.0) + pad_inches
+    # A margin resizes the axes, which can change the tick spacing and so the width of the tick labels: check that nothing now lies
+    # outside the page and, if so, add exactly the overflow (monotone, so it cannot run away; the margins stay below half the page).
+    for _ in range(5):
+        margin_x, margin_y = min(margin_x, 0.45 * width_in), min(margin_y, 0.45 * height_in)
         fig.subplots_adjust(left=margin_x / width_in, right=1 - margin_x / width_in,
                              bottom=margin_y / height_in, top=1 - margin_y / height_in)
+        fig.canvas.draw()
+        box = fig.get_tightbbox(fig.canvas.get_renderer())
+        over_x = max(-box.x0, box.x1 - width_in, 0.0)
+        over_y = max(-box.y0, box.y1 - height_in, 0.0)
+        if over_x < 1e-3 and over_y < 1e-3:
+            break
+        margin_x, margin_y = margin_x + over_x, margin_y + over_y
     fig.savefig(out_path)
