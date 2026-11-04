@@ -86,13 +86,13 @@ cf,short_name,city,region,lat,lon,kind
 80229010584,ROMA Foro Italico,Roma,Lazio,41.933,12.459,public_university
 09106101000,Universitas MERCATORUM,Roma,Lazio,41.903,12.496,telematic
 08134851008,Roma UnitelmaSapienza,Roma,Lazio,41.903,12.496,public_university
-04894530635,Stazione Zoologica Anton Dohrn di Napoli,Napoli,Campania,40.833,14.235,private_university
+04894530635,SZN Anton Dohrn,Napoli,Campania,40.833,14.235,research_body
 97394340588,Internazionale UNINETTUNO,Roma,Lazio,41.903,12.496,telematic
 80007610522,per Stranieri di SIENA,Siena,Toscana,43.331,11.321,public_university
-80012990273,Conservatorio Di Musica Di Venezia,Venezia,Veneto,45.441,12.316,afam
-80024610158,Commerciale Luigi Bocconi MILANO,Milano,Lombardia,45.45,9.189,private_university
+80012990273,Conservatorio Venezia,Venezia,Veneto,45.441,12.316,afam
+80024610158,Bocconi,Milano,Lombardia,45.45,9.189,private_university
 80004350163,Bergamo,Bergamo,Lombardia,45.687,9.661,public_university
-02508710585,Luiss Libera Università Internazionale degli Studi Sociali Guido Carli,,,,,private_university
-02635620582,Libera Università degli Studi Maria SS.Assunta,,,,,public_university
-07154361005,Guglielmo Marconi,,,,,telematic
-80040520639,Suor Orsola Benincasa,,,,,public_university
+02508710585,LUISS,Roma,Lazio,41.903,12.496,private_university
+02635620582,LUMSA,Roma,Lazio,41.903,12.496,private_university
+07154361005,Guglielmo Marconi,Roma,Lazio,41.903,12.496,telematic
+80040520639,Suor Orsola Benincasa,Napoli,Campania,40.852,14.268,private_university

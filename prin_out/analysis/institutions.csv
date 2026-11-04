@@ -69,30 +69,30 @@
 06838821004,INGV,Roma,National research bodies,national_research_body,3,0,3,453469.0,0.0,453469.0,0.18705139340426444,1,68,4
 05411471211,Pegaso,Napoli,Campania,telematic,3,0,3,449916.0,0.0,449916.0,0.1855858167038387,2,69,3
 09261710017,INRiM,Torino,Piemonte,research_body,2,0,2,438258.0,0.0,438258.0,0.18077700916835798,2,70,1
-80024610158,Commerciale Luigi Bocconi MILANO,Milano,Lombardia,private_university,1,1,0,407570.0,407570.0,0.0,0.1681185183767271,1,71,6
+80024610158,Bocconi,Milano,Lombardia,private_university,1,1,0,407570.0,407570.0,0.0,0.1681185183767271,1,71,6
 80071270153,IULM,Milano,Lombardia,private_university,2,0,2,396241.0,0.0,396241.0,0.16344542002628437,2,72,7
 00055590327,OGS,Trieste,Friuli-Venezia Giulia,research_body,2,0,2,387539.0,0.0,387539.0,0.1598559327065251,1,73,2
 01114010620,Sannio,Benevento,Campania,public_university,2,0,2,362466.0,0.0,362466.0,0.14951357283887126,2,74,52
 82002850418,Urbino,Urbino,Marche,public_university,2,0,2,359583.0,0.0,359583.0,0.1483243643876111,2,75,53
-02635620582,Libera Università degli Studi Maria SS.Assunta,,National research bodies,public_university,2,0,2,342670.0,0.0,342670.0,0.14134792230083928,1,76,54
-97962900581,UniCamillus,Roma,Lazio,private_university,2,0,2,335991.0,0.0,335991.0,0.13859290209759037,1,77,8
+02635620582,LUMSA,Roma,Lazio,private_university,2,0,2,342670.0,0.0,342670.0,0.14134792230083928,1,76,8
+97962900581,UniCamillus,Roma,Lazio,private_university,2,0,2,335991.0,0.0,335991.0,0.13859290209759037,1,77,9
 97471900155,San Raffaele Roma,Roma,Lazio,telematic,2,0,2,334933.0,0.0,334933.0,0.13815648775786327,2,78,4
-04894530635,Stazione Zoologica Anton Dohrn di Napoli,Napoli,Campania,private_university,1,1,0,315895.0,315895.0,0.0,0.1303035045823201,1,79,9
-96003410766,Basilicata,Potenza,Basilicata,public_university,2,0,2,285387.0,0.0,285387.0,0.1177192619770322,2,80,55
+04894530635,SZN Anton Dohrn,Napoli,Campania,research_body,1,1,0,315895.0,315895.0,0.0,0.1303035045823201,1,79,3
+96003410766,Basilicata,Potenza,Basilicata,public_university,2,0,2,285387.0,0.0,285387.0,0.1177192619770322,2,80,54
 95315120634,Scuola Superiore Meridionale,Napoli,Campania,school,1,0,1,249626.0,0.0,249626.0,0.10296820980030148,1,81,7
-80002630541,Stranieri di Perugia,Perugia,Umbria,public_university,1,1,0,244890.0,244890.0,0.0,0.10101465751963269,1,82,56
+80002630541,Stranieri di Perugia,Perugia,Umbria,public_university,1,1,0,244890.0,244890.0,0.0,0.10101465751963269,1,82,55
 93135780729,LUM,Casamassima,Puglia,private_university,1,1,0,223975.0,223975.0,0.0,0.09238743075650183,1,83,10
-80004350163,Bergamo,Bergamo,Lombardia,public_university,1,1,0,212168.0,212168.0,0.0,0.08751716222232606,1,84,57
-80007610522,per Stranieri di SIENA,Siena,Toscana,public_university,1,0,1,205069.0,0.0,205069.0,0.08458889625094351,1,85,58
-80009280274,IUAV,Venezia,Veneto,public_university,1,0,1,204999.0,0.0,204999.0,0.08456002195625457,1,86,59
-08134851008,Roma UnitelmaSapienza,Roma,Lazio,public_university,1,1,0,200317.0,200317.0,0.0,0.08262874413148867,1,87,60
-80229010584,ROMA Foro Italico,Roma,Lazio,public_university,1,0,1,199998.0,0.0,199998.0,0.08249715984569193,1,88,61
-80040520639,Suor Orsola Benincasa,,National research bodies,public_university,1,0,1,198706.0,0.0,198706.0,0.08196422286371895,1,89,62
-02508710585,Luiss Libera Università Internazionale degli Studi Sociali Guido Carli,,National research bodies,private_university,1,0,1,190220.0,0.0,190220.0,0.07846383336757128,1,90,11
+80004350163,Bergamo,Bergamo,Lombardia,public_university,1,1,0,212168.0,212168.0,0.0,0.08751716222232606,1,84,56
+80007610522,per Stranieri di SIENA,Siena,Toscana,public_university,1,0,1,205069.0,0.0,205069.0,0.08458889625094351,1,85,57
+80009280274,IUAV,Venezia,Veneto,public_university,1,0,1,204999.0,0.0,204999.0,0.08456002195625457,1,86,58
+08134851008,Roma UnitelmaSapienza,Roma,Lazio,public_university,1,1,0,200317.0,200317.0,0.0,0.08262874413148867,1,87,59
+80229010584,ROMA Foro Italico,Roma,Lazio,public_university,1,0,1,199998.0,0.0,199998.0,0.08249715984569193,1,88,60
+80040520639,Suor Orsola Benincasa,Napoli,Campania,private_university,1,0,1,198706.0,0.0,198706.0,0.08196422286371895,1,89,11
+02508710585,LUISS,Roma,Lazio,private_university,1,0,1,190220.0,0.0,190220.0,0.07846383336757128,1,90,12
 97394340588,Internazionale UNINETTUNO,Roma,Lazio,telematic,1,0,1,183984.0,0.0,183984.0,0.07589154620071094,1,91,5
-07154361005,Guglielmo Marconi,,National research bodies,telematic,1,0,1,173860.0,0.0,173860.0,0.07171549820884209,1,92,6
+07154361005,Guglielmo Marconi,Roma,Lazio,telematic,1,0,1,173860.0,0.0,173860.0,0.07171549820884209,1,92,6
 09106101000,Universitas MERCATORUM,Roma,Lazio,telematic,1,0,1,165231.0,0.0,165231.0,0.06815612265354416,1,93,7
 80006930608,Accademia Belle Arti Frosinone,Frosinone,Lazio,afam,1,0,1,161707.0,0.0,161707.0,0.06670250816091813,1,94,1
-00177050432,Macerata,Macerata,Marche,public_university,1,0,1,140885.0,0.0,140885.0,0.05811364296073115,1,95,63
-80012990273,Conservatorio Di Musica Di Venezia,Venezia,Veneto,afam,1,0,1,125839.0,0.0,125839.0,0.051907319562305765,1,96,2
-92012890676,Teramo,Teramo,Abruzzo,public_university,1,0,1,125524.0,0.0,125524.0,0.051777385236205536,1,97,64
+00177050432,Macerata,Macerata,Marche,public_university,1,0,1,140885.0,0.0,140885.0,0.05811364296073115,1,95,61
+80012990273,Conservatorio Venezia,Venezia,Veneto,afam,1,0,1,125839.0,0.0,125839.0,0.051907319562305765,1,96,2
+92012890676,Teramo,Teramo,Abruzzo,public_university,1,0,1,125524.0,0.0,125524.0,0.051777385236205536,1,97,62
