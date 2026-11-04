@@ -332,6 +332,16 @@
    "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-10/PE9_Tabella_A_-_Graduatoria_finale%5B1%5D.pdf",
    "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-10/PE9_Tabella_B_-_Progetti_finanziati%5B1%5D.pdf"
   },
+  "SH1": {
+   "annulled_by": null,
+   "date": "04/11/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-11/Decreto%20Direttoriale%20n.%2063%20del%2004-11-2026.pdf",
+   "decree_number": 63,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-63-del-4-11-2026",
+   "sector": "SH1",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-11/SH1_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-11/SH1_Tabella_B_Progetti%20finanziati.pdf"
+  },
   "SH2": {
    "annulled_by": null,
    "date": "03/11/2026",

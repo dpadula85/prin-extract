@@ -25,6 +25,17 @@ from analysis import DATA, PI_COLOR, RU_COLOR, tex
 log = logging.getLogger(__name__)
 
 FOCUS = DATA / "focus.txt"
+# Official names (DM 639/2024, Allegato A, area 03); the longest are shortened.
+GSD_NAMES = {
+    "03/CHEM-01": "Analytical, environmental and cultural heritage chemistry",
+    "03/CHEM-02": "Physical chemistry",
+    "03/CHEM-03": "General and inorganic chemistry",
+    "03/CHEM-04": "Industrial chemistry",
+    "03/CHEM-05": "Organic chemistry",
+    "03/CHEM-06": "Chemical fundamentals of technologies",
+    "03/CHEM-07": "Pharmaceutical, toxicological, nutraceutical and food chemistry",
+    "03/CHEM-08": "Technology, socioeconomics and regulation of medicines",
+}
 LEVELS = {"Ordinario": "po", "Associato": "pa", "Ricercatore": "ru"}  # the others are fixed-term (rtd)
 
 
