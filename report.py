@@ -577,7 +577,9 @@ def build_focus(out_dir: Path) -> Optional[str]:
                                str(int(r["erc_sectors"])), f"{r['mur_total'] / 1e3:.0f}", f"{r['budget_share_pct']:.2f}",
                                f"{r['mean_k_eur_per_unit']:.0f}"])
             mix_rows.append([name, f"{r['women_pct']:.0f}", str(int(r["pi_under40"]))] + [str(int(r[k])) for k in ("po", "pa", "rtd", "ru")])
-        overview = (table(["GSD", "Units", "PI", "Projects", "Institutions", "ERC sectors", "k EUR", r"Share \%", "k EUR/unit"],
+        names = [[tex(c.split("/")[-1]), tex(focus.GSD_NAMES[c])] for c in codes if c in focus.GSD_NAMES]
+        name_tab = table(["GSD", "Name"], names, "ll", r"\footnotesize") + "\n" if names else ""
+        overview = (name_tab + table(["GSD", "Units", "PI", "Projects", "Institutions", "ERC sectors", "k EUR", r"Share \%", "k EUR/unit"],
                           money_rows, "lrrrrrrrr", r"\footnotesize")
                     + "\n" + table(["GSD", r"Women \%", "PI under 40", "PO", "PA", "RTD", "RU"], mix_rows, "lrrrrrr", r"\footnotesize")
                     + "\n{\\footnotesize Units: funded units whose leader's GSD is the row's; PI: of these, coordinators; Institutions and ERC sectors: "
@@ -623,7 +625,7 @@ def build_focus(out_dir: Path) -> Optional[str]:
                       rf"The projects have {int(pr['other_units'])} other units, of which {int(pr['other_found'])} have a leader with a known GSD"
                       + (rf": {mix}." if mix else ".")
                       + (rf" Sub-sectors: {join([f'{tex(i)} {int(x['units'])}' for i, x in ssds.iterrows()])}." if len(ssds) > 1 else ""))
-            parts.append("\\clearpage\n" + section(f"GSD {tex(c)}", "To list the units of one GSD by ERC sector and by institution.", result,
+            parts.append("\\clearpage\n" + section(f"GSD {tex(c)}" + (f": {tex(focus.GSD_NAMES[c])}" if c in focus.GSD_NAMES else ""), "To list the units of one GSD by ERC sector and by institution.", result,
                                                     sec_tab + "\n" + ins_tab, level="subsection"))
     if not parts:
         return None
