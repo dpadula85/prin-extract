@@ -142,6 +142,16 @@
   }
  },
  "decrees": {
+  "LS1": {
+   "annulled_by": null,
+   "date": "13/11/2026",
+   "decree": "https://www.mur.gov.it/sites/default/files/2026-11/Decreto%20Direttoriale%20n.%2068%20del%2013-11-2026.pdf",
+   "decree_number": 68,
+   "page": "https://www.mur.gov.it/it/atti-e-normativa/decreto-direttoriale-n-68-del-13-11-2026",
+   "sector": "LS1",
+   "tabella_a": "https://www.mur.gov.it/sites/default/files/2026-11/LS1_Tabella_A_Graduatoria%20finale.pdf",
+   "tabella_b": "https://www.mur.gov.it/sites/default/files/2026-11/LS1_Tabella_B_Progetti%20finanziati.pdf"
+  },
   "LS2": {
    "annulled_by": null,
    "date": "06/10/2026",
