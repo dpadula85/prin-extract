@@ -1,4 +1,14 @@
 ﻿sector,rank,project_code,title,pi_given,pi_surname,score,excellence,impact,equity,men,women,birth_year,under40,funded
+LS1,1,2026P73NSN,Protein LACTylation and metabolic rewiring In Cancer progression and therapy response (PLAsTIC),Paola,CHIARUGI,97.75,,,,,,,False,True
+LS1,2,2026PWKJK3,Metabolic Determinants of Organotropic Metastasis: A Multi-Scale Dissection of Amino Acid-Driven Tumor Adaptation,Francesca,CUTRUZZOLA',93.5,,,,,,,False,True
+LS1,3,2026PBA8FF,Pulse2Splice: Robotic Cardiac Modulation Linking Heart Dynamics to Cancer RNA Processing,Serena,ZACCHIGNA,93.0,37.5,,,,,,False,True
+LS1,4,2026PEKXCK,ORCHESTRA: Organelle and vesicle crosstalk in metabolon-targeted autophagy driving metabolic switches,Francesco,CECCONI,93.0,37.0,,,,,,False,True
+LS1,5,2026PC3YSL,In situ study of the molecular mechanisms of regulation of striated muscle contraction in health and disease,Marco,LINARI,92.75,,,,,,,False,True
+LS1,6,2026P9YH2Y,A multidisciplinary team to foster Translational Research And drug design in channelopathies causing Developmental and Epileptic encephalopathies: from structural biology to therapeutic targeting (TRADE),Maurizio,TAGLIALATELA,92.0,,,,,,,False,True
+LS1,7,2026PS4TRW,DNA damage-driven macrophage senescence as a mechanism of Mycobacterium tuberculosis persistence (DAMAGE-TB).,Riccardo,MIGGIANO,91.0,,,,,,,True,False
+LS1,8,2026PWBF3K,Deciphering the Mitochondria–Micronuclei Crosstalk in Colorectal Cancer - MiMiC,Paolo,PINTON,85.75,,,,,,,False,False
+LS1,9,2026PMWH82,MozARt: Motor-unit Androgen Receptor signalling in physiology and androgen-biased neurodegeneration,Maria,PENNUTO,85.0,34.0,,,,,,False,False
+LS1,10,2026P4253P,The signalling basis of Tumour-Induced Skeletal Muscle Metabolic Dysfunction in Cancer Cachexia,Andrea,GRAZIANI,85.0,33.0,,,,,,False,False
 LS2,1,2026PJCJL7,Decoding and Targeting Cancer Plasticity,Giovanni,TONON,95.25,,,,,,,False,True
 LS2,2,2026PPSM7R,Deciphering how conformational landscape converts repeat-rich protein architecture into trafficking decisions,Alexander Miguel,MONZON,95.0,,,,,,,True,True
 LS2,3,2026P32FB5,Harnessing Regulatory Toolkits Underlying Meristem Developmental Plasticity and Stress Resilience in Arabidopsis thaliana and Oryza sativa (MeriPlaSt),Veronica,GREGIS,92.5,,,,,,,False,True
